@@ -102,6 +102,15 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.updatedAt").exists()
     }
 
+    @DisplayName("잘못된 메뉴 아이디로 조회할 수 없다.")
+    @Test
+    fun getMenu_notFound() {
+        webTestClient.get().uri("/v1/menus/${0}")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().is5xxServerError
+    }
+
     private fun generateMenu(request: CreateMenuRequest): Menu {
         val now = LocalDateTime.now()
         return Menu(
