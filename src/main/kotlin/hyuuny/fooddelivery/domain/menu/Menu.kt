@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.menu
 
+import CreateMenuCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -20,6 +21,21 @@ class Menu(
     @Id
     var id = id
         protected set
+
+    companion object {
+        fun handle(command: CreateMenuCommand): Menu {
+            return Menu(
+                name = command.name,
+                price = Price(command.price),
+                status = MenuStatus.ON_SALE,
+                popularity = command.popularity,
+                imageUrl = command.imageUrl,
+                description = command.description,
+                createdAt = command.createdAt,
+                updatedAt = command.updatedAt
+            )
+        }
+    }
 
 }
 
