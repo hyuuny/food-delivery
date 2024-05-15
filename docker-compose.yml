@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: food-delivery
+    ports:
+      - "5432:5432"
+    volumes:
+      - ~/docker-volumes/food-delivery/postgresql:/var/lib/postgresql/data
