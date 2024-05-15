@@ -51,6 +51,26 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.updatedAt").exists()
     }
 
+    @DisplayName("메뉴 가격이 0이하이면 등록할 수 없다.")
+    @Test
+    fun createMenu_invalidPrice() {
+        val request = CreateMenuRequest(
+            name = "싸이버거",
+            price = 0,
+            status = MenuStatus.ON_SALE,
+            popularity = true,
+            imageUrl = "cyburger-image-url",
+            description = "[베스트]닭다리살"
+        )
+
+        webTestClient.post().uri("/v1/menus")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().is5xxServerError
+    }
+
     private fun generateMenu(request: CreateMenuRequest): Menu {
         val now = LocalDateTime.now()
         return Menu(
