@@ -22,4 +22,11 @@ class MenuHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun getMenu(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val menu = useCase.getMenu(id)
+        val response = MenuResponse(menu)
+        return ok().bodyValueAndAwait(response)
+    }
+
 }

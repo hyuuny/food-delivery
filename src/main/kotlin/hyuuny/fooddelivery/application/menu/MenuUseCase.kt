@@ -29,4 +29,9 @@ class MenuUseCase(
         return repository.insert(menu)
     }
 
+    suspend fun getMenu(id: Long): Menu {
+        return repository.findById(id)
+            ?: throw IllegalStateException("${id}번 메뉴를 찾을 수 없습니다.")
+    }
+
 }

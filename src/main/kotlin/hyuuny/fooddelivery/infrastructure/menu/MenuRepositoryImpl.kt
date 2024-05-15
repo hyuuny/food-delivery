@@ -14,9 +14,7 @@ class MenuRepositoryImpl(
 
     override suspend fun insert(menu: Menu): Menu = template.insert<Menu>().usingAndAwait(menu)
 
-    override suspend fun findById(id: Long): Menu? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun findById(id: Long): Menu? = dao.findById(id)
 
     override suspend fun update(menu: Menu): Menu {
         TODO("Not yet implemented")

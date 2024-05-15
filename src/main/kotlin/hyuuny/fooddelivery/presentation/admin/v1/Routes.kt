@@ -15,6 +15,7 @@ class Routes {
         return coRouter {
             "/v1/menus".nest {
                 POST("", handler::createMenu)
+                GET("/{id}", handler::getMenu)
             }
         }
     }
