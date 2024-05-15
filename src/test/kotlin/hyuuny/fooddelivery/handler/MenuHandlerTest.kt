@@ -71,6 +71,37 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .expectStatus().is5xxServerError
     }
 
+    @DisplayName("메뉴를 상세조회할 수 있다.")
+    @Test
+    fun getMenu() {
+        val request = CreateMenuRequest(
+            name = "싸이버거",
+            price = 0,
+            status = MenuStatus.ON_SALE,
+            popularity = true,
+            imageUrl = "cyburger-image-url",
+            description = "[베스트]닭다리살"
+        )
+        val menu = generateMenu(request)
+        coEvery { useCase.getMenu(any()) } returns menu
+
+        webTestClient.get().uri("/v1/menus/${menu.id}")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.id").isEqualTo(menu.id!!)
+            .jsonPath("$.name").isEqualTo(menu.name)
+            .jsonPath("$.price").isEqualTo(menu.price.value)
+            .jsonPath("$.status").isEqualTo(menu.status.name)
+            .jsonPath("$.popularity").isEqualTo(menu.popularity)
+            .jsonPath("$.imageUrl").isEqualTo(menu.imageUrl!!)
+            .jsonPath("$.description").isEqualTo(menu.description!!)
+            .jsonPath("$.createdAt").exists()
+            .jsonPath("$.updatedAt").exists()
+    }
+
     private fun generateMenu(request: CreateMenuRequest): Menu {
         val now = LocalDateTime.now()
         return Menu(
