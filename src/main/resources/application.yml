@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/food-delivery
+    username: root
+    password: 1234
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    root: info
+    org.springframework: info
