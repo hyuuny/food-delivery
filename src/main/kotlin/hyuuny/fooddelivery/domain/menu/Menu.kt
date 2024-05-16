@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.menu
 
+import ChangeMenuStatusCommand
 import CreateMenuCommand
 import UpdateMenuCommand
 import org.springframework.data.annotation.Id
@@ -58,6 +59,11 @@ class Menu(
         popularity = command.popularity
         imageUrl = command.imageUrl
         description = command.description
+        updatedAt = command.updatedAt
+    }
+
+    fun handle(command: ChangeMenuStatusCommand) {
+        status = command.status
         updatedAt = command.updatedAt
     }
 

@@ -34,6 +34,18 @@ class MenuRepositoryImpl(
             )
     }
 
+    override suspend fun updateMenuStatus(menu: Menu) {
+        template.update<Menu>()
+            .matching(
+                Query.query(
+                    where("id") isEqual (menu.id!!),
+                ),
+            ).applyAndAwait(
+                Update.update("status", menu.status)
+                    .set("updatedAt", menu.updatedAt)
+            )
+    }
+
     override suspend fun delete(id: Long) {
         TODO("Not yet implemented")
     }

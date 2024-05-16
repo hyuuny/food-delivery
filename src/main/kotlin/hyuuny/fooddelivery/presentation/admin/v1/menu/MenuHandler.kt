@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.presentation.admin.v1.menu
 
+import ChangeMenuStatusRequest
 import CreateMenuRequest
 import MenuResponse
 import UpdateMenuRequest
@@ -31,6 +32,13 @@ class MenuHandler(
         val id = request.pathVariable("id").toLong()
         val body = request.awaitBody<UpdateMenuRequest>()
         useCase.updateMenu(id, body)
+        return ok().buildAndAwait()
+    }
+
+    suspend fun changeMenuStatus(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<ChangeMenuStatusRequest>()
+        useCase.changeMenuStatus(id, body)
         return ok().buildAndAwait()
     }
 

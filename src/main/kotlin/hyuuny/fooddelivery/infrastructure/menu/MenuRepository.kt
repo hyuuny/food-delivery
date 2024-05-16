@@ -10,6 +10,8 @@ interface MenuRepository {
 
     suspend fun update(menu: Menu)
 
+    suspend fun updateMenuStatus(menu: Menu)
+
     suspend fun delete(id: Long)
 
 }

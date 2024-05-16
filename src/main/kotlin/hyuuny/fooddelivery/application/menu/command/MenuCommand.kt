@@ -20,3 +20,8 @@ data class UpdateMenuCommand(
     val description: String?,
     val updatedAt: LocalDateTime
 )
+
+data class ChangeMenuStatusCommand(
+    val status: MenuStatus,
+    val updatedAt: LocalDateTime
+)

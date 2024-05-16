@@ -16,3 +16,7 @@ data class UpdateMenuRequest(
     val imageUrl: String?,
     val description: String?,
 )
+
+data class ChangeMenuStatusRequest(
+    val status: MenuStatus,
+)

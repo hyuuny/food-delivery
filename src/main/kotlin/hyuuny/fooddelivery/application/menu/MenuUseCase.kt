@@ -1,5 +1,7 @@
 package hyuuny.fooddelivery.application.menu
 
+import ChangeMenuStatusCommand
+import ChangeMenuStatusRequest
 import CreateMenuCommand
 import CreateMenuRequest
 import UpdateMenuCommand
@@ -50,6 +52,18 @@ class MenuUseCase(
             )
         )
         repository.update(menu)
+    }
+
+    suspend fun changeMenuStatus(id: Long, request: ChangeMenuStatusRequest) {
+        val now = LocalDateTime.now()
+        val menu = repository.findById(id) ?: throw IllegalStateException("${id}번 메뉴를 찾을 수 없습니다.")
+        menu.handle(
+            ChangeMenuStatusCommand(
+                status = request.status,
+                updatedAt = now
+            )
+        )
+        repository.updateMenuStatus(menu)
     }
 
 }
