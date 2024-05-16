@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.handler
 
+import ChangeMenuStatusRequest
 import CreateMenuRequest
 import UpdateMenuRequest
 import com.ninjasquad.springmockk.MockkBean
@@ -125,6 +126,24 @@ class MenuHandlerTest : BaseIntegrationTest() {
         coEvery { useCase.updateMenu(any(), request) } returns Unit
 
         webTestClient.put().uri("/v1/menus/${1}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("메뉴의 상태를 변경할 수 있다.")
+    @Test
+    fun changeMenuStatus() {
+        val request = ChangeMenuStatusRequest(
+            status = MenuStatus.SOLD_OUT
+        )
+        coEvery { useCase.changeMenuStatus(any(), request) } returns Unit
+
+        webTestClient.patch().uri("/v1/menus/change-status/${1}")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
