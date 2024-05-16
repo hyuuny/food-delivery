@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.domain.menu
 
 import CreateMenuCommand
+import UpdateMenuCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -8,19 +9,33 @@ import java.time.LocalDateTime
 @Table("menus")
 class Menu(
     id: Long? = null,
-    val name: String,
-    val price: Price,
-    val status: MenuStatus = MenuStatus.ON_SALE,
-    val popularity: Boolean = false,
-    val imageUrl: String? = null,
-    val description: String? = null,
+    name: String,
+    price: Price,
+    status: MenuStatus = MenuStatus.ON_SALE,
+    popularity: Boolean = false,
+    imageUrl: String? = null,
+    description: String? = null,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
+    updatedAt: LocalDateTime,
 ) {
 
     @Id
     var id = id
         protected set
+    var name = name
+        private set
+    var price = price
+        private set
+    var status = status
+        private set
+    var popularity = popularity
+        private set
+    var imageUrl = imageUrl
+        private set
+    var description = description
+        private set
+    var updatedAt = updatedAt
+        private set
 
     companion object {
         fun handle(command: CreateMenuCommand): Menu {
@@ -35,6 +50,15 @@ class Menu(
                 updatedAt = command.updatedAt
             )
         }
+    }
+
+    fun handle(command: UpdateMenuCommand) {
+        name = command.name
+        price = Price(command.price)
+        popularity = command.popularity
+        imageUrl = command.imageUrl
+        description = command.description
+        updatedAt = command.updatedAt
     }
 
 }

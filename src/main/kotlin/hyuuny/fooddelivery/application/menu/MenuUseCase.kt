@@ -2,6 +2,8 @@ package hyuuny.fooddelivery.application.menu
 
 import CreateMenuCommand
 import CreateMenuRequest
+import UpdateMenuCommand
+import UpdateMenuRequest
 import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.infrastructure.menu.MenuRepository
 import org.springframework.stereotype.Service
@@ -32,6 +34,22 @@ class MenuUseCase(
     suspend fun getMenu(id: Long): Menu {
         return repository.findById(id)
             ?: throw IllegalStateException("${id}번 메뉴를 찾을 수 없습니다.")
+    }
+
+    suspend fun updateMenu(id: Long, request: UpdateMenuRequest) {
+        val now = LocalDateTime.now()
+        val menu = repository.findById(id) ?: throw IllegalStateException("${id}번 메뉴를 찾을 수 없습니다.")
+        menu.handle(
+            UpdateMenuCommand(
+                name = request.name,
+                price = request.price,
+                popularity = request.popularity,
+                imageUrl = request.imageUrl,
+                description = request.description,
+                updatedAt = now,
+            )
+        )
+        repository.update(menu)
     }
 
 }

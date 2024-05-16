@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.handler
 
 import CreateMenuRequest
+import UpdateMenuRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.domain.menu.Menu
@@ -76,7 +77,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
     fun getMenu() {
         val request = CreateMenuRequest(
             name = "싸이버거",
-            price = 0,
+            price = 5000,
             status = MenuStatus.ON_SALE,
             popularity = true,
             imageUrl = "cyburger-image-url",
@@ -109,6 +110,28 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().is5xxServerError
+    }
+
+    @DisplayName("메뉴의 정보를 변경할 수 있다.")
+    @Test
+    fun updateMenu() {
+        val request = UpdateMenuRequest(
+            name = "후라이드 치킨",
+            price = 20000,
+            popularity = false,
+            imageUrl = "chicken-image-url",
+            description = "맛있는 양념치킨"
+        )
+        coEvery { useCase.updateMenu(any(), request) } returns Unit
+
+        webTestClient.put().uri("/v1/menus/${1}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
     }
 
     private fun generateMenu(request: CreateMenuRequest): Menu {

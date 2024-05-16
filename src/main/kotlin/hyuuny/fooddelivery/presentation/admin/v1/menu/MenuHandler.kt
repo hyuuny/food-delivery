@@ -2,13 +2,11 @@ package hyuuny.fooddelivery.presentation.admin.v1.menu
 
 import CreateMenuRequest
 import MenuResponse
+import UpdateMenuRequest
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.awaitBody
-import org.springframework.web.reactive.function.server.bodyValueAndAwait
 
 @Component
 class MenuHandler(
@@ -27,6 +25,13 @@ class MenuHandler(
         val menu = useCase.getMenu(id)
         val response = MenuResponse(menu)
         return ok().bodyValueAndAwait(response)
+    }
+
+    suspend fun updateMeno(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<UpdateMenuRequest>()
+        useCase.updateMenu(id, body)
+        return ok().buildAndAwait()
     }
 
 }

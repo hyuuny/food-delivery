@@ -11,3 +11,12 @@ data class CreateMenuCommand(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )
+
+data class UpdateMenuCommand(
+    val name: String,
+    val price: Long,
+    val popularity: Boolean,
+    val imageUrl: String?,
+    val description: String?,
+    val updatedAt: LocalDateTime
+)

@@ -1,9 +1,11 @@
 package hyuuny.fooddelivery.infrastructure.menu
 
 import hyuuny.fooddelivery.domain.menu.Menu
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.data.r2dbc.core.insert
-import org.springframework.data.r2dbc.core.usingAndAwait
+import org.springframework.data.r2dbc.core.*
+import org.springframework.data.relational.core.query.Criteria.where
+import org.springframework.data.relational.core.query.Query
+import org.springframework.data.relational.core.query.Update
+import org.springframework.data.relational.core.query.isEqual
 import org.springframework.stereotype.Component
 
 @Component
@@ -16,8 +18,20 @@ class MenuRepositoryImpl(
 
     override suspend fun findById(id: Long): Menu? = dao.findById(id)
 
-    override suspend fun update(menu: Menu): Menu {
-        TODO("Not yet implemented")
+    override suspend fun update(menu: Menu) {
+        template.update<Menu>()
+            .matching(
+                Query.query(
+                    where("id") isEqual (menu.id!!),
+                ),
+            ).applyAndAwait(
+                Update.update("name", menu.name)
+                    .set("price", menu.price.value)
+                    .set("popularity", menu.popularity)
+                    .set("imageUrl", menu.imageUrl)
+                    .set("description", menu.description)
+                    .set("updatedAt", menu.updatedAt)
+            )
     }
 
     override suspend fun delete(id: Long) {

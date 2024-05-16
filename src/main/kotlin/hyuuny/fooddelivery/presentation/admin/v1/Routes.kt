@@ -16,6 +16,7 @@ class Routes {
             "/v1/menus".nest {
                 POST("", handler::createMenu)
                 GET("/{id}", handler::getMenu)
+                PUT("/{id}", handler::updateMeno)
             }
         }
     }

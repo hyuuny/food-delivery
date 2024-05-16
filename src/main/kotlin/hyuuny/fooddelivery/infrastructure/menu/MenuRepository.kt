@@ -8,7 +8,7 @@ interface MenuRepository {
 
     suspend fun findById(id: Long): Menu?
 
-    suspend fun update(menu: Menu): Menu
+    suspend fun update(menu: Menu)
 
     suspend fun delete(id: Long)
 
