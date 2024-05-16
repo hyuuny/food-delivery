@@ -47,12 +47,12 @@ internal class CreateMenuUseCaseTest : BehaviorSpec({
 
             then("메뉴를 등록할 수 있다.") {
                 result.id.shouldNotBeNull()
-                result.name shouldBe result.name
-                result.price shouldBe result.price
-                result.status shouldBe result.status
-                result.popularity shouldBe result.popularity
-                result.imageUrl shouldBe result.imageUrl
-                result.description shouldBe result.description
+                result.name shouldBe request.name
+                result.price.value shouldBe request.price
+                result.status shouldBe request.status
+                result.popularity shouldBe request.popularity
+                result.imageUrl shouldBe request.imageUrl
+                result.description shouldBe request.description
                 result.createdAt.shouldNotBeNull()
                 result.updatedAt.shouldNotBeNull()
             }
