@@ -66,4 +66,9 @@ class MenuUseCase(
         repository.updateMenuStatus(menu)
     }
 
+    suspend fun deleteMenu(id: Long) {
+        if (!repository.existsById(id)) throw NoSuchElementException("존재하지 않는 메뉴입니다.")
+        repository.delete(id)
+    }
+
 }

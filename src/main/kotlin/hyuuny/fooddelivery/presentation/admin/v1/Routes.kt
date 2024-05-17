@@ -18,6 +18,7 @@ class Routes {
                 GET("/{id}", handler::getMenu)
                 PUT("/{id}", handler::updateMeno)
                 PATCH("/change-status/{id}", handler::changeMenuStatus)
+                DELETE("/{id}", handler::deleteMenu)
             }
         }
     }

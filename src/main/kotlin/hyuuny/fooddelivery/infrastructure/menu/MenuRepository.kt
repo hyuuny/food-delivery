@@ -14,4 +14,6 @@ interface MenuRepository {
 
     suspend fun delete(id: Long)
 
+    suspend fun existsById(id: Long): Boolean
+
 }

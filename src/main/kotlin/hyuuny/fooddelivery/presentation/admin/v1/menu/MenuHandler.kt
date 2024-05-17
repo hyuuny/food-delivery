@@ -42,4 +42,10 @@ class MenuHandler(
         return ok().buildAndAwait()
     }
 
+    suspend fun deleteMenu(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        useCase.deleteMenu(id)
+        return ok().buildAndAwait()
+    }
+
 }

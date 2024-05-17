@@ -47,6 +47,8 @@ class MenuRepositoryImpl(
     }
 
     override suspend fun delete(id: Long) {
-        TODO("Not yet implemented")
+        dao.deleteById(id)
     }
+
+    override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 }
