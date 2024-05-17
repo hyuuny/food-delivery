@@ -153,6 +153,19 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
+    @DisplayName("메뉴를 삭제할 수 있다.")
+    @Test
+    fun deleteMenu() {
+        coEvery { useCase.deleteMenu(any()) } returns Unit
+
+        webTestClient.delete().uri("/v1/menus/${1}")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
     private fun generateMenu(request: CreateMenuRequest): Menu {
         val now = LocalDateTime.now()
         return Menu(
