@@ -3,7 +3,6 @@ package hyuuny.fooddelivery.application.menu
 import CreateMenuRequest
 import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.domain.menu.MenuStatus
-import hyuuny.fooddelivery.domain.menu.Price
 import hyuuny.fooddelivery.infrastructure.menu.MenuRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -32,7 +31,7 @@ internal class CreateMenuUseCaseTest : BehaviorSpec({
         val expectedMenu = Menu(
             id = 1,
             name = "싸이버거",
-            price = Price(6000),
+            price = 6000,
             status = MenuStatus.ON_SALE,
             popularity = true,
             imageUrl = "cyburger-image-url",
@@ -48,7 +47,7 @@ internal class CreateMenuUseCaseTest : BehaviorSpec({
             then("메뉴를 등록할 수 있다.") {
                 result.id.shouldNotBeNull()
                 result.name shouldBe request.name
-                result.price.value shouldBe request.price
+                result.price shouldBe request.price
                 result.status shouldBe request.status
                 result.popularity shouldBe request.popularity
                 result.imageUrl shouldBe request.imageUrl

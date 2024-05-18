@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 class Menu(
     id: Long? = null,
     name: String,
-    price: Price,
+    price: Long,
     status: MenuStatus = MenuStatus.ON_SALE,
     popularity: Boolean = false,
     imageUrl: String? = null,
@@ -40,9 +40,11 @@ class Menu(
 
     companion object {
         fun handle(command: CreateMenuCommand): Menu {
+            if (command.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
+
             return Menu(
                 name = command.name,
-                price = Price(command.price),
+                price = command.price,
                 status = MenuStatus.ON_SALE,
                 popularity = command.popularity,
                 imageUrl = command.imageUrl,
@@ -54,8 +56,10 @@ class Menu(
     }
 
     fun handle(command: UpdateMenuCommand) {
+        if (command.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
+
         name = command.name
-        price = Price(command.price)
+        price = command.price
         popularity = command.popularity
         imageUrl = command.imageUrl
         description = command.description

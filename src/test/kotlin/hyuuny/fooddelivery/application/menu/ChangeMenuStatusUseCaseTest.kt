@@ -3,7 +3,6 @@ package hyuuny.fooddelivery.application.menu
 import ChangeMenuStatusRequest
 import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.domain.menu.MenuStatus
-import hyuuny.fooddelivery.domain.menu.Price
 import hyuuny.fooddelivery.infrastructure.menu.MenuRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -24,7 +23,7 @@ internal class ChangeMenuStatusUseCaseTest : BehaviorSpec({
         val existingMenu = Menu(
             id = menuId,
             name = "싸이버거",
-            price = Price(6000),
+            price = 6000,
             status = MenuStatus.ON_SALE,
             popularity = true,
             imageUrl = "cyburger-image-url",

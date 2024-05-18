@@ -17,7 +17,31 @@ data class MenuResponse(
     constructor(entity: Menu) : this(
         id = entity.id!!,
         name = entity.name,
-        price = entity.price.value,
+        price = entity.price,
+        status = entity.status,
+        popularity = entity.popularity,
+        imageUrl = entity.imageUrl,
+        description = entity.description,
+        createdAt = entity.createdAt,
+        updatedAt = entity.updatedAt,
+    )
+}
+
+data class MenuResponses(
+    val id: Long,
+    val name: String,
+    val price: Long,
+    val status: MenuStatus,
+    val popularity: Boolean,
+    val imageUrl: String?,
+    val description: String?,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+) {
+    constructor(entity: Menu) : this(
+        id = entity.id!!,
+        name = entity.name,
+        price = entity.price,
         status = entity.status,
         popularity = entity.popularity,
         imageUrl = entity.imageUrl,

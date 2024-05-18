@@ -4,10 +4,13 @@ import ChangeMenuStatusCommand
 import ChangeMenuStatusRequest
 import CreateMenuCommand
 import CreateMenuRequest
+import MenuSearchCondition
 import UpdateMenuCommand
 import UpdateMenuRequest
 import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.infrastructure.menu.MenuRepository
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -15,6 +18,11 @@ import java.time.LocalDateTime
 class MenuUseCase(
     private val repository: MenuRepository
 ) {
+
+    suspend fun getMenus(searchCondition: MenuSearchCondition, pageable: Pageable): PageImpl<Menu> {
+        val page = repository.findAllBySearchCondition(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
 
     suspend fun createMenu(request: CreateMenuRequest): Menu {
         val now = LocalDateTime.now()
