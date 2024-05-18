@@ -15,6 +15,7 @@ class Routes {
         return coRouter {
             "/v1/menus".nest {
                 POST("", handler::createMenu)
+                GET("", handler::getMenus)
                 GET("/{id}", handler::getMenu)
                 PUT("/{id}", handler::updateMeno)
                 PATCH("/change-status/{id}", handler::changeMenuStatus)

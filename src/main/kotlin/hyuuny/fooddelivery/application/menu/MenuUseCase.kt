@@ -20,7 +20,7 @@ class MenuUseCase(
 ) {
 
     suspend fun getMenus(searchCondition: MenuSearchCondition, pageable: Pageable): PageImpl<Menu> {
-        val page = repository.findAllBySearchCondition(searchCondition, pageable)
+        val page = repository.findAllMenus(searchCondition, pageable)
         return PageImpl(page.content, pageable, page.totalElements)
     }
 

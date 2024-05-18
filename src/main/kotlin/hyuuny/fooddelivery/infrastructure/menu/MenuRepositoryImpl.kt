@@ -1,7 +1,13 @@
 package hyuuny.fooddelivery.infrastructure.menu
 
+import MenuSearchCondition
 import hyuuny.fooddelivery.domain.menu.Menu
+import kotlinx.coroutines.reactive.awaitFirstOrElse
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.core.*
+import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
 import org.springframework.data.relational.core.query.Update
@@ -26,7 +32,7 @@ class MenuRepositoryImpl(
                 ),
             ).applyAndAwait(
                 Update.update("name", menu.name)
-                    .set("price", menu.price.value)
+                    .set("price", menu.price)
                     .set("popularity", menu.popularity)
                     .set("imageUrl", menu.imageUrl)
                     .set("description", menu.description)
@@ -51,4 +57,38 @@ class MenuRepositoryImpl(
     }
 
     override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
+
+    override suspend fun findAllMenus(searchCondition: MenuSearchCondition, pageable: Pageable): Page<Menu> {
+        val criteria = buildCriteria(searchCondition)
+        val query = Query.query(criteria).with(pageable)
+
+        val data = template.select(Menu::class.java)
+            .matching(query)
+            .all()
+            .collectList()
+            .awaitFirstOrElse { emptyList() }
+
+        val total = template.select(Menu::class.java)
+            .matching(Query.query(criteria))
+            .count()
+            .awaitFirstOrElse { 0 }
+
+        return PageImpl(data, pageable, total)
+    }
+
+    private fun buildCriteria(condition: MenuSearchCondition): Criteria {
+        var criteria = Criteria.empty()
+
+        condition.name?.let {
+            criteria = criteria.and("name").like("%$it%")
+        }
+        condition.status?.let {
+            criteria = criteria.and("status").`is`(it.name)
+        }
+        condition.popularity?.let {
+            criteria = criteria.and("popularity").`is`(it)
+        }
+
+        return criteria
+    }
 }

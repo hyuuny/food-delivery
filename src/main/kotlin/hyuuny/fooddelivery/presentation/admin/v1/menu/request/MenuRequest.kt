@@ -20,3 +20,9 @@ data class UpdateMenuRequest(
 data class ChangeMenuStatusRequest(
     val status: MenuStatus,
 )
+
+data class MenuSearchCondition(
+    val name: String? = null,
+    val status: MenuStatus? = null,
+    val popularity: Boolean? = null,
+)
