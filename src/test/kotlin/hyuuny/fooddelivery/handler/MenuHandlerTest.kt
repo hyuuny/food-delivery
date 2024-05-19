@@ -7,10 +7,12 @@ import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.domain.menu.MenuStatus
-import hyuuny.fooddelivery.domain.menu.Price
 import io.mockk.coEvery
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.MediaType
 import java.time.LocalDateTime
 
@@ -44,7 +46,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(menu.id!!)
             .jsonPath("$.name").isEqualTo(menu.name)
-            .jsonPath("$.price").isEqualTo(menu.price.value)
+            .jsonPath("$.price").isEqualTo(menu.price)
             .jsonPath("$.status").isEqualTo(menu.status.name)
             .jsonPath("$.popularity").isEqualTo(menu.popularity)
             .jsonPath("$.imageUrl").isEqualTo(menu.imageUrl!!)
@@ -95,7 +97,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(menu.id!!)
             .jsonPath("$.name").isEqualTo(menu.name)
-            .jsonPath("$.price").isEqualTo(menu.price.value)
+            .jsonPath("$.price").isEqualTo(menu.price)
             .jsonPath("$.status").isEqualTo(menu.status.name)
             .jsonPath("$.popularity").isEqualTo(menu.popularity)
             .jsonPath("$.imageUrl").isEqualTo(menu.imageUrl!!)
@@ -166,12 +168,72 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
+    @DisplayName("메뉴 목록을 불러올 수 있다.")
+    @Test
+    fun getMenus() {
+        val now = LocalDateTime.now()
+        val cyburger = Menu(
+            id = 1L,
+            name = "싸이버거",
+            price = 5000,
+            status = MenuStatus.ON_SALE,
+            popularity = true,
+            imageUrl = "cyburger-image-url",
+            description = "[베스트]닭다리살",
+            createdAt = now,
+            updatedAt = now
+        )
+
+        val hotDog = Menu(
+            id = 2,
+            name = "핫도그",
+            price = 3000,
+            status = MenuStatus.ON_SALE,
+            popularity = true,
+            imageUrl = "hotdog-image-url",
+            description = "[인기메뉴]닭고기로 만든 핫도그",
+            createdAt = now,
+            updatedAt = now
+        )
+        val menus = listOf(cyburger, hotDog).sortedByDescending { it.id }
+
+        val pageable = PageRequest.of(0, 15, Sort.by(Sort.Direction.DESC, "id"))
+        val page = PageImpl(menus, pageable, menus.size.toLong())
+
+        coEvery { useCase.getMenus(any(), any()) } returns page
+
+        webTestClient.get().uri("/v1/menus?name=&status=&popularity=&sort=id:desc")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.content[0].id").isEqualTo(2)
+            .jsonPath("$.content[0].name").isEqualTo("핫도그")
+            .jsonPath("$.content[0].price").isEqualTo(3000)
+            .jsonPath("$.content[0].status").isEqualTo("ON_SALE")
+            .jsonPath("$.content[0].popularity").isEqualTo(true)
+            .jsonPath("$.content[0].imageUrl").isEqualTo("hotdog-image-url")
+            .jsonPath("$.content[0].description").isEqualTo("[인기메뉴]닭고기로 만든 핫도그")
+            .jsonPath("$.content[1].id").isEqualTo(1)
+            .jsonPath("$.content[1].name").isEqualTo("싸이버거")
+            .jsonPath("$.content[1].price").isEqualTo(5000)
+            .jsonPath("$.content[1].status").isEqualTo("ON_SALE")
+            .jsonPath("$.content[1].popularity").isEqualTo(true)
+            .jsonPath("$.content[1].imageUrl").isEqualTo("cyburger-image-url")
+            .jsonPath("$.content[1].description").isEqualTo("[베스트]닭다리살")
+            .jsonPath("$.totalElements").isEqualTo(2)
+            .jsonPath("$.size").isEqualTo(15)
+            .jsonPath("$.number").isEqualTo(0)
+            .jsonPath("$.last").isEqualTo(true)
+    }
+
     private fun generateMenu(request: CreateMenuRequest): Menu {
         val now = LocalDateTime.now()
         return Menu(
             id = 1,
             name = request.name,
-            price = Price(request.price),
+            price = request.price,
             status = request.status,
             popularity = request.popularity,
             imageUrl = request.imageUrl,
@@ -180,4 +242,5 @@ class MenuHandlerTest : BaseIntegrationTest() {
             updatedAt = now,
         )
     }
+
 }
