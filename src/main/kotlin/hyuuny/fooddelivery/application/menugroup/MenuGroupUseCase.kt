@@ -2,8 +2,11 @@ package hyuuny.fooddelivery.application.menugroup
 
 import CreateMenuGroupCommand
 import CreateMenuGroupRequest
+import MenuGroupSearchCondition
 import hyuuny.fooddelivery.domain.menugroup.MenuGroup
 import hyuuny.fooddelivery.infrastructure.menugroup.MenuGroupRepository
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -11,6 +14,11 @@ import java.time.LocalDateTime
 class MenuGroupUseCase(
     private val repository: MenuGroupRepository
 ) {
+
+    suspend fun getMenuGroups(searchCondition: MenuGroupSearchCondition, pageable: Pageable): PageImpl<MenuGroup> {
+        val page = repository.findAllMenuGroups(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
 
     suspend fun createMenuGroup(request: CreateMenuGroupRequest): MenuGroup {
         val now = LocalDateTime.now()

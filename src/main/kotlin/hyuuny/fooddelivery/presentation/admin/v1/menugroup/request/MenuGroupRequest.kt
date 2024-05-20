@@ -3,3 +3,9 @@ data class CreateMenuGroupRequest(
     val name: String,
     val required: Boolean,
 )
+
+data class MenuGroupSearchCondition(
+    val menuId: Long? = null,
+    val name: String? = null,
+)
+

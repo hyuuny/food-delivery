@@ -29,6 +29,7 @@ class Routes {
     fun menuGroupApi(handler: MenuGroupHandler): RouterFunction<ServerResponse> {
         return coRouter {
             "/v1/menu-groups".nest {
+                GET("", handler::getMenuGroups)
                 GET("/{id}", handler::getMenuGroup)
             }
 
