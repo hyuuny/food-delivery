@@ -10,3 +10,11 @@ CREATE TABLE IF NOT EXISTS menus
     created_at  TIMESTAMP             NOT NULL,
     updated_at  TIMESTAMP             NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS menu_group
+(
+    id       SERIAL PRIMARY KEY,
+    menu_id  BIGINT                NOT NULL,
+    name     VARCHAR(255),
+    required BOOLEAN DEFAULT FALSE NOT NULL
+);
