@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.menugroup
 
 import CreateMenuGroupRequest
+import UpdateMenuGroupRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
 import hyuuny.fooddelivery.domain.menugroup.MenuGroup
@@ -210,6 +211,46 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.size").isEqualTo(15)
             .jsonPath("$.number").isEqualTo(0)
             .jsonPath("$.last").isEqualTo(true)
+    }
+
+    @DisplayName("메뉴그룹의 정보를 변경할 수 있다.")
+    @Test
+    fun updateMenuGroup() {
+        coEvery { menuRepository.existsById(any()) } returns true
+        val request = UpdateMenuGroupRequest(
+            menuId = 1L,
+            name = "치킨세트",
+            required = true
+        )
+        coEvery { useCase.updateMenuGroup(any(), any()) } returns Unit
+
+        webTestClient.put().uri("/menus/${request.menuId}/menu-groups/${1}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("존재하지 메뉴의 메뉴그룹은 변경할 수 없다.")
+    @Test
+    fun updateMenuGroup_notFound() {
+        coEvery { menuRepository.existsById(any()) } throws ResponseStatusException(NOT_FOUND, "존재하지 않는 메뉴입니다.")
+        val request = UpdateMenuGroupRequest(
+            menuId = 0L,
+            name = "치킨세트",
+            required = true
+        )
+        coEvery { useCase.updateMenuGroup(any(), any()) } returns Unit
+
+        webTestClient.put().uri("/menus/${request.menuId}/menu-groups${1}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isNotFound
     }
 
     private fun generateMenuGroup(request: CreateMenuGroupRequest): MenuGroup {
