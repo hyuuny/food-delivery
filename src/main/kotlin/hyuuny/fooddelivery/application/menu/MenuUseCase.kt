@@ -79,4 +79,6 @@ class MenuUseCase(
         repository.delete(id)
     }
 
+    suspend fun existById(id: Long): Boolean = repository.existsById(id)
+
 }

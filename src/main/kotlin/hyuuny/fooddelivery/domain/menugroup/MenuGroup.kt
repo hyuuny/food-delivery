@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.menugroup
 
+import CreateMenuGroupCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -23,5 +24,19 @@ class MenuGroup(
         private set
     var updatedAt = updatedAt
         private set
+
+    companion object {
+        fun handle(command: CreateMenuGroupCommand): MenuGroup {
+            if (command.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
+
+            return MenuGroup(
+                menuId = command.menuId,
+                name = command.name,
+                required = command.required,
+                createdAt = command.createdAt,
+                updatedAt = command.updatedAt
+            )
+        }
+    }
 
 }
