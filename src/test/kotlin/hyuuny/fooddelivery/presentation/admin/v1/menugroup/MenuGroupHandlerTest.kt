@@ -68,6 +68,31 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .expectStatus().isNotFound
     }
 
+    @DisplayName("메뉴그룹을 상세조회 할 수 있다.")
+    @Test
+    fun getMenuGroup() {
+        val request = CreateMenuGroupRequest(
+            menuId = 1L,
+            name = "치킨세트",
+            required = true
+        )
+        val menuGroup = generateMenuGroup(request)
+        coEvery { useCase.getMenuGroup(any()) } returns menuGroup
+
+        webTestClient.get().uri("/v1/menu-groups/${menuGroup.id}")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.id").isEqualTo(menuGroup.id!!)
+            .jsonPath("$.menuId").isEqualTo(menuGroup.menuId)
+            .jsonPath("$.name").isEqualTo(menuGroup.name)
+            .jsonPath("$.required").isEqualTo(menuGroup.required)
+            .jsonPath("$.createdAt").exists()
+            .jsonPath("$.updatedAt").exists()
+    }
+
     private fun generateMenuGroup(request: CreateMenuGroupRequest): MenuGroup {
         val now = LocalDateTime.now()
         return MenuGroup(
