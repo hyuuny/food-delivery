@@ -3,6 +3,8 @@ package hyuuny.fooddelivery.application.menugroup
 import CreateMenuGroupCommand
 import CreateMenuGroupRequest
 import MenuGroupSearchCondition
+import UpdateMenuGroupCommand
+import UpdateMenuGroupRequest
 import hyuuny.fooddelivery.domain.menugroup.MenuGroup
 import hyuuny.fooddelivery.infrastructure.menugroup.MenuGroupRepository
 import org.springframework.data.domain.PageImpl
@@ -37,6 +39,19 @@ class MenuGroupUseCase(
     suspend fun getMenuGroup(id: Long): MenuGroup {
         return repository.findById(id)
             ?: throw IllegalStateException("${id}번 메뉴그룹을 찾을 수 없습니다.")
+    }
+
+    suspend fun updateMenuGroup(id: Long, request: UpdateMenuGroupRequest) {
+        val now = LocalDateTime.now()
+        val menuGroup = repository.findById(id) ?: throw IllegalStateException("${id}번 메뉴그룹을 찾을 수 없습니다.")
+        menuGroup.handle(
+            UpdateMenuGroupCommand(
+                name = request.name,
+                required = request.required,
+                updatedAt = now,
+            )
+        )
+        repository.update(menuGroup)
     }
 
 }

@@ -11,6 +11,10 @@ interface MenuGroupRepository {
 
     suspend fun findById(id: Long): MenuGroup?
 
+    suspend fun update(menuGroup: MenuGroup)
+
+    suspend fun delete(id: Long)
+
     suspend fun findAllMenuGroups(searchCondition: MenuGroupSearchCondition, pageable: Pageable): Page<MenuGroup>
 
 }

@@ -6,11 +6,11 @@ import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.data.r2dbc.core.insert
-import org.springframework.data.r2dbc.core.usingAndAwait
+import org.springframework.data.r2dbc.core.*
 import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
+import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
 
 @Component
@@ -22,6 +22,23 @@ class MenuGroupRepositoryImpl(
     override suspend fun insert(menuGroup: MenuGroup): MenuGroup = template.insert<MenuGroup>().usingAndAwait(menuGroup)
 
     override suspend fun findById(id: Long): MenuGroup? = dao.findById(id)
+
+    override suspend fun update(menuGroup: MenuGroup) {
+        template.update<MenuGroup>()
+            .matching(
+                Query.query(
+                    where("id").`is`(menuGroup.id!!),
+                ),
+            ).applyAndAwait(
+                Update.update("name", menuGroup.name)
+                    .set("required", menuGroup.required)
+                    .set("updatedAt", menuGroup.updatedAt)
+            )
+    }
+
+    override suspend fun delete(id: Long) {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun findAllMenuGroups(
         searchCondition: MenuGroupSearchCondition,
