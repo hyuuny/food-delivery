@@ -1,4 +1,4 @@
-package hyuuny.fooddelivery.handler
+package hyuuny.fooddelivery.presentation.admin.v1.menu
 
 import ChangeMenuStatusRequest
 import CreateMenuRequest
@@ -7,6 +7,7 @@ import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.domain.menu.MenuStatus
+import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
 import io.mockk.coEvery
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
