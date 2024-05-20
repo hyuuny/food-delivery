@@ -14,4 +14,6 @@ class MenuGroupRepositoryImpl(
 
     override suspend fun insert(menuGroup: MenuGroup): MenuGroup = template.insert<MenuGroup>().usingAndAwait(menuGroup)
 
+    override suspend fun findById(id: Long): MenuGroup? = dao.findById(id)
+
 }

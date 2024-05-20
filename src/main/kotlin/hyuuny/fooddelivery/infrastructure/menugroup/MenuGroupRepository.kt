@@ -6,4 +6,6 @@ interface MenuGroupRepository {
 
     suspend fun insert(menuGroup: MenuGroup): MenuGroup
 
+    suspend fun findById(id: Long): MenuGroup?
+
 }

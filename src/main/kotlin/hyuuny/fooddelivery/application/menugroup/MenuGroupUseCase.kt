@@ -26,4 +26,9 @@ class MenuGroupUseCase(
         return repository.insert(menuGroup)
     }
 
+    suspend fun getMenuGroup(id: Long): MenuGroup {
+        return repository.findById(id)
+            ?: throw IllegalStateException("${id}번 메뉴그룹을 찾을 수 없습니다.")
+    }
+
 }

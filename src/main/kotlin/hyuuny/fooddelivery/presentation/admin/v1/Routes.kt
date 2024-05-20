@@ -28,6 +28,10 @@ class Routes {
     @Bean
     fun menuGroupApi(handler: MenuGroupHandler): RouterFunction<ServerResponse> {
         return coRouter {
+            "/v1/menu-groups".nest {
+                GET("/{id}", handler::getMenuGroup)
+            }
+
             "/menus/{menuId}/menu-groups".nest {
                 POST("", handler::createMenuGroup)
             }

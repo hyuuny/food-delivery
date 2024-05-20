@@ -30,4 +30,11 @@ class MenuGroupHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun getMenuGroup(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val menuGroup = useCase.getMenuGroup(id)
+        val response = MenuGroupResponse(menuGroup)
+        return ok().bodyValueAndAwait(response)
+    }
+
 }
