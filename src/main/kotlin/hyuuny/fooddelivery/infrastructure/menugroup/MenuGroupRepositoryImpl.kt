@@ -70,7 +70,7 @@ class MenuGroupRepositoryImpl(
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val query = """
             WITH updates (id, priority, updated_at) AS (
-                VALUES ${menuGroups.joinToString(", ") { "(${it.id}, ${it.priority}, '${it.updatedAt.format(formatter)}')" }}
+                VALUES ${menuGroups.joinToString(", ") { "(${it.id}, ${it.priority}, '${it.updatedAt.format(formatter)}'::timestamp)" }}
             )
             UPDATE menu_group
             SET 
