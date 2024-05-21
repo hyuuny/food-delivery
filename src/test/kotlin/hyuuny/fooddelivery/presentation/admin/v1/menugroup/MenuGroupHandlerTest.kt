@@ -33,7 +33,8 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
         val request = CreateMenuGroupRequest(
             menuId = 1L,
             name = "치킨세트",
-            required = true
+            required = true,
+            priority = 1,
         )
         val menuGroup = generateMenuGroup(request)
         coEvery { useCase.createMenuGroup(request) } returns menuGroup
@@ -50,6 +51,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.menuId").isEqualTo(menuGroup.menuId)
             .jsonPath("$.name").isEqualTo(menuGroup.name)
             .jsonPath("$.required").isEqualTo(menuGroup.required)
+            .jsonPath("$.priority").isEqualTo(menuGroup.priority)
             .jsonPath("$.createdAt").exists()
             .jsonPath("$.updatedAt").exists()
     }
@@ -61,7 +63,8 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
         val request = CreateMenuGroupRequest(
             menuId = 0L,
             name = "치킨세트",
-            required = true
+            required = true,
+            priority = 1,
         )
 
         webTestClient.post().uri("/menus/${request.menuId}/menu-groups")
@@ -78,7 +81,8 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
         val request = CreateMenuGroupRequest(
             menuId = 1L,
             name = "치킨세트",
-            required = true
+            required = true,
+            priority = 1,
         )
         val menuGroup = generateMenuGroup(request)
         coEvery { useCase.getMenuGroup(any()) } returns menuGroup
@@ -93,6 +97,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.menuId").isEqualTo(menuGroup.menuId)
             .jsonPath("$.name").isEqualTo(menuGroup.name)
             .jsonPath("$.required").isEqualTo(menuGroup.required)
+            .jsonPath("$.priority").isEqualTo(menuGroup.priority)
             .jsonPath("$.createdAt").exists()
             .jsonPath("$.updatedAt").exists()
     }
@@ -107,6 +112,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             menuId = 1L,
             name = "치킨세트",
             required = true,
+            priority = 1,
             createdAt = now,
             updatedAt = now
         )
@@ -115,6 +121,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             menuId = 1L,
             name = "사장님 추천",
             required = true,
+            priority = 2,
             createdAt = now,
             updatedAt = now
         )
@@ -123,6 +130,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             menuId = 2L,
             name = "사이드!",
             required = true,
+            priority = 3,
             createdAt = now,
             updatedAt = now
         )
@@ -141,16 +149,19 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[0].menuId").isEqualTo(thirdMenuGroup.menuId)
             .jsonPath("$.content[0].name").isEqualTo(thirdMenuGroup.name)
             .jsonPath("$.content[0].required").isEqualTo(thirdMenuGroup.required)
+            .jsonPath("$.content[0].priority").isEqualTo(thirdMenuGroup.priority)
             .jsonPath("$.content[0].createdAt").exists()
             .jsonPath("$.content[1].id").isEqualTo(secondMenuGroup.id!!)
             .jsonPath("$.content[1].menuId").isEqualTo(secondMenuGroup.menuId)
             .jsonPath("$.content[1].name").isEqualTo(secondMenuGroup.name)
             .jsonPath("$.content[1].required").isEqualTo(secondMenuGroup.required)
+            .jsonPath("$.content[1].priority").isEqualTo(secondMenuGroup.priority)
             .jsonPath("$.content[1].createdAt").exists()
             .jsonPath("$.content[2].id").isEqualTo(firstMenuGroup.id!!)
             .jsonPath("$.content[2].menuId").isEqualTo(firstMenuGroup.menuId)
             .jsonPath("$.content[2].name").isEqualTo(firstMenuGroup.name)
             .jsonPath("$.content[2].required").isEqualTo(firstMenuGroup.required)
+            .jsonPath("$.content[2].priority").isEqualTo(firstMenuGroup.priority)
             .jsonPath("$.content[2].createdAt").exists()
             .jsonPath("$.totalElements").isEqualTo(3)
             .jsonPath("$.size").isEqualTo(15)
@@ -167,6 +178,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             menuId = 1L,
             name = "치킨세트",
             required = true,
+            priority = 1,
             createdAt = now,
             updatedAt = now
         )
@@ -175,6 +187,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             menuId = 1L,
             name = "사장님 추천",
             required = true,
+            priority = 2,
             createdAt = now,
             updatedAt = now
         )
@@ -183,6 +196,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             menuId = 2L,
             name = "사이드!",
             required = true,
+            priority = 3,
             createdAt = now,
             updatedAt = now
         )
@@ -201,11 +215,13 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[0].menuId").isEqualTo(secondMenuGroup.menuId)
             .jsonPath("$.content[0].name").isEqualTo(secondMenuGroup.name)
             .jsonPath("$.content[0].required").isEqualTo(secondMenuGroup.required)
+            .jsonPath("$.content[0].priority").isEqualTo(secondMenuGroup.priority)
             .jsonPath("$.content[0].createdAt").exists()
             .jsonPath("$.content[1].id").isEqualTo(firstMenuGroup.id!!)
             .jsonPath("$.content[1].menuId").isEqualTo(firstMenuGroup.menuId)
             .jsonPath("$.content[1].name").isEqualTo(firstMenuGroup.name)
             .jsonPath("$.content[1].required").isEqualTo(firstMenuGroup.required)
+            .jsonPath("$.content[1].priority").isEqualTo(firstMenuGroup.priority)
             .jsonPath("$.content[1].createdAt").exists()
             .jsonPath("$.totalElements").isEqualTo(2)
             .jsonPath("$.size").isEqualTo(15)
@@ -260,6 +276,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             menuId = request.menuId,
             name = request.name,
             required = request.required,
+            priority = request.priority,
             createdAt = now,
             updatedAt = now
         )

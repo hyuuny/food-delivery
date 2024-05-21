@@ -3,6 +3,8 @@ package hyuuny.fooddelivery.application.menugroup
 import CreateMenuGroupCommand
 import CreateMenuGroupRequest
 import MenuGroupSearchCondition
+import ReOrderMenuGroupCommand
+import ReorderMenuGroupRequests
 import UpdateMenuGroupCommand
 import UpdateMenuGroupRequest
 import hyuuny.fooddelivery.domain.menugroup.MenuGroup
@@ -29,6 +31,7 @@ class MenuGroupUseCase(
                 menuId = request.menuId,
                 name = request.name,
                 required = request.required,
+                priority = request.priority,
                 createdAt = now,
                 updatedAt = now
             )
@@ -52,6 +55,25 @@ class MenuGroupUseCase(
             )
         )
         repository.update(menuGroup)
+    }
+
+    suspend fun reOrderMenuGroups(menuId: Long, request: ReorderMenuGroupRequests) {
+        val now = LocalDateTime.now()
+        val menuGroups = repository.findAllByMenuId(menuId)
+
+        if (menuGroups.size != request.reOrderedMenuGroups.size) throw IllegalStateException("메뉴그룹의 개수가 일치하지 않습니다.")
+
+        val menuGroupMap = menuGroups.associateBy { it.id }
+        request.reOrderedMenuGroups.forEach {
+            val menuGroup = menuGroupMap[it.menuGroupId] ?: return@forEach
+            menuGroup.handle(
+                ReOrderMenuGroupCommand(
+                    priority = it.priority,
+                    updatedAt = now,
+                )
+            )
+        }
+        repository.bulkUpdatePriority(menuGroups)
     }
 
 }

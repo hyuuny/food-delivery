@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.domain.menugroup
 
 import CreateMenuGroupCommand
+import ReOrderMenuGroupCommand
 import UpdateMenuGroupCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
@@ -12,6 +13,7 @@ class MenuGroup(
     val menuId: Long,
     name: String,
     required: Boolean = false,
+    priority: Int,
     val createdAt: LocalDateTime,
     updatedAt: LocalDateTime,
 ) {
@@ -22,6 +24,8 @@ class MenuGroup(
     var name = name
         private set
     var required = required
+        private set
+    var priority = priority
         private set
     var updatedAt = updatedAt
         private set
@@ -34,6 +38,7 @@ class MenuGroup(
                 menuId = command.menuId,
                 name = command.name,
                 required = command.required,
+                priority = command.priority,
                 createdAt = command.createdAt,
                 updatedAt = command.updatedAt
             )
@@ -45,6 +50,11 @@ class MenuGroup(
 
         this.name = command.name
         this.required = command.required
+        this.updatedAt = command.updatedAt
+    }
+
+    fun handle(command: ReOrderMenuGroupCommand) {
+        this.priority = command.priority
         this.updatedAt = command.updatedAt
     }
 

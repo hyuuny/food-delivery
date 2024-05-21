@@ -17,4 +17,8 @@ interface MenuGroupRepository {
 
     suspend fun findAllMenuGroups(searchCondition: MenuGroupSearchCondition, pageable: Pageable): Page<MenuGroup>
 
+    suspend fun findAllByMenuId(menuId: Long): List<MenuGroup>
+
+    suspend fun bulkUpdatePriority(menuGroups: List<MenuGroup>)
+
 }

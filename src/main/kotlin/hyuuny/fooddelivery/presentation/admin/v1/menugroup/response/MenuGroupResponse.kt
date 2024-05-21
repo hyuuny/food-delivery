@@ -8,6 +8,7 @@ data class MenuGroupResponse(
     val menuId: Long,
     val name: String,
     val required: Boolean,
+    val priority: Int,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
@@ -16,6 +17,7 @@ data class MenuGroupResponse(
         menuId = entity.menuId,
         name = entity.name,
         required = entity.required,
+        priority = entity.priority,
         createdAt = entity.createdAt,
         updatedAt = entity.updatedAt,
     )
@@ -26,6 +28,7 @@ data class MenuGroupResponses(
     val menuId: Long,
     val name: String,
     val required: Boolean,
+    val priority: Int,
     val createdAt: LocalDateTime,
 ) {
     constructor(entity: MenuGroup) : this(
@@ -33,6 +36,7 @@ data class MenuGroupResponses(
         menuId = entity.menuId,
         name = entity.name,
         required = entity.required,
+        priority = entity.priority,
         createdAt = entity.createdAt,
     )
 }

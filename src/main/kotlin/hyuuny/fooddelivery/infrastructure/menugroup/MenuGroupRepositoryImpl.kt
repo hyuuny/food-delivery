@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
 import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
+import java.time.format.DateTimeFormatter
 
 @Component
 class MenuGroupRepositoryImpl(
@@ -59,6 +60,31 @@ class MenuGroupRepositoryImpl(
             .awaitFirstOrElse { 0 }
 
         return PageImpl(data, pageable, total)
+    }
+
+    override suspend fun findAllByMenuId(menuId: Long): List<MenuGroup> = dao.findAllByMenuId(menuId)
+
+    override suspend fun bulkUpdatePriority(menuGroups: List<MenuGroup>) {
+        if (menuGroups.isEmpty()) return
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val query = """
+            WITH updates (id, priority, updated_at) AS (
+                VALUES ${menuGroups.joinToString(", ") { "(${it.id}, ${it.priority}, '${it.updatedAt.format(formatter)}')" }}
+            )
+            UPDATE menu_group
+            SET 
+                priority = updates.priority, 
+                updated_at = updates.updated_at
+            FROM updates
+            WHERE menu_group.id = updates.id
+        """
+
+        // 배치 업데이트를 실행합니다.
+        template.databaseClient.sql(query)
+            .fetch()
+            .rowsUpdated()
+            .awaitFirstOrElse { throw RuntimeException("Batch update failed") }
     }
 
     private fun buildCriteria(searchCondition: MenuGroupSearchCondition): Criteria {
