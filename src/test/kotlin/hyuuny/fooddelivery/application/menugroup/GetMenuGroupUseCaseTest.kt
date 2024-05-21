@@ -23,6 +23,7 @@ internal class GetMenuGroupUseCaseTest : BehaviorSpec({
             menuId = expectedMenuId,
             name = "반반치킨 선택",
             required = true,
+            priority = 1,
             createdAt = now,
             updatedAt = now
         )
@@ -36,6 +37,7 @@ internal class GetMenuGroupUseCaseTest : BehaviorSpec({
                 result.menuId shouldBe expectedMenuId
                 result.name shouldBe expectedMenuGroup.name
                 result.required shouldBe expectedMenuGroup.required
+                result.priority shouldBe expectedMenuGroup.priority
                 result.createdAt shouldBe expectedMenuGroup.createdAt
                 result.updatedAt shouldBe expectedMenuGroup.updatedAt
             }

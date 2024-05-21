@@ -21,6 +21,7 @@ class CreateGroupUseCaseTest : BehaviorSpec({
             menuId = 1L,
             name = "반반치킨 선택",
             required = true,
+            priority = 1,
         )
 
         val now = LocalDateTime.now()
@@ -29,6 +30,7 @@ class CreateGroupUseCaseTest : BehaviorSpec({
             menuId = 1L,
             name = "반반치킨 선택",
             required = true,
+            priority = 1,
             createdAt = now,
             updatedAt = now,
         )
@@ -42,6 +44,7 @@ class CreateGroupUseCaseTest : BehaviorSpec({
                 result.menuId shouldBe request.menuId
                 result.name shouldBe request.name
                 result.required shouldBe request.required
+                result.priority shouldBe request.priority
                 result.createdAt.shouldNotBeNull()
                 result.updatedAt shouldBe result.createdAt
             }
@@ -50,7 +53,7 @@ class CreateGroupUseCaseTest : BehaviorSpec({
         `when`("메뉴 이름을 2글자 이하로 입력하면") {
             then("메뉴 그룹을 등록할 수 없다.") {
                 val ex = shouldThrow<IllegalArgumentException> {
-                    useCase.createMenuGroup(CreateMenuGroupRequest(menuId = 1L, name = "일", required = true))
+                    useCase.createMenuGroup(CreateMenuGroupRequest(menuId = 1L, name = "일", required = true, priority = 1))
                 }
                 ex.message shouldBe "이름은 2자 이상이어야 합니다."
             }

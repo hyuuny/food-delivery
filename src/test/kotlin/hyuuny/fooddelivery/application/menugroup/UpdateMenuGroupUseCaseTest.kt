@@ -25,6 +25,7 @@ internal class UpdateMenuGroupUseCaseTest : BehaviorSpec({
             menuId = menuId,
             name = "반반치킨 선택",
             required = true,
+            priority = 1,
             createdAt = now,
             updatedAt = now
         )
