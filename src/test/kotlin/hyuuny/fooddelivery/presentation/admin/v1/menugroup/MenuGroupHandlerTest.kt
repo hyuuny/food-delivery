@@ -39,7 +39,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
         val menuGroup = generateMenuGroup(request)
         coEvery { useCase.createMenuGroup(request) } returns menuGroup
 
-        webTestClient.post().uri("/menus/${request.menuId}/menu-groups")
+        webTestClient.post().uri("/v1/menus/${request.menuId}/menu-groups")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -240,7 +240,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.updateMenuGroup(any(), any()) } returns Unit
 
-        webTestClient.put().uri("/menus/${request.menuId}/menu-groups/${1}")
+        webTestClient.put().uri("/v1/menus/${request.menuId}/menu-groups/${1}")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
