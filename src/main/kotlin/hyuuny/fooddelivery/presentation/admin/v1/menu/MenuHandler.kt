@@ -6,14 +6,15 @@ import MenuResponse
 import MenuResponses
 import MenuSearchCondition
 import UpdateMenuRequest
+import extractCursorAndCount
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.domain.menu.MenuStatus
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
+import parseSort
 
 @Component
 class MenuHandler(
@@ -21,7 +22,7 @@ class MenuHandler(
 ) {
 
     suspend fun getMenus(request: ServerRequest): ServerResponse {
-        val name = request.queryParamOrNull("name")
+        val name = request.queryParamOrNull("name")?.takeIf { it.isNotBlank() }
         val status = request.queryParamOrNull("status")
             ?.takeIf { it.isNotBlank() }
             ?.let { MenuStatus.valueOf(it.uppercase().trim()) }
@@ -31,16 +32,10 @@ class MenuHandler(
         }
 
         val searchCondition = MenuSearchCondition(name = name, status = status, popularity = popularity)
-        val cursor = request.queryParamOrNull("cursor")?.toIntOrNull() ?: 0
-        val count = request.queryParamOrNull("count")?.toIntOrNull() ?: 15
 
         val sortParam = request.queryParamOrNull("sort")
-        val sort: Sort = sortParam?.let {
-            val splitParam = it.split(":")
-            val property = splitParam[0]
-            val direction = if (splitParam.getOrNull(1) == "asc") Sort.Direction.ASC else Sort.Direction.DESC
-            Sort.by(direction, property)
-        } ?: Sort.by(Sort.Direction.DESC, "id")
+        val sort = parseSort(sortParam)
+        val (cursor, count) = extractCursorAndCount(request)
 
         val pageRequest = PageRequest.of(cursor, count, sort)
         val page = useCase.getMenus(searchCondition, pageRequest)

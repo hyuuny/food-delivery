@@ -4,19 +4,19 @@ import CreateMenuGroupRequest
 import MenuGroupSearchCondition
 import ReorderMenuGroupRequests
 import UpdateMenuGroupRequest
+import extractCursorAndCount
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
 import hyuuny.fooddelivery.presentation.admin.v1.menugroup.response.MenuGroupResponse
 import hyuuny.fooddelivery.presentation.admin.v1.menugroup.response.MenuGroupResponses
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
-import org.springframework.data.domain.Sort.Direction
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.server.ResponseStatusException
+import parseSort
 
 @Component
 class MenuGroupHandler(
@@ -26,19 +26,12 @@ class MenuGroupHandler(
 
     suspend fun getMenuGroups(request: ServerRequest): ServerResponse {
         val menuId = request.queryParamOrNull("menuId")?.toLong()
-        val name = request.queryParamOrNull("name")
-
+        val name = request.queryParamOrNull("name")?.takeIf { it.isNotBlank() }
         val searchCondition = MenuGroupSearchCondition(menuId = menuId, name = name)
-        val cursor = request.queryParamOrNull("cursor")?.toIntOrNull() ?: 0
-        val count = request.queryParamOrNull("count")?.toIntOrNull() ?: 15
 
         val sortParam = request.queryParamOrNull("sort")
-        val sort = sortParam?.let {
-            val splitParam = it.split(":")
-            val property = splitParam[0]
-            val direction = if (splitParam.getOrNull(1) == "asc") Direction.ASC else Direction.DESC
-            Sort.by(direction, property)
-        } ?: Sort.by(Direction.DESC, "id")
+        val sort = parseSort(sortParam)
+        val (cursor, count) = extractCursorAndCount(request)
 
         val pageRequest = PageRequest.of(cursor, count, sort)
         val page = useCase.getMenuGroups(searchCondition, pageRequest)
