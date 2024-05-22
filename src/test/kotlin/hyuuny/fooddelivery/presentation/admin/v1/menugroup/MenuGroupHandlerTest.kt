@@ -305,7 +305,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
-    @DisplayName("존재하지 않는 메뉴그룹의 순서를 변경할 수 없다.")
+    @DisplayName("존재하지 않는 메뉴의 메뉴그룹 순서를 변경할 수 없다.")
     @Test
     fun reOrderMenuGroup_notFound() {
         coEvery { menuRepository.existsById(any()) } throws ResponseStatusException(NOT_FOUND, "존재하지 않는 메뉴입니다.")
@@ -333,6 +333,34 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(requests)
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
+    @DisplayName("메뉴그룹을 삭제할 수 있다.")
+    @Test
+    fun deleteMenuGroup() {
+        val menuId = 1
+        coEvery { menuRepository.existsById(any()) } returns true
+        coEvery { useCase.deleteMenuGroup(any()) } returns Unit
+
+        webTestClient.delete().uri("/v1/menus/${menuId}/menu-groups/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("존재하지 않는 메뉴의 메뉴그룹을 삭제할 수 없다.")
+    @Test
+    fun deleteMenuGroup_notFound() {
+        val menuId = 1
+        coEvery { menuRepository.existsById(any()) } throws ResponseStatusException(NOT_FOUND, "존재하지 않는 메뉴입니다.")
+        coEvery { useCase.deleteMenuGroup(any()) } returns Unit
+
+        webTestClient.delete().uri("/v1/menus/${menuId}/menu-groups/1")
+            .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isNotFound
     }
