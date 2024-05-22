@@ -44,7 +44,7 @@ class MenuGroupRepositoryImpl(
         pageable: Pageable
     ): Page<MenuGroup> {
         val criteria = buildCriteria(searchCondition)
-        val query = Query.query(criteria)
+        val query = Query.query(criteria).with(pageable)
 
         val data = template.select(MenuGroup::class.java)
             .matching(query)
