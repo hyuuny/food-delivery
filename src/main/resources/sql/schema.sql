@@ -21,3 +21,13 @@ CREATE TABLE IF NOT EXISTS menu_group
     created_at TIMESTAMP             NOT NULL,
     updated_at TIMESTAMP             NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS menu_option
+(
+    id             SERIAL PRIMARY KEY,
+    menu_group_id  BIGINT                NOT NULL,
+    name           VARCHAR(255)          NOT NULL,
+    price          BIGINT DEFAULT 0      NOT NULL,
+    created_at     TIMESTAMP             NOT NULL,
+    updated_at     TIMESTAMP             NOT NULL
+);
