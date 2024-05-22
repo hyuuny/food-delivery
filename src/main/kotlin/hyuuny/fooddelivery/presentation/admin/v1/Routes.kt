@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.presentation.admin.v1
 
 import hyuuny.fooddelivery.presentation.admin.v1.menu.MenuHandler
 import hyuuny.fooddelivery.presentation.admin.v1.menugroup.MenuGroupHandler
+import hyuuny.fooddelivery.presentation.admin.v1.menuoption.MenuOptionHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.server.RouterFunction
@@ -38,6 +39,15 @@ class Routes {
                 PUT("/{id}", handler::updateMenuGroup)
                 PATCH("/re-order", handler::reOrderMenuGroup)
                 DELETE("/{id}", handler::deleteMenuGroup)
+            }
+        }
+    }
+
+    @Bean
+    fun menuOptionApi(handler: MenuOptionHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/v1/menu-groups/{menuGroupId}/menu-options".nest {
+                POST("", handler::createMenuOption)
             }
         }
     }
