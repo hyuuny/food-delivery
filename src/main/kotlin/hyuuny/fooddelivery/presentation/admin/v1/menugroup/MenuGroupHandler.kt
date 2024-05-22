@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.presentation.admin.v1.menugroup
 
 import CreateMenuGroupRequest
 import MenuGroupSearchCondition
+import ReorderMenuGroupRequests
 import UpdateMenuGroupRequest
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
@@ -71,6 +72,16 @@ class MenuGroupHandler(
         if (!menuUseCase.existById(menuId)) throw ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다.")
 
         useCase.updateMenuGroup(id, body)
+        return ok().buildAndAwait()
+    }
+
+    suspend fun reOrderMenuGroup(request: ServerRequest): ServerResponse {
+        val menuId = request.pathVariable("menuId").toLong()
+        val body = request.awaitBody<ReorderMenuGroupRequests>()
+
+        if (!menuUseCase.existById(menuId)) throw ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다.")
+
+        useCase.reOrderMenuGroups(menuId, body)
         return ok().buildAndAwait()
     }
 

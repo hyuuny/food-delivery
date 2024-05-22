@@ -36,6 +36,7 @@ class Routes {
             "/v1/menus/{menuId}/menu-groups".nest {
                 POST("", handler::createMenuGroup)
                 PUT("/{id}", handler::updateMenuGroup)
+                PATCH("/re-order", handler::reOrderMenuGroup)
             }
         }
     }
