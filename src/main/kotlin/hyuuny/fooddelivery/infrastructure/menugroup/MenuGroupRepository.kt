@@ -21,4 +21,6 @@ interface MenuGroupRepository {
 
     suspend fun bulkUpdatePriority(menuGroups: List<MenuGroup>)
 
+    suspend fun existsById(id: Long): Boolean
+
 }

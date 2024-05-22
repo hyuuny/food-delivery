@@ -76,4 +76,9 @@ class MenuGroupUseCase(
         repository.bulkUpdatePriority(menuGroups)
     }
 
+    suspend fun deleteMenuGroup(id: Long) {
+        if (!repository.existsById(id)) throw IllegalStateException("${id}번 메뉴그룹을 찾을 수 없습니다.")
+        repository.delete(id)
+    }
+
 }
