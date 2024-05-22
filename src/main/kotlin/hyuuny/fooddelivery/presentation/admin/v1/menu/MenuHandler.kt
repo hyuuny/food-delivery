@@ -26,7 +26,9 @@ class MenuHandler(
             ?.takeIf { it.isNotBlank() }
             ?.let { MenuStatus.valueOf(it.uppercase().trim()) }
 
-        val popularity = request.queryParamOrNull("popularity")?.toBoolean()
+        val popularity = request.queryParamOrNull("popularity")?.let { popularity ->
+            popularity.lowercase().takeIf { it == "true" || it == "false" }?.toBoolean()
+        }
 
         val searchCondition = MenuSearchCondition(name = name, status = status, popularity = popularity)
         val cursor = request.queryParamOrNull("cursor")?.toIntOrNull() ?: 0
