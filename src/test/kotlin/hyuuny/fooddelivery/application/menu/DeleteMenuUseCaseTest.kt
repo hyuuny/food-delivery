@@ -8,7 +8,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 
-internal class DeleteMenuStatusUseCaseTest : BehaviorSpec({
+internal class DeleteMenuUseCaseTest : BehaviorSpec({
 
     val repository = mockk<MenuRepository>()
     val useCase = MenuUseCase(repository)
