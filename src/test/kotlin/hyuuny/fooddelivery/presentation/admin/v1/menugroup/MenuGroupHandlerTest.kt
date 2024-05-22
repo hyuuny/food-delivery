@@ -1,6 +1,8 @@
 package hyuuny.fooddelivery.presentation.admin.v1.menugroup
 
 import CreateMenuGroupRequest
+import ReorderMenuGroupRequest
+import ReorderMenuGroupRequests
 import UpdateMenuGroupRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
@@ -265,6 +267,72 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
+    @DisplayName("메뉴그룹의 순서를 변경할 수 있다.")
+    @Test
+    fun reOrderMenuGroup() {
+        coEvery { menuRepository.existsById(any()) } returns true
+
+        val menuId = 1L
+        val requests = ReorderMenuGroupRequests(
+            reOrderedMenuGroups = listOf(
+                ReorderMenuGroupRequest(
+                    menuGroupId = menuId,
+                    priority = 3,
+                ),
+                ReorderMenuGroupRequest(
+                    menuGroupId = menuId,
+                    priority = 1,
+                ),
+                ReorderMenuGroupRequest(
+                    menuGroupId = menuId,
+                    priority = 2,
+                )
+            ),
+        )
+        coEvery { useCase.reOrderMenuGroups(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/v1/menus/${menuId}/menu-groups/re-order")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(requests)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("존재하지 않는 메뉴그룹의 순서를 변경할 수 없다.")
+    @Test
+    fun reOrderMenuGroup_notFound() {
+        coEvery { menuRepository.existsById(any()) } throws ResponseStatusException(NOT_FOUND, "존재하지 않는 메뉴입니다.")
+
+        val menuId = 0L
+        val requests = ReorderMenuGroupRequests(
+            reOrderedMenuGroups = listOf(
+                ReorderMenuGroupRequest(
+                    menuGroupId = menuId,
+                    priority = 3,
+                ),
+                ReorderMenuGroupRequest(
+                    menuGroupId = menuId,
+                    priority = 1,
+                ),
+                ReorderMenuGroupRequest(
+                    menuGroupId = menuId,
+                    priority = 2,
+                )
+            ),
+        )
+        coEvery { useCase.reOrderMenuGroups(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/v1/menus/${menuId}/menu-groups/re-order")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(requests)
             .exchange()
             .expectStatus().isNotFound
     }
