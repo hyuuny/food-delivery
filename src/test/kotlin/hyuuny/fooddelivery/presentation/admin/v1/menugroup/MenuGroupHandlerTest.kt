@@ -165,10 +165,10 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[2].required").isEqualTo(firstMenuGroup.required)
             .jsonPath("$.content[2].priority").isEqualTo(firstMenuGroup.priority)
             .jsonPath("$.content[2].createdAt").exists()
-            .jsonPath("$.totalElements").isEqualTo(3)
+            .jsonPath("$.pageNumber").isEqualTo(1)
             .jsonPath("$.size").isEqualTo(15)
-            .jsonPath("$.number").isEqualTo(0)
             .jsonPath("$.last").isEqualTo(true)
+            .jsonPath("$.totalElements").isEqualTo(3)
     }
 
     @DisplayName("메뉴 아이디로 검색하면 메뉴아이디에 해당하는 메뉴그룹 목록을 불러올 수 있다.")
@@ -225,10 +225,10 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].required").isEqualTo(firstMenuGroup.required)
             .jsonPath("$.content[1].priority").isEqualTo(firstMenuGroup.priority)
             .jsonPath("$.content[1].createdAt").exists()
-            .jsonPath("$.totalElements").isEqualTo(2)
+            .jsonPath("$.pageNumber").isEqualTo(1)
             .jsonPath("$.size").isEqualTo(15)
-            .jsonPath("$.number").isEqualTo(0)
             .jsonPath("$.last").isEqualTo(true)
+            .jsonPath("$.totalElements").isEqualTo(2)
     }
 
     @DisplayName("메뉴그룹의 정보를 변경할 수 있다.")

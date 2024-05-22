@@ -8,8 +8,8 @@ import MenuSearchCondition
 import UpdateMenuRequest
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.menu.MenuUseCase
+import hyuuny.fooddelivery.common.response.SimplePage
 import hyuuny.fooddelivery.domain.menu.MenuStatus
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
@@ -39,7 +39,7 @@ class MenuHandler(
 
         val pageRequest = PageRequest.of(cursor, count, sort)
         val page = useCase.getMenus(searchCondition, pageRequest)
-        val responses = PageImpl(page.content.map { MenuResponses(it) }, pageRequest, page.totalElements)
+        val responses = SimplePage(page.content.map { MenuResponses(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }
 

@@ -223,10 +223,10 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].popularity").isEqualTo(true)
             .jsonPath("$.content[1].imageUrl").isEqualTo("cyburger-image-url")
             .jsonPath("$.content[1].description").isEqualTo("[베스트]닭다리살")
-            .jsonPath("$.totalElements").isEqualTo(2)
+            .jsonPath("$.pageNumber").isEqualTo(1)
             .jsonPath("$.size").isEqualTo(15)
-            .jsonPath("$.number").isEqualTo(0)
             .jsonPath("$.last").isEqualTo(true)
+            .jsonPath("$.totalElements").isEqualTo(2)
     }
 
     @DisplayName("메뉴 목록을 아이디 기준으로 오름차순 정렬할 수 있다.")
@@ -283,10 +283,10 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].popularity").isEqualTo(true)
             .jsonPath("$.content[1].imageUrl").isEqualTo("hotdog-image-url")
             .jsonPath("$.content[1].description").isEqualTo("[인기메뉴]닭고기로 만든 핫도그")
-            .jsonPath("$.totalElements").isEqualTo(2)
+            .jsonPath("$.pageNumber").isEqualTo(1)
             .jsonPath("$.size").isEqualTo(15)
-            .jsonPath("$.number").isEqualTo(0)
             .jsonPath("$.last").isEqualTo(true)
+            .jsonPath("$.totalElements").isEqualTo(2)
     }
 
     private fun generateMenu(request: CreateMenuRequest): Menu {

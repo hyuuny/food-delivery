@@ -7,9 +7,9 @@ import UpdateMenuGroupRequest
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
+import hyuuny.fooddelivery.common.response.SimplePage
 import hyuuny.fooddelivery.presentation.admin.v1.menugroup.response.MenuGroupResponse
 import hyuuny.fooddelivery.presentation.admin.v1.menugroup.response.MenuGroupResponses
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -35,8 +35,8 @@ class MenuGroupHandler(
 
         val pageRequest = PageRequest.of(cursor, count, sort)
         val page = useCase.getMenuGroups(searchCondition, pageRequest)
-        val response = PageImpl(page.content.map { MenuGroupResponses(it) }, pageRequest, page.totalElements)
-        return ok().bodyValueAndAwait(response)
+        val responses = SimplePage(page.content.map { MenuGroupResponses(it) }, page)
+        return ok().bodyValueAndAwait(responses)
     }
 
     suspend fun createMenuGroup(request: ServerRequest): ServerResponse {
