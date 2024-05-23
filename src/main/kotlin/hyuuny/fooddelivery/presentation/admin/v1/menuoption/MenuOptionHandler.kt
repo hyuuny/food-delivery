@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.presentation.admin.v1.menuoption
 
 import CreateMenuOptionRequest
 import MenuOptionSearchCondition
+import UpdateMenuOptionRequest
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
 import hyuuny.fooddelivery.application.menuoption.MenuOptionUseCase
@@ -47,6 +48,20 @@ class MenuOptionHandler(
 
         val menuOption = useCase.createMenuOption(body)
         return ok().bodyValueAndAwait(menuOption)
+    }
+
+    suspend fun updateMenuOption(request: ServerRequest): ServerResponse {
+        val menuGroupId = request.pathVariable("menuGroupId").toLong()
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<UpdateMenuOptionRequest>()
+
+        if (!menuGroupUseCase.existsById(menuGroupId)) throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "존재하지 않는 메뉴그룹입니다."
+        )
+
+        useCase.updateMenuOption(id, body)
+        return ok().buildAndAwait()
     }
 
 }

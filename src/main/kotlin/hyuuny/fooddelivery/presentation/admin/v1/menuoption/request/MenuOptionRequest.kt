@@ -4,6 +4,11 @@ data class CreateMenuOptionRequest(
     val price: Long
 )
 
+data class UpdateMenuOptionRequest(
+    val name: String,
+    val price: Long,
+)
+
 data class MenuOptionSearchCondition(
     val menuGroupId: Long? = null,
     val name: String? = null,

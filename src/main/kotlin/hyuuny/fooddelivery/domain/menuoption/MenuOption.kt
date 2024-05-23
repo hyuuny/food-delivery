@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.domain.menuoption
 
 import CreateMenuOptionCommand
+import UpdateMenuOptionCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -37,6 +38,14 @@ class MenuOption(
                 updatedAt = command.updatedAt
             )
         }
+    }
+
+    fun handle(command: UpdateMenuOptionCommand) {
+        if (command.name.isBlank()) throw IllegalArgumentException("옵션명은 공백일수 없습니다.")
+
+        name = command.name
+        price = command.price
+        updatedAt = command.updatedAt
     }
 
 }

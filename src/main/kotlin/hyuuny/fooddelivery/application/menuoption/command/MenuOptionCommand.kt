@@ -7,3 +7,9 @@ data class CreateMenuOptionCommand(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
+
+data class UpdateMenuOptionCommand(
+    val name: String,
+    val price: Long,
+    val updatedAt: LocalDateTime,
+)

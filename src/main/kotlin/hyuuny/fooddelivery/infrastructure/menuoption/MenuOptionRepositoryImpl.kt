@@ -6,11 +6,11 @@ import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.data.r2dbc.core.insert
-import org.springframework.data.r2dbc.core.usingAndAwait
+import org.springframework.data.r2dbc.core.*
 import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
+import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
 
 @Component
@@ -27,7 +27,16 @@ class MenuOptionRepositoryImpl(
     }
 
     override suspend fun update(menuOption: MenuOption) {
-        TODO("Not yet implemented")
+        template.update<MenuOption>()
+            .matching(
+                Query.query(
+                    where("id").`is`(menuOption.id!!),
+                ),
+            ).applyAndAwait(
+                Update.update("name", menuOption.name)
+                    .set("price", menuOption.price)
+                    .set("updatedAt", menuOption.updatedAt)
+            )
     }
 
     override suspend fun delete(id: Long) {
