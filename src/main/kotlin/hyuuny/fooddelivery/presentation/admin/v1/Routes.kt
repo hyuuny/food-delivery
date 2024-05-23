@@ -48,6 +48,7 @@ class Routes {
         return coRouter {
             "/v1/menu-options".nest {
                 GET("", handler::getMenuOptions)
+                GET("/{id}", handler::getMenuOption)
             }
 
             "/v1/menu-groups/{menuGroupId}/menu-options".nest {

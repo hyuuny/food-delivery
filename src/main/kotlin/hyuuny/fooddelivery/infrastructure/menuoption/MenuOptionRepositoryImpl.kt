@@ -22,9 +22,7 @@ class MenuOptionRepositoryImpl(
     override suspend fun insert(menuOption: MenuOption): MenuOption =
         template.insert<MenuOption>().usingAndAwait(menuOption)
 
-    override suspend fun findById(id: Long): MenuOption? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun findById(id: Long): MenuOption? = dao.findById(id)
 
     override suspend fun update(menuOption: MenuOption) {
         template.update<MenuOption>()

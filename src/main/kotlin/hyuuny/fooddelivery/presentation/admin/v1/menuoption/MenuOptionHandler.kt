@@ -7,6 +7,7 @@ import extractCursorAndCount
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
 import hyuuny.fooddelivery.application.menuoption.MenuOptionUseCase
 import hyuuny.fooddelivery.common.response.SimplePage
+import hyuuny.fooddelivery.presentation.admin.v1.menuoption.response.MenuOptionResponse
 import hyuuny.fooddelivery.presentation.admin.v1.menuoption.response.MenuOptionResponses
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
@@ -48,6 +49,13 @@ class MenuOptionHandler(
 
         val menuOption = useCase.createMenuOption(body)
         return ok().bodyValueAndAwait(menuOption)
+    }
+
+    suspend fun getMenuOption(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val menuOption = useCase.getMenuOption(id)
+        val response = MenuOptionResponse(menuOption)
+        return ok().bodyValueAndAwait(response)
     }
 
     suspend fun updateMenuOption(request: ServerRequest): ServerResponse {
