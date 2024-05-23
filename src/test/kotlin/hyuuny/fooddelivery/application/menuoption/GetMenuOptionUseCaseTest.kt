@@ -44,9 +44,10 @@ internal class GetMenuOptionUseCaseTest : BehaviorSpec({
             coEvery { repository.findById(any()) } returns null
 
             then("메뉴옵션을 상세조회 할 수 없다.") {
-                shouldThrow<IllegalStateException> {
+                val ex = shouldThrow<NoSuchElementException> {
                     useCase.getMenuOption(0)
                 }
+                ex.message shouldBe "메뉴옵션을 찾을 수 없습니다."
             }
         }
     }

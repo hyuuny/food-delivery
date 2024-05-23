@@ -50,7 +50,7 @@ internal class ChangeMenuStatusUseCaseTest : BehaviorSpec({
 
             then("메뉴의 상태를 변경 할 수 없다.") {
                 val notExistId = 0L
-                val ex = shouldThrow<IllegalStateException> {
+                val ex = shouldThrow<NoSuchElementException> {
                     useCase.changeMenuStatus(notExistId, ChangeMenuStatusRequest(MenuStatus.SOLD_OUT))
                 }
                 ex.message shouldBe "${notExistId}번 메뉴를 찾을 수 없습니다."

@@ -42,13 +42,12 @@ class MenuUseCase(
     }
 
     suspend fun getMenu(id: Long): Menu {
-        return repository.findById(id)
-            ?: throw IllegalStateException("${id}번 메뉴를 찾을 수 없습니다.")
+        return findMenuByIdOrThrow(id)
     }
 
     suspend fun updateMenu(id: Long, request: UpdateMenuRequest) {
         val now = LocalDateTime.now()
-        val menu = repository.findById(id) ?: throw IllegalStateException("${id}번 메뉴를 찾을 수 없습니다.")
+        val menu = findMenuByIdOrThrow(id)
         menu.handle(
             UpdateMenuCommand(
                 name = request.name,
@@ -64,7 +63,7 @@ class MenuUseCase(
 
     suspend fun changeMenuStatus(id: Long, request: ChangeMenuStatusRequest) {
         val now = LocalDateTime.now()
-        val menu = repository.findById(id) ?: throw IllegalStateException("${id}번 메뉴를 찾을 수 없습니다.")
+        val menu = findMenuByIdOrThrow(id)
         menu.handle(
             ChangeMenuStatusCommand(
                 status = request.status,
@@ -80,5 +79,8 @@ class MenuUseCase(
     }
 
     suspend fun existById(id: Long): Boolean = repository.existsById(id)
+
+    private suspend fun findMenuByIdOrThrow(id: Long): Menu = repository.findById(id)
+        ?: throw NoSuchElementException("${id}번 메뉴를 찾을 수 없습니다.")
 
 }

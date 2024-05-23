@@ -40,13 +40,12 @@ class MenuGroupUseCase(
     }
 
     suspend fun getMenuGroup(id: Long): MenuGroup {
-        return repository.findById(id)
-            ?: throw IllegalStateException("${id}번 메뉴그룹을 찾을 수 없습니다.")
+        return findMenuGroupByIdOrThrow(id)
     }
 
     suspend fun updateMenuGroup(id: Long, request: UpdateMenuGroupRequest) {
         val now = LocalDateTime.now()
-        val menuGroup = repository.findById(id) ?: throw IllegalStateException("${id}번 메뉴그룹을 찾을 수 없습니다.")
+        val menuGroup = findMenuGroupByIdOrThrow(id)
         menuGroup.handle(
             UpdateMenuGroupCommand(
                 name = request.name,
@@ -77,10 +76,13 @@ class MenuGroupUseCase(
     }
 
     suspend fun deleteMenuGroup(id: Long) {
-        if (!repository.existsById(id)) throw IllegalStateException("${id}번 메뉴그룹을 찾을 수 없습니다.")
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 메뉴그룹을 찾을 수 없습니다.")
         repository.delete(id)
     }
 
     suspend fun existsById(id: Long): Boolean = repository.existsById(id)
+
+    private suspend fun findMenuGroupByIdOrThrow(id: Long): MenuGroup = repository.findById(id)
+        ?: throw NoSuchElementException("${id}번 메뉴그룹을 찾을 수 없습니다.")
 
 }

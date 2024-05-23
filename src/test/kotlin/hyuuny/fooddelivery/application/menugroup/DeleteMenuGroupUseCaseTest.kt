@@ -30,7 +30,7 @@ internal class DeleteMenuGroupUseCaseTest : BehaviorSpec({
             coEvery { repository.existsById(any()) } returns false
 
             then("메뉴그릅을 찾을 수 없다는 메세지가 반환된다.") {
-                val ex = shouldThrow<IllegalStateException> {
+                val ex = shouldThrow<NoSuchElementException> {
                     useCase.deleteMenuGroup(0)
                 }
                 ex.message shouldBe "0번 메뉴그룹을 찾을 수 없습니다."

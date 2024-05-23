@@ -51,7 +51,7 @@ internal class GetMenuUseCaseTest : BehaviorSpec({
             coEvery { repository.findById(any()) } returns null
 
             then("메뉴를 상세조회 할 수 없다.") {
-                shouldThrow<IllegalStateException> {
+                shouldThrow<NoSuchElementException> {
                     useCase.getMenu(0)
                 }
             }

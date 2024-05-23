@@ -47,7 +47,7 @@ internal class GetMenuGroupUseCaseTest : BehaviorSpec({
             coEvery { repository.findById(any()) } returns null
 
             then("메뉴를 상세조회 할 수 없다.") {
-                val ex = shouldThrow<IllegalStateException> {
+                val ex = shouldThrow<NoSuchElementException> {
                     useCase.getMenuGroup(0)
                 }
                 ex.message shouldBe "0번 메뉴그룹을 찾을 수 없습니다."
