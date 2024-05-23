@@ -228,6 +228,30 @@ class MenuOptionHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.totalElements").isEqualTo(4)
     }
 
+    @DisplayName("메뉴옵션을 상세조회 할 수 있다.")
+    @Test
+    fun getMenuOption() {
+        val request = CreateMenuOptionRequest(
+            menuGroupId = 1L,
+            name = "후라이드 + 양념",
+            price = 1000,
+        )
+        val menuOption = generateMenuOption(request)
+        coEvery { useCase.getMenuOption(any()) } returns menuOption
+
+        webTestClient.get().uri("/v1/menu-options/${menuOption.id}")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.id").isEqualTo(menuOption.id!!)
+            .jsonPath("$.menuGroupId").isEqualTo(menuOption.menuGroupId)
+            .jsonPath("$.name").isEqualTo(menuOption.name)
+            .jsonPath("$.price").isEqualTo(menuOption.price)
+            .jsonPath("$.createdAt").exists()
+            .jsonPath("$.updatedAt").exists()
+    }
+
     @DisplayName("메뉴옵션의 정보를 변경할 수 있다.")
     @Test
     fun updateMenuOption() {
