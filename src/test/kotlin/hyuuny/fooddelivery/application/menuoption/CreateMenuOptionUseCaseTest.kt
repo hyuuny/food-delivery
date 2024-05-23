@@ -11,7 +11,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.LocalDateTime
 
-class CreateGroupUseCaseTest : BehaviorSpec({
+class CreateMenuOptionUseCaseTest : BehaviorSpec({
 
     val repository = mockk<MenuOptionRepository>()
     val useCase = MenuOptionUseCase(repository)
