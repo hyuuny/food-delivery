@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.menuoption
 
 import CreateMenuOptionRequest
+import UpdateMenuOptionRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.menuoption.MenuOptionUseCase
 import hyuuny.fooddelivery.domain.menuoption.MenuOption
@@ -225,6 +226,48 @@ class MenuOptionHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.size").isEqualTo(15)
             .jsonPath("$.last").isEqualTo(true)
             .jsonPath("$.totalElements").isEqualTo(4)
+    }
+
+    @DisplayName("메뉴옵션의 정보를 변경할 수 있다.")
+    @Test
+    fun updateMenuOption() {
+        coEvery { menuGroupRepository.existsById(any()) } returns true
+        val request = UpdateMenuOptionRequest(
+            name = "불닭 + 청양마요",
+            price = 3000,
+        )
+        coEvery { useCase.updateMenuOption(any(), any()) } returns Unit
+
+        webTestClient.put().uri("/v1/menu-groups/1/menu-options/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("존재하지 않는 메뉴그룹의 옵션 정보는 변경할 수 있다.")
+    @Test
+    fun updateMenuOption_notFound() {
+        coEvery { menuGroupRepository.existsById(any()) } throws ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "존재하지 않는 메뉴그룹입니다."
+        )
+
+        val request = UpdateMenuOptionRequest(
+            name = "불닭 + 청양마요",
+            price = 3000,
+        )
+        coEvery { useCase.updateMenuOption(any(), any()) } returns Unit
+
+        webTestClient.put().uri("/v1/menu-groups/1/menu-options/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isNotFound
     }
 
     private fun generateMenuOption(request: CreateMenuOptionRequest): MenuOption {
