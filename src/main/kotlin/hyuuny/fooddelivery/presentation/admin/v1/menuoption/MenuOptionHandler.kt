@@ -1,22 +1,40 @@
 package hyuuny.fooddelivery.presentation.admin.v1.menuoption
 
 import CreateMenuOptionRequest
+import MenuOptionSearchCondition
+import extractCursorAndCount
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
 import hyuuny.fooddelivery.application.menuoption.MenuOptionUseCase
+import hyuuny.fooddelivery.common.response.SimplePage
+import hyuuny.fooddelivery.presentation.admin.v1.menuoption.response.MenuOptionResponses
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.awaitBody
-import org.springframework.web.reactive.function.server.bodyValueAndAwait
 import org.springframework.web.server.ResponseStatusException
+import parseSort
 
 @Component
 class MenuOptionHandler(
     private val useCase: MenuOptionUseCase,
     private val menuGroupUseCase: MenuGroupUseCase
 ) {
+
+    suspend fun getMenuOptions(request: ServerRequest): ServerResponse {
+        val menuGroupId = request.queryParamOrNull("menuGroupId")?.toLong()
+        val name = request.queryParamOrNull("name")?.takeIf { it.isNotBlank() }
+        val searchCondition = MenuOptionSearchCondition(menuGroupId = menuGroupId, name = name)
+
+        val sortParam = request.queryParamOrNull("sort")
+        val sort = parseSort(sortParam)
+        val (cursor, count) = extractCursorAndCount(request)
+
+        val pageRequest = PageRequest.of(cursor, count, sort)
+        val page = useCase.getMenuOptions(searchCondition, pageRequest)
+        val responses = SimplePage(page.content.map { MenuOptionResponses(it) }, page)
+        return ok().bodyValueAndAwait(responses)
+    }
 
     suspend fun createMenuOption(request: ServerRequest): ServerResponse {
         val menuGroupId = request.pathVariable("menuGroupId").toLong()

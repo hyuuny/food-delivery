@@ -46,6 +46,10 @@ class Routes {
     @Bean
     fun menuOptionApi(handler: MenuOptionHandler): RouterFunction<ServerResponse> {
         return coRouter {
+            "/v1/menu-options".nest {
+                GET("", handler::getMenuOptions)
+            }
+
             "/v1/menu-groups/{menuGroupId}/menu-options".nest {
                 POST("", handler::createMenuOption)
             }
