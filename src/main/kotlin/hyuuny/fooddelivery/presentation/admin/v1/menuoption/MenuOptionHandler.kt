@@ -72,4 +72,17 @@ class MenuOptionHandler(
         return ok().buildAndAwait()
     }
 
+    suspend fun deleteMenuOption(request: ServerRequest): ServerResponse {
+        val menuGroupId = request.pathVariable("menuGroupId").toLong()
+        val id = request.pathVariable("id").toLong()
+
+        if (!menuGroupUseCase.existsById(menuGroupId)) throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "존재하지 않는 메뉴그룹입니다."
+        )
+
+        useCase.deleteMenuOption(id)
+        return ok().buildAndAwait()
+    }
+
 }

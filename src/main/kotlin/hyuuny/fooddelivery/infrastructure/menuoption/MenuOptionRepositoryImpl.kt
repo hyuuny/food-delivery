@@ -37,9 +37,7 @@ class MenuOptionRepositoryImpl(
             )
     }
 
-    override suspend fun delete(id: Long) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun delete(id: Long) = dao.deleteById(id)
 
     override suspend fun findAllMenuOptions(
         searchCondition: MenuOptionSearchCondition,
@@ -61,6 +59,8 @@ class MenuOptionRepositoryImpl(
 
         return PageImpl(data, pageable, total)
     }
+
+    override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
     private fun buildCriteria(searchCondition: MenuOptionSearchCondition): Criteria {
         var criteria = Criteria.empty()

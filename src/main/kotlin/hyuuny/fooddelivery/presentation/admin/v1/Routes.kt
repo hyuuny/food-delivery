@@ -54,6 +54,7 @@ class Routes {
             "/v1/menu-groups/{menuGroupId}/menu-options".nest {
                 POST("", handler::createMenuOption)
                 PUT("/{id}", handler::updateMenuOption)
+                DELETE("/{id}", handler::deleteMenuOption)
             }
         }
     }

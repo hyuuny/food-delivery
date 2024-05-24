@@ -17,4 +17,6 @@ interface MenuOptionRepository {
 
     suspend fun findAllMenuOptions(searchCondition: MenuOptionSearchCondition, pageable: Pageable): Page<MenuOption>
 
+    suspend fun existsById(id: Long): Boolean
+
 }

@@ -37,13 +37,12 @@ class MenuOptionUseCase(
     }
 
     suspend fun getMenuOption(id: Long): MenuOption {
-        return repository.findById(id)
-            ?: throw IllegalStateException("메뉴옵션을 찾을 수 없습니다.")
+        return findMenuOptionByIdOrThrow(id)
     }
 
     suspend fun updateMenuOption(id: Long, request: UpdateMenuOptionRequest) {
         val now = LocalDateTime.now()
-        val menuOption = repository.findById(id) ?: throw IllegalArgumentException("존재하지 않는 메뉴옵션입니다.")
+        val menuOption = findMenuOptionByIdOrThrow(id)
         menuOption.handle(
             UpdateMenuOptionCommand(
                 name = request.name,
@@ -52,6 +51,14 @@ class MenuOptionUseCase(
             )
         )
         repository.update(menuOption)
+    }
+
+    private suspend fun findMenuOptionByIdOrThrow(id: Long): MenuOption = repository.findById(id)
+        ?: throw NoSuchElementException("메뉴옵션을 찾을 수 없습니다.")
+
+    suspend fun deleteMenuOption(id: Long) {
+        if (!repository.existsById(id)) throw NoSuchElementException("메뉴옵션을 찾을 수 없습니다.")
+        repository.delete(id)
     }
 
 }
