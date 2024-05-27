@@ -15,3 +15,5 @@ logging:
   level:
     root: info
     org.springframework: info
+    io.r2dbc.postgresql.QUERY: DEBUG
+    io.r2dbc.postgresql.PARAM: DEBUG
