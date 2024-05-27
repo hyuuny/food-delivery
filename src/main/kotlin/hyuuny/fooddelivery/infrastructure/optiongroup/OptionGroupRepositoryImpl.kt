@@ -70,12 +70,12 @@ class OptionGroupRepositoryImpl(
             WITH updates (id, priority, updated_at) AS (
                 VALUES ${optionGroups.joinToString(", ") { "(${it.id}, ${it.priority}, '${it.updatedAt.format(formatter)}'::timestamp)" }}
             )
-            UPDATE menu_group
+            UPDATE option_group
             SET 
                 priority = updates.priority, 
                 updated_at = updates.updated_at
             FROM updates
-            WHERE menu_group.id = updates.id
+            WHERE option_group.id = updates.id
         """
 
         // 배치 업데이트를 실행합니다.
