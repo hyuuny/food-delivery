@@ -53,12 +53,15 @@ class OptionUseCase(
         repository.update(option)
     }
 
-    private suspend fun findOptionByIdOrThrow(id: Long): Option = repository.findById(id)
-        ?: throw NoSuchElementException("옵션을 찾을 수 없습니다.")
-
     suspend fun deleteOption(id: Long) {
         if (!repository.existsById(id)) throw NoSuchElementException("옵션을 찾을 수 없습니다.")
         repository.delete(id)
     }
+
+    suspend fun getAllByOptionGroupIds(optionGroupIds: List<Long>): List<Option> =
+        repository.findAllByOptionGroupIdIn(optionGroupIds)
+
+    private suspend fun findOptionByIdOrThrow(id: Long): Option = repository.findById(id)
+        ?: throw NoSuchElementException("옵션을 찾을 수 없습니다.")
 
 }

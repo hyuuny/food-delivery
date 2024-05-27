@@ -82,6 +82,8 @@ class OptionGroupUseCase(
 
     suspend fun existsById(id: Long): Boolean = repository.existsById(id)
 
+    suspend fun getAllByMenuId(menuId: Long): List<OptionGroup> = repository.findAllByMenuId(menuId)
+
     private suspend fun findOptionGroupByIdOrThrow(id: Long): OptionGroup = repository.findById(id)
         ?: throw NoSuchElementException("존재하지 않는 옵션그룹입니다.")
 

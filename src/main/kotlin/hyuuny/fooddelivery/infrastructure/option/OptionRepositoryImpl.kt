@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.infrastructure.option
 
 import OptionSearchCondition
 import hyuuny.fooddelivery.domain.option.Option
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -61,6 +62,9 @@ class OptionRepositoryImpl(
     }
 
     override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
+
+    override suspend fun findAllByOptionGroupIdIn(optionGroupIds: List<Long>): List<Option> =
+        dao.findAllByOptionGroupIdIn(optionGroupIds).toList()
 
     private fun buildCriteria(searchCondition: OptionSearchCondition): Criteria {
         var criteria = Criteria.empty()
