@@ -41,7 +41,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         val optionGroup = generateOptionGroup(request)
         coEvery { useCase.createOptionGroup(request) } returns optionGroup
 
-        webTestClient.post().uri("/v1/menus/${request.menuId}/option-groups")
+        webTestClient.post().uri("/admin/v1/menus/${request.menuId}/option-groups")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -89,7 +89,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         val optionGroup = generateOptionGroup(request)
         coEvery { useCase.getOptionGroup(any()) } returns optionGroup
 
-        webTestClient.get().uri("/v1/option-groups/${optionGroup.id}")
+        webTestClient.get().uri("/admin/v1/option-groups/${optionGroup.id}")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk
@@ -142,7 +142,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         val page = PageImpl(optionGroups, pageable, optionGroups.size.toLong())
         coEvery { useCase.getOptionGroups(any(), any()) } returns page
 
-        webTestClient.get().uri("/v1/option-groups?menu_id=&name=&sort=id:desc")
+        webTestClient.get().uri("/admin/v1/option-groups?menu_id=&name=&sort=id:desc")
             .exchange()
             .expectStatus().isOk
             .expectBody()
@@ -199,7 +199,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         val page = PageImpl(optionGroups, pageable, optionGroups.size.toLong())
         coEvery { useCase.getOptionGroups(any(), any()) } returns page
 
-        webTestClient.get().uri("/v1/option-groups?menu_id=1&name=&sort=id:desc")
+        webTestClient.get().uri("/admin/v1/option-groups?menu_id=1&name=&sort=id:desc")
             .exchange()
             .expectStatus().isOk
             .expectBody()
@@ -233,7 +233,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.updateOptionGroup(any(), any()) } returns Unit
 
-        webTestClient.put().uri("/v1/menus/${request.menuId}/option-groups/${1}")
+        webTestClient.put().uri("/admin/v1/menus/${request.menuId}/option-groups/${1}")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -286,7 +286,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.reOrderOptionGroups(any(), any()) } returns Unit
 
-        webTestClient.patch().uri("/v1/menus/${menuId}/option-groups/re-order")
+        webTestClient.patch().uri("/admin/v1/menus/${menuId}/option-groups/re-order")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(requests)
@@ -320,7 +320,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.reOrderOptionGroups(any(), any()) } returns Unit
 
-        webTestClient.patch().uri("/v1/menus/${menuId}/option-groups/re-order")
+        webTestClient.patch().uri("/admin/v1/menus/${menuId}/option-groups/re-order")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(requests)
@@ -335,7 +335,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         coEvery { menuRepository.existsById(any()) } returns true
         coEvery { useCase.deleteOptionGroup(any()) } returns Unit
 
-        webTestClient.delete().uri("/v1/menus/${menuId}/option-groups/1")
+        webTestClient.delete().uri("/admin/v1/menus/${menuId}/option-groups/1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk
@@ -350,7 +350,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         coEvery { menuRepository.existsById(any()) } throws ResponseStatusException(NOT_FOUND, "존재하지 않는 메뉴입니다.")
         coEvery { useCase.deleteOptionGroup(any()) } returns Unit
 
-        webTestClient.delete().uri("/v1/menus/${menuId}/option-groups/1")
+        webTestClient.delete().uri("/admin/v1/menus/${menuId}/option-groups/1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isNotFound

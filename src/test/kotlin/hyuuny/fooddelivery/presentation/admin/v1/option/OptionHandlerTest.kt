@@ -38,7 +38,7 @@ class OptionHandlerTest : BaseIntegrationTest() {
         val option = generateOption(request)
         coEvery { useCase.createOption(any()) } returns option
 
-        webTestClient.post().uri("/v1/option-groups/${request.optionGroupId}/options")
+        webTestClient.post().uri("/admin/v1/option-groups/${request.optionGroupId}/options")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -67,7 +67,7 @@ class OptionHandlerTest : BaseIntegrationTest() {
             price = 1000,
         )
 
-        webTestClient.post().uri("/v1/option-groups/${request.optionGroupId}/options")
+        webTestClient.post().uri("/admin/v1/option-groups/${request.optionGroupId}/options")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -118,7 +118,7 @@ class OptionHandlerTest : BaseIntegrationTest() {
         val page = PageImpl(options, pageable, options.size.toLong())
         coEvery { useCase.getOptions(any(), any()) } returns page
 
-        webTestClient.get().uri("/v1/options?option-group-id=&name=&sort=id:desc")
+        webTestClient.get().uri("/admin/v1/options?option-group-id=&name=&sort=id:desc")
             .exchange()
             .expectStatus().isOk
             .expectBody()
@@ -197,7 +197,7 @@ class OptionHandlerTest : BaseIntegrationTest() {
         val page = PageImpl(options, pageable, options.size.toLong())
         coEvery { useCase.getOptions(any(), any()) } returns page
 
-        webTestClient.get().uri("/v1/options?option-group-id=&name=&sort=price:asc,id:desc")
+        webTestClient.get().uri("/admin/v1/options?option-group-id=&name=&sort=price:asc,id:desc")
             .exchange()
             .expectStatus().isOk
             .expectBody()
@@ -239,7 +239,7 @@ class OptionHandlerTest : BaseIntegrationTest() {
         val option = generateOption(request)
         coEvery { useCase.getOption(any()) } returns option
 
-        webTestClient.get().uri("/v1/options/${option.id}")
+        webTestClient.get().uri("/admin/v1/options/${option.id}")
             .exchange()
             .expectStatus().isOk
             .expectBody()
@@ -262,7 +262,7 @@ class OptionHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.updateOption(any(), any()) } returns Unit
 
-        webTestClient.put().uri("/v1/option-groups/1/options/1")
+        webTestClient.put().uri("/admin/v1/option-groups/1/options/1")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -286,7 +286,7 @@ class OptionHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.updateOption(any(), any()) } returns Unit
 
-        webTestClient.put().uri("/v1/option-groups/1/options/1")
+        webTestClient.put().uri("/admin/v1/option-groups/1/options/1")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -301,7 +301,7 @@ class OptionHandlerTest : BaseIntegrationTest() {
         coEvery { optionGroupRepository.existsById(any()) } returns true
         coEvery { useCase.deleteOption(any()) } returns Unit
 
-        webTestClient.delete().uri("/v1/option-groups/${optionGroupId}/options/1")
+        webTestClient.delete().uri("/admin/v1/option-groups/${optionGroupId}/options/1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk
@@ -319,7 +319,7 @@ class OptionHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.deleteOption(any()) } returns Unit
 
-        webTestClient.delete().uri("/v1/option-groups/${optionGroupId}/options/1")
+        webTestClient.delete().uri("/admin/v1/option-groups/${optionGroupId}/options/1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isNotFound

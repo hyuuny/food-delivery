@@ -37,7 +37,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         val menu = generateMenu(request)
         coEvery { useCase.createMenu(request) } returns menu
 
-        webTestClient.post().uri("/v1/menus")
+        webTestClient.post().uri("/admin/v1/menus")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -68,7 +68,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
             description = "[베스트]닭다리살"
         )
 
-        webTestClient.post().uri("/v1/menus")
+        webTestClient.post().uri("/admin/v1/menus")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -90,7 +90,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         val menu = generateMenu(request)
         coEvery { useCase.getMenu(any()) } returns menu
 
-        webTestClient.get().uri("/v1/menus/${menu.id}")
+        webTestClient.get().uri("/admin/v1/menus/${menu.id}")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk
@@ -110,7 +110,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
     @DisplayName("잘못된 메뉴 아이디로 조회할 수 없다.")
     @Test
     fun getMenu_notFound() {
-        webTestClient.get().uri("/v1/menus/${0}")
+        webTestClient.get().uri("/admin/v1/menus/${0}")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().is5xxServerError
@@ -128,7 +128,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.updateMenu(any(), request) } returns Unit
 
-        webTestClient.put().uri("/v1/menus/${1}")
+        webTestClient.put().uri("/admin/v1/menus/${1}")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -146,7 +146,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.changeMenuStatus(any(), request) } returns Unit
 
-        webTestClient.patch().uri("/v1/menus/change-status/${1}")
+        webTestClient.patch().uri("/admin/v1/menus/change-status/${1}")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -161,7 +161,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
     fun deleteMenu() {
         coEvery { useCase.deleteMenu(any()) } returns Unit
 
-        webTestClient.delete().uri("/v1/menus/${1}")
+        webTestClient.delete().uri("/admin/v1/menus/${1}")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk
@@ -203,7 +203,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
 
         coEvery { useCase.getMenus(any(), any()) } returns page
 
-        webTestClient.get().uri("/v1/menus?name=&status=&popularity=&sort=id:desc")
+        webTestClient.get().uri("/admin/v1/menus?name=&status=&popularity=&sort=id:desc")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk
@@ -263,7 +263,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
 
         coEvery { useCase.getMenus(any(), any()) } returns page
 
-        webTestClient.get().uri("/v1/menus?name=&status=&popularity=&sort=id:asc")
+        webTestClient.get().uri("/admin/v1/menus?name=&status=&popularity=&sort=id:asc")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk

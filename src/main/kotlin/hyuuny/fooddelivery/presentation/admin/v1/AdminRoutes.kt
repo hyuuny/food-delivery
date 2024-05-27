@@ -15,7 +15,7 @@ class AdminRoutes {
     @Bean
     fun menuAdminApi(handler: MenuHandler): RouterFunction<ServerResponse> {
         return coRouter {
-            "/v1/menus".nest {
+            "/admin/v1/menus".nest {
                 POST("", handler::createMenu)
                 GET("", handler::getMenus)
                 GET("/{id}", handler::getMenu)
@@ -29,12 +29,12 @@ class AdminRoutes {
     @Bean
     fun optionGroupAdminApi(handler: OptionGroupHandler): RouterFunction<ServerResponse> {
         return coRouter {
-            "/v1/option-groups".nest {
+            "/admin/v1/option-groups".nest {
                 GET("", handler::getOptionGroups)
                 GET("/{id}", handler::getOptionGroup)
             }
 
-            "/v1/menus/{menuId}/option-groups".nest {
+            "/admin/v1/menus/{menuId}/option-groups".nest {
                 POST("", handler::createOptionGroup)
                 PUT("/{id}", handler::updateOptionGroup)
                 PATCH("/re-order", handler::reOrderOptionGroup)
@@ -46,12 +46,12 @@ class AdminRoutes {
     @Bean
     fun optionAdminApi(handler: OptionHandler): RouterFunction<ServerResponse> {
         return coRouter {
-            "/v1/options".nest {
+            "/admin/v1/options".nest {
                 GET("", handler::getOptions)
                 GET("/{id}", handler::getOption)
             }
 
-            "/v1/option-groups/{optionGroupId}/options".nest {
+            "/admin/v1/option-groups/{optionGroupId}/options".nest {
                 POST("", handler::createOption)
                 PUT("/{id}", handler::updateOption)
                 DELETE("/{id}", handler::deleteOption)
