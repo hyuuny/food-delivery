@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
 import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
+import selectAndCount
 import java.time.format.DateTimeFormatter
 
 @Component
@@ -20,7 +21,8 @@ class OptionGroupRepositoryImpl(
     private val template: R2dbcEntityTemplate,
 ) : OptionGroupRepository {
 
-    override suspend fun insert(optionGroup: OptionGroup): OptionGroup = template.insert<OptionGroup>().usingAndAwait(optionGroup)
+    override suspend fun insert(optionGroup: OptionGroup): OptionGroup =
+        template.insert<OptionGroup>().usingAndAwait(optionGroup)
 
     override suspend fun findById(id: Long): OptionGroup? = dao.findById(id)
 
@@ -46,18 +48,9 @@ class OptionGroupRepositoryImpl(
         val criteria = buildCriteria(searchCondition)
         val query = Query.query(criteria).with(pageable)
 
-        val data = template.select(OptionGroup::class.java)
-            .matching(query)
-            .all()
-            .collectList()
-            .awaitFirstOrElse { emptyList() }
-
-        val total = template.select(OptionGroup::class.java)
-            .matching(Query.query(criteria))
-            .count()
-            .awaitFirstOrElse { 0 }
-
-        return PageImpl(data, pageable, total)
+        return template.selectAndCount<OptionGroup>(query, criteria).let { (data, total) ->
+            PageImpl(data, pageable, total)
+        }
     }
 
     override suspend fun findAllByMenuId(menuId: Long): List<OptionGroup> = dao.findAllByMenuId(menuId)
@@ -78,11 +71,10 @@ class OptionGroupRepositoryImpl(
             WHERE option_group.id = updates.id
         """
 
-        // 배치 업데이트를 실행합니다.
         template.databaseClient.sql(query)
             .fetch()
             .rowsUpdated()
-            .awaitFirstOrElse { throw RuntimeException("Batch update failed") }
+            .awaitFirstOrElse { throw RuntimeException("Batch optionGroup update failed") }
     }
 
     override suspend fun existsById(id: Long): Boolean = dao.existsById(id)

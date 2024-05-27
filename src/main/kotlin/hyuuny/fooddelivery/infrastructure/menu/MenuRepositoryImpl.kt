@@ -2,7 +2,6 @@ package hyuuny.fooddelivery.infrastructure.menu
 
 import MenuSearchCondition
 import hyuuny.fooddelivery.domain.menu.Menu
-import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -13,6 +12,7 @@ import org.springframework.data.relational.core.query.Query
 import org.springframework.data.relational.core.query.Update
 import org.springframework.data.relational.core.query.isEqual
 import org.springframework.stereotype.Component
+import selectAndCount
 
 @Component
 class MenuRepositoryImpl(
@@ -62,18 +62,9 @@ class MenuRepositoryImpl(
         val criteria = buildCriteria(searchCondition)
         val query = Query.query(criteria).with(pageable)
 
-        val data = template.select(Menu::class.java)
-            .matching(query)
-            .all()
-            .collectList()
-            .awaitFirstOrElse { emptyList() }
-
-        val total = template.select(Menu::class.java)
-            .matching(Query.query(criteria))
-            .count()
-            .awaitFirstOrElse { 0 }
-
-        return PageImpl(data, pageable, total)
+        return template.selectAndCount<Menu>(query, criteria).let { (data, total) ->
+            PageImpl(data, pageable, total)
+        }
     }
 
     private fun buildCriteria(condition: MenuSearchCondition): Criteria {
