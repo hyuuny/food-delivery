@@ -24,10 +24,21 @@ CREATE TABLE IF NOT EXISTS option_group
 
 CREATE TABLE IF NOT EXISTS option
 (
-    id             SERIAL PRIMARY KEY,
-    option_group_id  BIGINT                NOT NULL,
-    name           VARCHAR(255)          NOT NULL,
-    price          BIGINT DEFAULT 0      NOT NULL,
-    created_at     TIMESTAMP             NOT NULL,
-    updated_at     TIMESTAMP             NOT NULL
+    id              SERIAL PRIMARY KEY,
+    option_group_id BIGINT           NOT NULL,
+    name            VARCHAR(255)     NOT NULL,
+    price           BIGINT DEFAULT 0 NOT NULL,
+    created_at      TIMESTAMP        NOT NULL,
+    updated_at      TIMESTAMP        NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS menu_group
+(
+    id          SERIAL PRIMARY KEY,
+    store_id    BIGINT       NOT NULL,
+    name        VARCHAR(255) NOT NULL,
+    priority    INT          NOT NULL,
+    description VARCHAR(255),
+    created_at  TIMESTAMP    NOT NULL,
+    updated_at  TIMESTAMP    NOT NULL
 );
