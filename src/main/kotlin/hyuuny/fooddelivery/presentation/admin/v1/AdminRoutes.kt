@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1
 
 import hyuuny.fooddelivery.presentation.admin.v1.menu.MenuHandler
+import hyuuny.fooddelivery.presentation.admin.v1.menugroup.MenuGroupHandler
 import hyuuny.fooddelivery.presentation.admin.v1.option.OptionHandler
 import hyuuny.fooddelivery.presentation.admin.v1.optiongroup.OptionGroupHandler
 import org.springframework.context.annotation.Bean
@@ -55,6 +56,22 @@ class AdminRoutes {
                 POST("", handler::createOption)
                 PUT("/{id}", handler::updateOption)
                 DELETE("/{id}", handler::deleteOption)
+            }
+        }
+    }
+
+    @Bean
+    fun menuGroupAdminApi(handler: MenuGroupHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/v1/menu-groups".nest {
+                GET("", handler::getMenuGroups)
+                GET("/{id}", handler::getMenuGroup)
+            }
+
+            "/v1/stores/{storeId}/menu-groups".nest {
+                POST("", handler::createMenuGroup)
+                PUT("/{id}", handler::updateMenuGroup)
+                PATCH("/re-order", handler::reOrderMenuGroup)
             }
         }
     }
