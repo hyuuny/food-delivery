@@ -79,4 +79,10 @@ class MenuGroupHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun deleteMenuGroup(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        useCase.deleteMenuGroup(id)
+        return ok().buildAndAwait()
+    }
+
 }

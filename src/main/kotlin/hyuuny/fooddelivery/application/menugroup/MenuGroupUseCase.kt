@@ -73,6 +73,11 @@ class MenuGroupUseCase(
         repository.bulkUpdatePriority(menuGroups)
     }
 
+    suspend fun deleteMenuGroup(id: Long) {
+        if (!repository.existsById(id)) throw NoSuchElementException("메뉴그룹을 찾을 수 없습니다.")
+        repository.delete(id)
+    }
+
     private suspend fun findMenuGroupByIdOrThrows(id: Long): MenuGroup {
         return repository.findById(id)
             ?: throw NoSuchElementException("메뉴그룹을 찾을 수 없습니다.")

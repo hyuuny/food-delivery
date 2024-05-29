@@ -72,6 +72,7 @@ class AdminRoutes {
                 POST("", handler::createMenuGroup)
                 PUT("/{id}", handler::updateMenuGroup)
                 PATCH("/re-order", handler::reOrderMenuGroup)
+                DELETE("/{id}", handler::deleteMenuGroup)
             }
         }
     }

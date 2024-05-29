@@ -38,9 +38,7 @@ class MenuGroupRepositoryImpl(
             )
     }
 
-    override suspend fun delete(id: Long) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun delete(id: Long) = dao.deleteById(id)
 
     override suspend fun findAllMenuGroups(
         searchCondition: MenuGroupSearchCondition,
@@ -76,6 +74,8 @@ class MenuGroupRepositoryImpl(
             .rowsUpdated()
             .awaitFirstOrElse { throw RuntimeException("Batch menuGroup update failed") }
     }
+
+    override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
     private fun buildCriteria(searchCondition: MenuGroupSearchCondition): Criteria {
         var criteria = Criteria.empty()
