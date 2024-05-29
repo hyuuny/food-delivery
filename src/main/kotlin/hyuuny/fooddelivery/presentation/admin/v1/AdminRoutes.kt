@@ -63,12 +63,12 @@ class AdminRoutes {
     @Bean
     fun menuGroupAdminApi(handler: MenuGroupHandler): RouterFunction<ServerResponse> {
         return coRouter {
-            "/v1/menu-groups".nest {
+            "/admin/v1/menu-groups".nest {
                 GET("", handler::getMenuGroups)
                 GET("/{id}", handler::getMenuGroup)
             }
 
-            "/v1/stores/{storeId}/menu-groups".nest {
+            "/admin/v1/stores/{storeId}/menu-groups".nest {
                 POST("", handler::createMenuGroup)
                 PUT("/{id}", handler::updateMenuGroup)
                 PATCH("/re-order", handler::reOrderMenuGroup)
