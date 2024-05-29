@@ -208,6 +208,21 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
+    @DisplayName("메뉴그릅을 삭제할 수 있다.")
+    @Test
+    fun deleteMenuGroup() {
+        val id = 1L
+        val storeId = 2L
+        coEvery { useCase.deleteMenuGroup(any()) } returns Unit
+
+        webTestClient.delete().uri("/admin/v1/stores/${storeId}/menu-groups/${id}")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
     private fun generateMenuGroup(request: CreateMenuGroupRequest): MenuGroup {
         val now = LocalDateTime.now()
         return MenuGroup(
