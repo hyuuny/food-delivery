@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.toList
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
-import org.springframework.data.r2dbc.core.*
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.r2dbc.core.applyAndAwait
+import org.springframework.data.r2dbc.core.update
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
@@ -20,8 +22,7 @@ class OptionRepositoryImpl(
     private val template: R2dbcEntityTemplate,
 ) : OptionRepository {
 
-    override suspend fun insert(option: Option): Option =
-        template.insert<Option>().usingAndAwait(option)
+    override suspend fun insert(option: Option): Option = dao.save(option)
 
     override suspend fun findById(id: Long): Option? = dao.findById(id)
 

@@ -6,7 +6,9 @@ import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
-import org.springframework.data.r2dbc.core.*
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.r2dbc.core.applyAndAwait
+import org.springframework.data.r2dbc.core.update
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
@@ -21,8 +23,7 @@ class OptionGroupRepositoryImpl(
     private val template: R2dbcEntityTemplate,
 ) : OptionGroupRepository {
 
-    override suspend fun insert(optionGroup: OptionGroup): OptionGroup =
-        template.insert<OptionGroup>().usingAndAwait(optionGroup)
+    override suspend fun insert(optionGroup: OptionGroup): OptionGroup = dao.save(optionGroup)
 
     override suspend fun findById(id: Long): OptionGroup? = dao.findById(id)
 

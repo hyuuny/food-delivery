@@ -5,7 +5,9 @@ import hyuuny.fooddelivery.domain.menugroup.MenuGroup
 import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
-import org.springframework.data.r2dbc.core.*
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.r2dbc.core.applyAndAwait
+import org.springframework.data.r2dbc.core.update
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
@@ -20,8 +22,7 @@ class MenuGroupRepositoryImpl(
     private val template: R2dbcEntityTemplate,
 ) : MenuGroupRepository {
 
-    override suspend fun insert(menuGroup: MenuGroup): MenuGroup =
-        template.insert<MenuGroup>().usingAndAwait(menuGroup)
+    override suspend fun insert(menuGroup: MenuGroup): MenuGroup = dao.save(menuGroup)
 
     override suspend fun findById(id: Long): MenuGroup? = dao.findById(id)
 
