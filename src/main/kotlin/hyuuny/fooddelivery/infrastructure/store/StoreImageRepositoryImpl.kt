@@ -1,0 +1,15 @@
+package hyuuny.fooddelivery.infrastructure.store
+
+import hyuuny.fooddelivery.domain.store.StoreImage
+import kotlinx.coroutines.flow.toList
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.stereotype.Component
+
+@Component
+class StoreImageRepositoryImpl(
+    private val dao: StoreImageDao,
+    private val template: R2dbcEntityTemplate,
+) : StoreImageRepository {
+
+    override suspend fun insertAll(storeImages: List<StoreImage>): List<StoreImage> = dao.saveAll(storeImages).toList()
+}
