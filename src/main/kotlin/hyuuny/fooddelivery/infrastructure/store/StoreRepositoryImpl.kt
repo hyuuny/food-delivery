@@ -46,13 +46,9 @@ class StoreRepositoryImpl(
             )
     }
 
-    override suspend fun delete(store: Store) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun delete(id: Long) = dao.deleteById(id)
 
-    override suspend fun existsById(id: Long): Boolean {
-        TODO("Not yet implemented")
-    }
+    override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
     override suspend fun findAllStores(searchCondition: StoreSearchCondition, pageable: Pageable): PageImpl<Store> {
         val criteria = buildCriteria(searchCondition)

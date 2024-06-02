@@ -13,7 +13,7 @@ interface StoreRepository {
 
     suspend fun update(store: Store)
 
-    suspend fun delete(store: Store)
+    suspend fun delete(id: Long)
 
     suspend fun existsById(id: Long): Boolean
 

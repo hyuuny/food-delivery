@@ -45,4 +45,6 @@ class StoreImageUseCase(
         repository.insertAll(storeImages)
     }
 
+    suspend fun deleteStoreImagesByStoreId(storeId: Long) = repository.deleteAllByStoreId(storeId)
+
 }

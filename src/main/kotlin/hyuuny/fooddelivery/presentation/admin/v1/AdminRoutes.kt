@@ -86,6 +86,7 @@ class AdminRoutes {
                 GET("/{id}", handler::getStore)
                 GET("", handler::getStores)
                 PUT("/{id}", handler::updateStore)
+                DELETE("/{id}", handler::deleteStore)
             }
         }
     }

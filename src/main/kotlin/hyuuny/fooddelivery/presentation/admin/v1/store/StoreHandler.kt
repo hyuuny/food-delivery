@@ -101,4 +101,17 @@ class StoreHandler(
         }
     }
 
+    suspend fun deleteStore(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+
+        return coroutineScope {
+            val storeDeferred = async { useCase.deleteStore(id) }
+            val detailDeferred = async { storeDetailUseCase.deleteStoreDetailByStoreId(id) }
+            val imageDeferred = async { storeImageUseCase.deleteStoreImagesByStoreId(id) }
+
+            awaitAll(storeDeferred, detailDeferred, imageDeferred)
+            ok().buildAndAwait()
+        }
+    }
+
 }

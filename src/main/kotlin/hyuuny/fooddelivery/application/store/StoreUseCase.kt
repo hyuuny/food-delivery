@@ -67,6 +67,11 @@ class StoreUseCase(
         repository.update(store)
     }
 
+    suspend fun deleteStore(id: Long) {
+        if (!repository.existsById(id)) throw throw NoSuchElementException("존재하지 않는 매장입니다.")
+        repository.delete(id)
+    }
+
     private suspend fun findStoreByIdOrThrows(id: Long) = repository.findById(id)
         ?: throw NoSuchElementException("존재하지 않는 매장입니다.")
 }
