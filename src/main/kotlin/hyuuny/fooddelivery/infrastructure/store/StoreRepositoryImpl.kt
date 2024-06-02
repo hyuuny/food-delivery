@@ -5,8 +5,12 @@ import hyuuny.fooddelivery.domain.store.Store
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.r2dbc.core.applyAndAwait
+import org.springframework.data.r2dbc.core.update
 import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
+import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
 import selectAndCount
 
@@ -21,7 +25,25 @@ class StoreRepositoryImpl(
     override suspend fun findById(id: Long): Store? = dao.findById(id)
 
     override suspend fun update(store: Store) {
-        TODO("Not yet implemented")
+        template.update<Store>()
+            .matching(
+                Query.query(
+                    where("id").`is`(store.id!!),
+                ),
+            ).applyAndAwait(
+                Update.update("categoryId", store.categoryId)
+                    .set("deliveryType", store.deliveryType)
+                    .set("name", store.name)
+                    .set("ownerName", store.ownerName)
+                    .set("taxId", store.taxId)
+                    .set("deliveryFee", store.deliveryFee)
+                    .set("minimumOrderAmount", store.minimumOrderAmount)
+                    .set("iconImageUrl", store.iconImageUrl)
+                    .set("description", store.description)
+                    .set("foodOrigin", store.foodOrigin)
+                    .set("phoneNumber", store.phoneNumber)
+                    .set("updatedAt", store.updatedAt)
+            )
     }
 
     override suspend fun delete(store: Store) {

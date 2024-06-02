@@ -20,7 +20,7 @@ data class StoreResponse(
     val foodOrigin: String,
     val phoneNumber: String,
     val storeDetail: StoreDetailResponse,
-    val storeImages: List<StoreImageResponse>,
+    val storeImages: List<StoreImageResponse>?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
@@ -28,7 +28,7 @@ data class StoreResponse(
         fun from(
             entity: Store,
             storeDetail: StoreDetailResponse,
-            storeImages: List<StoreImageResponse>
+            storeImages: List<StoreImageResponse>?
         ): StoreResponse {
             return StoreResponse(
                 id = entity.id!!,

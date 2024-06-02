@@ -7,4 +7,6 @@ interface StoreImageDao : CoroutineCrudRepository<StoreImage, Long> {
 
     suspend fun findAllByStoreId(storeId: Long): List<StoreImage>
 
+    suspend fun deleteAllByStoreId(storeId: Long)
+
 }

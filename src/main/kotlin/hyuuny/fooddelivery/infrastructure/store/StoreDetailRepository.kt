@@ -8,4 +8,6 @@ interface StoreDetailRepository {
 
     suspend fun findByStoreId(storeId: Long): StoreDetail?
 
+    suspend fun deleteByStoreId(storeId: Long)
+
 }

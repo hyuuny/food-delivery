@@ -31,4 +31,18 @@ class StoreImageUseCase(
 
     suspend fun getStoreImagesByStoreId(storeId: Long): List<StoreImage> = repository.findAllByStoreId(storeId)
 
+    suspend fun updateStoreImages(storeId: Long, request: CreateStoreImageRequest, now: LocalDateTime) {
+        repository.deleteAllByStoreId(storeId)
+        val storeImages = request.imageUrls.map {
+            StoreImage.handle(
+                CreateStoreImageCommand(
+                    storeId = storeId,
+                    imageUrl = it,
+                    createdAt = now
+                )
+            )
+        }
+        repository.insertAll(storeImages)
+    }
+
 }

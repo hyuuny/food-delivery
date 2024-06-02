@@ -17,4 +17,6 @@ class StoreDetailRepositoryImpl(
 
     override suspend fun findByStoreId(storeId: Long): StoreDetail? = dao.findByStoreId(storeId)
 
+    override suspend fun deleteByStoreId(storeId: Long) = dao.deleteByStoreId(storeId)
+
 }

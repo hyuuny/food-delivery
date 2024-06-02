@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.domain.store
 
 import CreateStoreCommand
+import UpdateStoreCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -69,6 +70,21 @@ class Store(
                 updatedAt = command.updatedAt
             )
         }
+    }
+
+    fun handle(command: UpdateStoreCommand) {
+        categoryId = command.categoryId
+        deliveryType = command.deliveryType
+        name = command.name
+        ownerName = command.ownerName
+        taxId = command.taxId
+        deliveryFee = command.deliveryFee
+        minimumOrderAmount = command.minimumOrderAmount
+        iconImageUrl = command.iconImageUrl
+        description = command.description
+        foodOrigin = command.foodOrigin
+        phoneNumber = command.phoneNumber
+        updatedAt = command.updatedAt
     }
 
 }

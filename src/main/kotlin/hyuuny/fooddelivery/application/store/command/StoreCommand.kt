@@ -32,3 +32,18 @@ data class CreateStoreImageCommand(
     val imageUrl: String,
     val createdAt: LocalDateTime,
 )
+
+data class UpdateStoreCommand(
+    val categoryId: Long,
+    val deliveryType: DeliveryType,
+    val name: String,
+    val ownerName: String,
+    val taxId: String,
+    val deliveryFee: Long,
+    val minimumOrderAmount: Long,
+    val iconImageUrl: String?,
+    val description: String,
+    val foodOrigin: String,
+    val phoneNumber: String,
+    val updatedAt: LocalDateTime,
+)

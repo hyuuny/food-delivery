@@ -7,4 +7,6 @@ interface StoreDetailDao : CoroutineCrudRepository<StoreDetail, Long> {
 
     suspend fun findByStoreId(storeId: Long): StoreDetail
 
+    suspend fun deleteByStoreId(storeId: Long)
+
 }
