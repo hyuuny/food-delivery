@@ -3,6 +3,7 @@ package hyuuny.fooddelivery.presentation.admin.v1.store
 import CreateStoreDetailRequest
 import CreateStoreImageRequest
 import CreateStoreRequest
+import UpdateStoreRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.store.StoreDetailUseCase
 import hyuuny.fooddelivery.application.store.StoreImageUseCase
@@ -77,7 +78,7 @@ class StoreHandlerTest : BaseIntegrationTest() {
         val now = LocalDateTime.now()
         val store = generateStore(request, now)
         val storeDetail = generateStoreDetail(store.id!!, request.storeDetail, now)
-        val storeImages = generateStoreImage(store.id!!, request.storeImage, now)
+        val storeImages = generateStoreImage(store.id!!, request.storeImage!!, now)
         coEvery { useCase.createStore(any(), any()) } returns store
         coEvery { storeDetailUseCase.createStoreDetail(any(), any(), any()) } returns storeDetail
         coEvery { storeImageUseCase.createStoreImages(any(), any(), any()) } returns storeImages
@@ -149,7 +150,7 @@ class StoreHandlerTest : BaseIntegrationTest() {
         val now = LocalDateTime.now()
         val store = generateStore(request, now)
         val storeDetail = generateStoreDetail(store.id!!, request.storeDetail, now)
-        val storeImages = generateStoreImage(store.id!!, request.storeImage, now)
+        val storeImages = generateStoreImage(store.id!!, request.storeImage!!, now)
         coEvery { useCase.getStore(any()) } returns store
         coEvery { storeDetailUseCase.getStoreDetailByStoreId(any()) } returns storeDetail
         coEvery { storeImageUseCase.getStoreImagesByStoreId(any()) } returns storeImages
@@ -349,6 +350,47 @@ class StoreHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.size").isEqualTo(15)
             .jsonPath("$.last").isEqualTo(true)
             .jsonPath("$.totalElements").isEqualTo(5)
+    }
+
+    @DisplayName("매장을 수정할 수 있다.")
+    @Test
+    fun updateStore() {
+        val storeId = 1L
+        val request = UpdateStoreRequest(
+            categoryId = 2L,
+            deliveryType = DeliveryType.SELF,
+            name = "가종원의 빽보이피자 2",
+            ownerName = "기피자",
+            taxId = "125-21-38723",
+            deliveryFee = 2500,
+            minimumOrderAmount = 16000,
+            iconImageUrl = null,
+            description = "안녕하세요. 가종원이 빽보이피자 2입니다 :)\n" +
+                    " ★ 음료는 기본 제공되지 않습니다. 필요하신분은 추가 주문 부탁드립니다.\n" +
+                    " ★ 다양한 리뷰이베트는 리뷰칸을 확인해주세요!",
+            foodOrigin = "슈퍼빽보이'카나디언:돼지고기(국내산), 페퍼로니: 돼지고기(국내산과 외국산 섞음), 소고기(호주산), 베이컨:돼지고기(미국산)",
+            phoneNumber = "070-9278-8765",
+            storeDetail = CreateStoreDetailRequest(
+                zipCode = "12345",
+                address = "서울시 강남구 강남대로123길 12",
+                detailedAddress = "1층 101호",
+                openHours = "매일 오전 11:00 ~ 오후 11시 30분",
+                closedDay = null,
+            ),
+            storeImage = null
+        )
+        coEvery { useCase.updateStore(any(), any(), any()) } returns Unit
+        coEvery { storeDetailUseCase.updateStoreDetail(any(), any(), any()) } returns Unit
+        coEvery { storeImageUseCase.updateStoreImages(any(), any(), any()) } returns Unit
+
+        webTestClient.put().uri("/admin/v1/stores/${storeId}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
     }
 
     private fun generateStore(request: CreateStoreRequest, now: LocalDateTime): Store {
