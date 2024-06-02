@@ -27,3 +27,12 @@ data class CreateStoreDetailRequest(
 data class CreateStoreImageRequest(
     val imageUrls: List<String>,
 )
+
+data class StoreSearchCondition(
+    val id: Long? = null,
+    val categoryId: Long? = null,
+    val deliveryType: DeliveryType? = null,
+    val name: String? = null,
+    val taxId: String? = null,
+    val phoneNumber: String? = null,
+)

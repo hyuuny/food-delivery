@@ -84,7 +84,7 @@ class AdminRoutes {
             "/admin/v1/stores".nest {
                 POST("", handler::createStore)
                 GET("/{id}", handler::getStore)
-
+                GET("", handler::getStores)
             }
         }
     }

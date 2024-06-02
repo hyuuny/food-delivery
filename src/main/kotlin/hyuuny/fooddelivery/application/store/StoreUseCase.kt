@@ -2,8 +2,12 @@ package hyuuny.fooddelivery.application.store
 
 import CreateStoreCommand
 import CreateStoreRequest
+import StoreSearchCondition
 import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.infrastructure.store.StoreRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -11,6 +15,11 @@ import java.time.LocalDateTime
 class StoreUseCase(
     private val repository: StoreRepository,
 ) {
+
+    suspend fun getStores(searchCondition: StoreSearchCondition, pageable: Pageable): Page<Store> {
+        val page = repository.findAllStores(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
 
     suspend fun createStore(request: CreateStoreRequest, now: LocalDateTime): Store {
         val store = Store.handle(

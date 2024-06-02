@@ -91,3 +91,33 @@ data class StoreImageResponse(
         }
     }
 }
+
+data class StoreResponses(
+    val id: Long,
+    val categoryId: Long,
+    val deliveryType: DeliveryType,
+    val name: String,
+    val ownerName: String,
+    val taxId: String,
+    val deliveryFee: Long,
+    val iconImageUrl: String?,
+    val phoneNumber: String,
+    val createdAt: LocalDateTime,
+) {
+    companion object {
+        fun from(entity: Store): StoreResponses {
+            return StoreResponses(
+                id = entity.id!!,
+                categoryId = entity.categoryId,
+                deliveryType = entity.deliveryType,
+                name = entity.name,
+                ownerName = entity.ownerName,
+                taxId = entity.taxId,
+                deliveryFee = entity.deliveryFee,
+                iconImageUrl = entity.iconImageUrl,
+                phoneNumber = entity.phoneNumber,
+                createdAt = entity.createdAt,
+            )
+        }
+    }
+}

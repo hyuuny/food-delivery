@@ -1,6 +1,9 @@
 package hyuuny.fooddelivery.infrastructure.store
 
+import StoreSearchCondition
 import hyuuny.fooddelivery.domain.store.Store
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 
 interface StoreRepository {
 
@@ -13,5 +16,7 @@ interface StoreRepository {
     suspend fun delete(store: Store)
 
     suspend fun existsById(id: Long): Boolean
+
+    suspend fun findAllStores(searchCondition: StoreSearchCondition, pageable: Pageable): PageImpl<Store>
 
 }

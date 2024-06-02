@@ -1,20 +1,24 @@
 package hyuuny.fooddelivery.presentation.admin.v1.store
 
 import CreateStoreRequest
+import StoreSearchCondition
+import extractCursorAndCount
 import hyuuny.fooddelivery.application.store.StoreDetailUseCase
 import hyuuny.fooddelivery.application.store.StoreImageUseCase
 import hyuuny.fooddelivery.application.store.StoreUseCase
+import hyuuny.fooddelivery.common.response.SimplePage
+import hyuuny.fooddelivery.domain.store.DeliveryType
 import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreDetailResponse
 import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreImageResponse
 import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreResponse
+import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreResponses
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.awaitBody
-import org.springframework.web.reactive.function.server.bodyValueAndAwait
+import parseSort
 import java.time.LocalDateTime
 
 @Component
@@ -23,6 +27,27 @@ class StoreHandler(
     private val storeDetailUseCase: StoreDetailUseCase,
     private val storeImageUseCase: StoreImageUseCase,
 ) {
+
+    suspend fun getStores(request: ServerRequest): ServerResponse {
+        val id = request.queryParamOrNull("id")?.toLong()
+        val categoryId = request.queryParamOrNull("categoryId")?.toLong()
+        val deliveryType = request.queryParamOrNull("deliveryType")
+            ?.takeIf { it.isNotBlank() }
+            ?.let { DeliveryType.valueOf(it.uppercase().trim()) }
+        val name = request.queryParamOrNull("name")?.takeIf { it.isNotBlank() }
+        val taxId = request.queryParamOrNull("taxId")?.takeIf { it.isNotBlank() }
+        val phoneNumber = request.queryParamOrNull("phoneNumber")?.takeIf { it.isNotBlank() }
+        val searchCondition = StoreSearchCondition(id, categoryId, deliveryType, name, taxId, phoneNumber)
+
+        val sortParam = request.queryParamOrNull("sort")
+        val sort = parseSort(sortParam)
+        val (cursor, count) = extractCursorAndCount(request)
+
+        val pageRequest = PageRequest.of(cursor, count, sort)
+        val page = useCase.getStores(searchCondition, pageRequest)
+        val responses = SimplePage(page.content.map { StoreResponses.from(it) }, page)
+        return ok().bodyValueAndAwait(responses)
+    }
 
     suspend fun createStore(request: ServerRequest): ServerResponse {
         val body = request.awaitBody<CreateStoreRequest>()
