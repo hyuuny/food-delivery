@@ -393,6 +393,22 @@ class StoreHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
+    @DisplayName("매장을 삭제할 수 있다.")
+    @Test
+    fun deleteStore() {
+        val storeId = 1L
+        coEvery { useCase.deleteStore(storeId) } returns Unit
+        coEvery { storeDetailUseCase.deleteStoreDetailByStoreId(storeId) } returns Unit
+        coEvery { storeImageUseCase.deleteStoreImagesByStoreId(storeId) } returns Unit
+
+        webTestClient.delete().uri("/admin/v1/stores/${storeId}")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
     private fun generateStore(request: CreateStoreRequest, now: LocalDateTime): Store {
         return Store(
             id = 1L,
