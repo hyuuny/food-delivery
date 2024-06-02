@@ -1,6 +1,7 @@
 import hyuuny.fooddelivery.domain.menu.MenuStatus
 
 data class CreateMenuRequest(
+    val menuGroupId: Long,
     val name: String,
     val price: Long,
     val status: MenuStatus,

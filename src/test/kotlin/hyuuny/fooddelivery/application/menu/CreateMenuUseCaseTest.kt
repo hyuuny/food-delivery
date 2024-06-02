@@ -19,6 +19,7 @@ internal class CreateMenuUseCaseTest : BehaviorSpec({
 
     given("메뉴를 등록하면서") {
         val request = CreateMenuRequest(
+            menuGroupId = 1L,
             name = "싸이버거",
             price = 6000,
             status = MenuStatus.ON_SALE,
@@ -30,6 +31,7 @@ internal class CreateMenuUseCaseTest : BehaviorSpec({
         val now = LocalDateTime.now()
         val expectedMenu = Menu(
             id = 1,
+            menuGroupId = 1L,
             name = "싸이버거",
             price = 6000,
             status = MenuStatus.ON_SALE,
@@ -46,6 +48,7 @@ internal class CreateMenuUseCaseTest : BehaviorSpec({
 
             then("메뉴를 등록할 수 있다.") {
                 result.id.shouldNotBeNull()
+                result.menuGroupId shouldBe request.menuGroupId
                 result.name shouldBe request.name
                 result.price shouldBe request.price
                 result.status shouldBe request.status
@@ -62,6 +65,7 @@ internal class CreateMenuUseCaseTest : BehaviorSpec({
                 shouldThrow<IllegalArgumentException> {
                     useCase.createMenu(
                         CreateMenuRequest(
+                            menuGroupId = 1L,
                             name = "싸이버거",
                             price = 0,
                             status = MenuStatus.ON_SALE,

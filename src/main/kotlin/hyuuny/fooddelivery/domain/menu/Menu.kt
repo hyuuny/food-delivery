@@ -10,6 +10,7 @@ import java.time.LocalDateTime
 @Table("menus")
 class Menu(
     id: Long? = null,
+    val menuGroupId: Long,
     name: String,
     price: Long,
     status: MenuStatus = MenuStatus.ON_SALE,
@@ -43,6 +44,7 @@ class Menu(
             if (command.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
 
             return Menu(
+                menuGroupId = command.menuGroupId,
                 name = command.name,
                 price = command.price,
                 status = MenuStatus.ON_SALE,

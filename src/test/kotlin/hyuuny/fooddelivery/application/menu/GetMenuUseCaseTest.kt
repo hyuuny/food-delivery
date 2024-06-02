@@ -20,6 +20,7 @@ internal class GetMenuUseCaseTest : BehaviorSpec({
         val now = LocalDateTime.now()
         val expectedMenu = Menu(
             id = expectedMenuId,
+            menuGroupId = 1L,
             name = "싸이버거",
             price = 6000,
             status = MenuStatus.ON_SALE,
@@ -36,6 +37,7 @@ internal class GetMenuUseCaseTest : BehaviorSpec({
 
             then("메뉴를 상세조회 할 수 있다.") {
                 result.id shouldBe expectedMenuId
+                result.menuGroupId shouldBe expectedMenu.menuGroupId
                 result.name shouldBe expectedMenu.name
                 result.price shouldBe expectedMenu.price
                 result.status shouldBe expectedMenu.status

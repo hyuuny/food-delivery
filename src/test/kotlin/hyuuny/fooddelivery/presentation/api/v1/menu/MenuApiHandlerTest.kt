@@ -59,6 +59,7 @@ class MenuApiHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(expectedResponse.id)
+            .jsonPath("$.menuGroupId").isEqualTo(expectedResponse.menuGroupId)
             .jsonPath("$.name").isEqualTo(expectedResponse.name)
             .jsonPath("$.price").isEqualTo(expectedResponse.price)
             .jsonPath("$.popularity").isEqualTo(expectedResponse.popularity)
@@ -76,6 +77,7 @@ class MenuApiHandlerTest : BaseIntegrationTest() {
         val now = LocalDateTime.now()
         return Menu(
             id = id,
+            menuGroupId = 1L,
             name = "싸이버거 세트",
             price = 6000,
             status = MenuStatus.ON_SALE,

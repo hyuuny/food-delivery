@@ -27,6 +27,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
     @Test
     fun createMenu() {
         val request = CreateMenuRequest(
+            menuGroupId = 1L,
             name = "싸이버거",
             price = 6000,
             status = MenuStatus.ON_SALE,
@@ -46,6 +47,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(menu.id!!)
+            .jsonPath("$.menuGroupId").isEqualTo(menu.menuGroupId)
             .jsonPath("$.name").isEqualTo(menu.name)
             .jsonPath("$.price").isEqualTo(menu.price)
             .jsonPath("$.status").isEqualTo(menu.status.name)
@@ -60,6 +62,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
     @Test
     fun createMenu_invalidPrice() {
         val request = CreateMenuRequest(
+            menuGroupId = 1L,
             name = "싸이버거",
             price = 0,
             status = MenuStatus.ON_SALE,
@@ -80,6 +83,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
     @Test
     fun getMenu() {
         val request = CreateMenuRequest(
+            menuGroupId = 1L,
             name = "싸이버거",
             price = 5000,
             status = MenuStatus.ON_SALE,
@@ -97,6 +101,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(menu.id!!)
+            .jsonPath("$.menuGroupId").isEqualTo(menu.menuGroupId)
             .jsonPath("$.name").isEqualTo(menu.name)
             .jsonPath("$.price").isEqualTo(menu.price)
             .jsonPath("$.status").isEqualTo(menu.status.name)
@@ -175,6 +180,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         val now = LocalDateTime.now()
         val cyburger = Menu(
             id = 1L,
+            menuGroupId = 1L,
             name = "싸이버거",
             price = 5000,
             status = MenuStatus.ON_SALE,
@@ -187,6 +193,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
 
         val hotDog = Menu(
             id = 2,
+            menuGroupId = 1L,
             name = "핫도그",
             price = 3000,
             status = MenuStatus.ON_SALE,
@@ -210,6 +217,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.content[0].id").isEqualTo(2)
+            .jsonPath("$.content[0].menuGroupId").isEqualTo(1)
             .jsonPath("$.content[0].name").isEqualTo("핫도그")
             .jsonPath("$.content[0].price").isEqualTo(3000)
             .jsonPath("$.content[0].status").isEqualTo("ON_SALE")
@@ -217,6 +225,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[0].imageUrl").isEqualTo("hotdog-image-url")
             .jsonPath("$.content[0].description").isEqualTo("[인기메뉴]닭고기로 만든 핫도그")
             .jsonPath("$.content[1].id").isEqualTo(1)
+            .jsonPath("$.content[1].menuGroupId").isEqualTo(1)
             .jsonPath("$.content[1].name").isEqualTo("싸이버거")
             .jsonPath("$.content[1].price").isEqualTo(5000)
             .jsonPath("$.content[1].status").isEqualTo("ON_SALE")
@@ -235,6 +244,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         val now = LocalDateTime.now()
         val cyburger = Menu(
             id = 1L,
+            menuGroupId = 1L,
             name = "싸이버거",
             price = 5000,
             status = MenuStatus.ON_SALE,
@@ -247,6 +257,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
 
         val hotDog = Menu(
             id = 2,
+            menuGroupId = 1L,
             name = "핫도그",
             price = 3000,
             status = MenuStatus.ON_SALE,
@@ -270,6 +281,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.content[0].id").isEqualTo(1)
+            .jsonPath("$.content[0].menuGroupId").isEqualTo(1)
             .jsonPath("$.content[0].name").isEqualTo("싸이버거")
             .jsonPath("$.content[0].price").isEqualTo(5000)
             .jsonPath("$.content[0].status").isEqualTo("ON_SALE")
@@ -277,6 +289,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[0].imageUrl").isEqualTo("cyburger-image-url")
             .jsonPath("$.content[0].description").isEqualTo("[베스트]닭다리살")
             .jsonPath("$.content[1].id").isEqualTo(2)
+            .jsonPath("$.content[1].menuGroupId").isEqualTo(1)
             .jsonPath("$.content[1].name").isEqualTo("핫도그")
             .jsonPath("$.content[1].price").isEqualTo(3000)
             .jsonPath("$.content[1].status").isEqualTo("ON_SALE")
@@ -293,6 +306,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         val now = LocalDateTime.now()
         return Menu(
             id = 1,
+            menuGroupId = 1,
             name = request.name,
             price = request.price,
             status = request.status,

@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 
 data class MenuResponse(
     val id: Long,
+    val menuGroupId: Long,
     val name: String,
     val price: Long,
     val status: MenuStatus,
@@ -16,6 +17,7 @@ data class MenuResponse(
 ) {
     constructor(entity: Menu) : this(
         id = entity.id!!,
+        menuGroupId = entity.menuGroupId,
         name = entity.name,
         price = entity.price,
         status = entity.status,
@@ -29,6 +31,7 @@ data class MenuResponse(
 
 data class MenuResponses(
     val id: Long,
+    val menuGroupId: Long,
     val name: String,
     val price: Long,
     val status: MenuStatus,
@@ -40,6 +43,7 @@ data class MenuResponses(
 ) {
     constructor(entity: Menu) : this(
         id = entity.id!!,
+        menuGroupId = entity.menuGroupId,
         name = entity.name,
         price = entity.price,
         status = entity.status,

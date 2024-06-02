@@ -28,6 +28,7 @@ class MenuUseCase(
         val now = LocalDateTime.now()
         val menu = Menu.handle(
             CreateMenuCommand(
+                menuGroupId = request.menuGroupId,
                 name = request.name,
                 price = request.price,
                 status = request.status,

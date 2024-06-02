@@ -22,6 +22,7 @@ internal class ChangeMenuStatusUseCaseTest : BehaviorSpec({
         val now = LocalDateTime.now()
         val existingMenu = Menu(
             id = menuId,
+            menuGroupId = 1L,
             name = "싸이버거",
             price = 6000,
             status = MenuStatus.ON_SALE,

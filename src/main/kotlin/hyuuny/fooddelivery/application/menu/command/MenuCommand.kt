@@ -3,6 +3,7 @@ import java.time.LocalDateTime
 
 data class CreateMenuCommand(
     val name: String,
+    val menuGroupId: Long,
     val price: Long,
     val status: MenuStatus,
     val popularity: Boolean,
