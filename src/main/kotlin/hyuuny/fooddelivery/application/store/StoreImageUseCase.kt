@@ -29,4 +29,6 @@ class StoreImageUseCase(
         return repository.insertAll(storeImages)
     }
 
+    suspend fun getStoreImagesByStoreId(storeId: Long): List<StoreImage> = repository.findAllByStoreId(storeId)
+
 }

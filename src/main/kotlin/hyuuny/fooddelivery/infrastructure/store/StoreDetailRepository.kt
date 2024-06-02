@@ -6,4 +6,6 @@ interface StoreDetailRepository {
 
     suspend fun insert(storeDetail: StoreDetail): StoreDetail
 
+    suspend fun findByStoreId(storeId: Long): StoreDetail?
+
 }

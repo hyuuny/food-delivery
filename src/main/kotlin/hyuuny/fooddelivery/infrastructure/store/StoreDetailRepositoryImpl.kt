@@ -14,4 +14,7 @@ class StoreDetailRepositoryImpl(
 
     override suspend fun insert(storeDetail: StoreDetail): StoreDetail =
         template.insert<StoreDetail>().usingAndAwait(storeDetail)
+
+    override suspend fun findByStoreId(storeId: Long): StoreDetail? = dao.findByStoreId(storeId)
+
 }

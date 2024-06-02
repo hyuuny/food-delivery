@@ -42,4 +42,20 @@ class StoreHandler(
         }
     }
 
+    suspend fun getStore(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+
+        val store = useCase.getStore(id)
+        val storeId = store.id!!
+        return coroutineScope {
+            val detailDeferred = async { storeDetailUseCase.getStoreDetailByStoreId(storeId) }
+            val imageDeferred = async { storeImageUseCase.getStoreImagesByStoreId(storeId) }
+
+            val storeDetailResponse = StoreDetailResponse.from(detailDeferred.await())
+            val storeImageResponses = imageDeferred.await().map { StoreImageResponse.from(it) }
+            val response = StoreResponse.from(store, storeDetailResponse, storeImageResponses)
+            ok().bodyValueAndAwait(response)
+        }
+    }
+
 }

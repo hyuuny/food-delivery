@@ -27,4 +27,7 @@ class StoreDetailUseCase(
         return repository.insert(storeDetail)
     }
 
+    suspend fun getStoreDetailByStoreId(storeId: Long): StoreDetail = repository.findByStoreId(storeId)
+        ?: throw NoSuchElementException("존재하지 않는 매장 정보입니다.")
+
 }

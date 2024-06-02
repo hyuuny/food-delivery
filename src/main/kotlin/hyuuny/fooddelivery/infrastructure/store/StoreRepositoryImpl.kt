@@ -12,9 +12,7 @@ class StoreRepositoryImpl(
 
     override suspend fun insert(store: Store): Store = dao.save(store)
 
-    override suspend fun findById(id: String): Store? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun findById(id: Long): Store? = dao.findById(id)
 
     override suspend fun update(store: Store) {
         TODO("Not yet implemented")
@@ -24,7 +22,7 @@ class StoreRepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    override suspend fun existsById(id: String): Boolean {
+    override suspend fun existsById(id: Long): Boolean {
         TODO("Not yet implemented")
     }
 }

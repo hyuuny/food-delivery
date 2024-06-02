@@ -33,4 +33,7 @@ class StoreUseCase(
         return repository.insert(store)
     }
 
+    suspend fun getStore(id: Long): Store = repository.findById(id)
+        ?: throw NoSuchElementException("존재하지 않는 매장입니다.")
+
 }

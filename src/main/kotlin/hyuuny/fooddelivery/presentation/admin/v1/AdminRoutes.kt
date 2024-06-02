@@ -83,6 +83,8 @@ class AdminRoutes {
         return coRouter {
             "/admin/v1/stores".nest {
                 POST("", handler::createStore)
+                GET("/{id}", handler::getStore)
+
             }
         }
     }

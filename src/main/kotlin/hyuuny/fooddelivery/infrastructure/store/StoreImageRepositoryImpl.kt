@@ -12,4 +12,6 @@ class StoreImageRepositoryImpl(
 ) : StoreImageRepository {
 
     override suspend fun insertAll(storeImages: List<StoreImage>): List<StoreImage> = dao.saveAll(storeImages).toList()
+
+    override suspend fun findAllByStoreId(storeId: Long): List<StoreImage> = dao.findAllByStoreId(storeId).toList()
 }
