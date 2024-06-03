@@ -69,6 +69,9 @@ class MenuRepositoryImpl(
         }
     }
 
+    override suspend fun findAllByMenuGroupIdIn(menuGroupIds: List<Long>): List<Menu> =
+        dao.findAllByMenuGroupIdIn(menuGroupIds)
+
     private fun buildCriteria(condition: MenuSearchCondition): Criteria {
         var criteria = Criteria.empty()
 

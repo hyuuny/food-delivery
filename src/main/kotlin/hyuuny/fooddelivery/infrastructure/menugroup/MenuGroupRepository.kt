@@ -23,4 +23,6 @@ interface MenuGroupRepository {
 
     suspend fun existsById(id: Long): Boolean
 
+    suspend fun findAllByStoreIds(storeIds: List<Long>): List<MenuGroup>
+
 }

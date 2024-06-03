@@ -7,4 +7,6 @@ interface MenuGroupDao : CoroutineCrudRepository<MenuGroup, Long> {
 
     suspend fun findAllByStoreId(storeId: Long): List<MenuGroup>
 
+    suspend fun findAllByStoreIdIn(storeIds: List<Long>): List<MenuGroup>
+
 }

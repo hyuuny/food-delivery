@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.store
 
+import StoreApiSearchCondition
 import StoreSearchCondition
 import hyuuny.fooddelivery.domain.store.Store
 import org.springframework.data.domain.PageImpl
@@ -83,6 +84,32 @@ class StoreRepositoryImpl(
 
         searchCondition.phoneNumber?.let {
             criteria = criteria.and("phone_number").like("%$it%")
+        }
+
+        return criteria
+    }
+
+    override suspend fun findAllStores(searchCondition: StoreApiSearchCondition, pageable: Pageable): PageImpl<Store> {
+        val criteria = buildCriteria(searchCondition)
+        val query = Query.query(criteria).with(pageable)
+        return template.selectAndCount<Store>(query, criteria).let { (data, total) ->
+            PageImpl(data, pageable, total)
+        }
+    }
+
+    private fun buildCriteria(searchCondition: StoreApiSearchCondition): Criteria {
+        var criteria = Criteria.empty()
+
+        searchCondition.categoryId?.let {
+            criteria = criteria.and("category_id").`is`(it)
+        }
+
+        searchCondition.deliveryType?.let {
+            criteria = criteria.and("delivery_type").`is`(it)
+        }
+
+        searchCondition.name?.let {
+            criteria = criteria.and("name").like("%$it%")
         }
 
         return criteria

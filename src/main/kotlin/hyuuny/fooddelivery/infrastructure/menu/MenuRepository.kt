@@ -21,4 +21,6 @@ interface MenuRepository {
 
     suspend fun findAllMenus(searchCondition: MenuSearchCondition, pageable: Pageable): Page<Menu>
 
+    suspend fun findAllByMenuGroupIdIn(menuGroupIds: List<Long>): List<Menu>
+
 }

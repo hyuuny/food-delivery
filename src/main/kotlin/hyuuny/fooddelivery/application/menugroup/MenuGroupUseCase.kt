@@ -73,6 +73,8 @@ class MenuGroupUseCase(
         repository.bulkUpdatePriority(menuGroups)
     }
 
+    suspend fun getAllByStoreId(storeId: Long) = repository.findAllByStoreId(storeId)
+
     suspend fun deleteMenuGroup(id: Long) {
         if (!repository.existsById(id)) throw NoSuchElementException("메뉴그룹을 찾을 수 없습니다.")
         repository.delete(id)
