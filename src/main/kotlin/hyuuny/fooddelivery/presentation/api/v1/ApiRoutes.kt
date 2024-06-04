@@ -25,6 +25,7 @@ class ApiRoutes {
         return coRouter {
             "/api/v1/stores".nest {
                 GET("/{id}", handler::getStore)
+                GET("", handler::getStores)
             }
         }
     }

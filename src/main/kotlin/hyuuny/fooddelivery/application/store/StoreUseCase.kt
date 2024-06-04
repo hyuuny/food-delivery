@@ -24,7 +24,10 @@ class StoreUseCase(
         return PageImpl(page.content, pageable, page.totalElements)
     }
 
-    suspend fun getStores(searchCondition: StoreApiSearchCondition, pageable: Pageable): PageImpl<Store> {
+    suspend fun getStoresByApiSearchCondition(
+        searchCondition: StoreApiSearchCondition,
+        pageable: Pageable
+    ): Page<Store> {
         val page = repository.findAllStores(searchCondition, pageable)
         return PageImpl(page.content, pageable, page.totalElements)
     }

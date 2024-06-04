@@ -78,7 +78,7 @@ class MenuGroupRepositoryImpl(
 
     override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
-    override suspend fun findAllByStoreIds(storeIds: List<Long>): List<MenuGroup> = dao.findAllByStoreIdIn(storeIds)
+    override suspend fun findAllByStoreIdIn(storeIds: List<Long>): List<MenuGroup> = dao.findAllByStoreIdIn(storeIds)
 
     private fun buildCriteria(searchCondition: MenuGroupSearchCondition): Criteria {
         var criteria = Criteria.empty()

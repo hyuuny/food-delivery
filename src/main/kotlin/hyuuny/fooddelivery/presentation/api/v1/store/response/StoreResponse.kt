@@ -6,6 +6,7 @@ import hyuuny.fooddelivery.domain.store.DeliveryType
 import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.domain.store.StoreDetail
 import hyuuny.fooddelivery.domain.store.StoreImage
+import java.time.LocalDateTime
 
 class StoreResponse(
     val id: Long,
@@ -133,6 +134,68 @@ data class MenuResponse(
                 popularity = entity.popularity,
                 imageUrl = entity.imageUrl,
                 description = entity.description,
+            )
+        }
+    }
+}
+
+data class StoreResponses(
+    val id: Long,
+    val categoryId: Long,
+    val deliveryType: DeliveryType,
+    val name: String,
+    val deliveryFee: Long,
+    val minimumOrderAmount: Long,
+    val menuGroups: List<MenuGroupResponses>,
+    val createdAt: LocalDateTime,
+) {
+    companion object {
+        fun from(entity: Store, menuGroups: List<MenuGroupResponses>): StoreResponses {
+            return StoreResponses(
+                id = entity.id!!,
+                categoryId = entity.categoryId,
+                deliveryType = entity.deliveryType,
+                name = entity.name,
+                deliveryFee = entity.deliveryFee,
+                minimumOrderAmount = entity.minimumOrderAmount,
+                menuGroups = menuGroups,
+                createdAt = entity.createdAt,
+            )
+        }
+    }
+}
+
+data class MenuGroupResponses(
+    val id: Long,
+    val storeId: Long,
+    val menus: List<MenuResponses>
+) {
+    companion object {
+        fun from(entity: MenuGroup, menus: List<MenuResponses>): MenuGroupResponses {
+            return MenuGroupResponses(
+                id = entity.id!!,
+                storeId = entity.storeId,
+                menus = menus
+            )
+        }
+    }
+}
+
+data class MenuResponses(
+    val id: Long,
+    val menuGroupId: Long,
+    val name: String,
+    val price: Long,
+    val imageUrl: String?,
+) {
+    companion object {
+        fun from(entity: Menu): MenuResponses {
+            return MenuResponses(
+                id = entity.id!!,
+                menuGroupId = entity.menuGroupId,
+                name = entity.name,
+                price = entity.price,
+                imageUrl = entity.imageUrl,
             )
         }
     }
