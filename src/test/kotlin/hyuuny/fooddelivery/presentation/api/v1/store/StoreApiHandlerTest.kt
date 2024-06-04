@@ -18,6 +18,8 @@ import io.mockk.coEvery
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import java.time.LocalDateTime
 
@@ -60,6 +62,7 @@ class StoreApiHandlerTest : BaseIntegrationTest() {
             .exchange()
             .expectStatus().isOk
             .expectBody()
+            .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(store.id!!)
             .jsonPath("$.categoryId").isEqualTo(store.categoryId)
             .jsonPath("$.deliveryType").isEqualTo(store.deliveryType.name)
@@ -100,6 +103,94 @@ class StoreApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.menuGroups[0].menus[0].popularity").isEqualTo(menus[0].popularity)
             .jsonPath("$.menuGroups[0].menus[0].imageUrl").isEqualTo(menus[0].imageUrl!!)
             .jsonPath("$.menuGroups[0].menus[0].description").isEqualTo(menus[0].description!!)
+    }
+
+    @DisplayName("매장 목록을 조회할 수 있다.")
+    @Test
+    fun getStores() {
+        val now = LocalDateTime.now()
+        val stores = (1..5).map { id ->
+            Store(
+                id = id.toLong(),
+                categoryId = 1L,
+                deliveryType = DeliveryType.OUTSOURCING,
+                name = "치킨집 $id",
+                ownerName = "치킨집 주인 $id",
+                taxId = "123-12-123$id",
+                deliveryFee = 3000 + (id * 1000).toLong(),
+                minimumOrderAmount = 15000 + (id * 5000).toLong(),
+                iconImageUrl = "https://example.com/chicken-icon-$id.jpg",
+                description = "치킨집 ${id}에서는 맛있는 치킨을 판매하고 있습니다. 신선한 식재료로 만든 맛있는 치킨을 맛보세요!",
+                foodOrigin = "치킨집 ${id}의 치킨은 신선한 국내산 닭고기를 사용하여 만들어집니다.",
+                phoneNumber = "02-1234-123$id",
+                createdAt = now,
+                updatedAt = now
+            )
+        }
+
+        val menuGroups = stores.map { store ->
+            val storeId = store.id!!
+            MenuGroup(
+                id = (storeId * 10 + 1),
+                storeId = storeId,
+                name = "치킨 메뉴 그룹 1",
+                priority = 1,
+                description = "치킨집 ${storeId}의 메뉴 그룹입니다. 다양한 맛있는 치킨 메뉴를 즐겨보세요!",
+                createdAt = now,
+                updatedAt = now
+            )
+        }
+
+        val menus = menuGroups.flatMap { group ->
+            (1..5).map { id ->
+                val groupId = group.id!!
+                Menu(
+                    id = (groupId * 10 + id),
+                    menuGroupId = groupId,
+                    name = "치킨 메뉴 $id",
+                    price = 10000 + (id * 1000).toLong(),
+                    status = ON_SALE,
+                    popularity = true,
+                    imageUrl = "https://example.com/chicken-menu-image-$id.jpg",
+                    description = "치킨집에서 판매하는 메뉴중 ${id}번째로 맛있는 치킨입니다. 맛있게 드세요!",
+                    createdAt = now,
+                    updatedAt = now
+                )
+            }
+        }
+
+        val sortedByDescending = stores.sortedByDescending { it.id }
+        val page = PageImpl(sortedByDescending, PageRequest.of(0, 15), stores.size.toLong())
+        coEvery { useCase.getStoresByApiSearchCondition(any(), any()) } returns page
+        coEvery { menuGroupUseCase.getAllByStoreIds(sortedByDescending.mapNotNull { it.id }) } returns menuGroups
+        coEvery { menuUseCase.getAllByMenuGroupIds(menuGroups.mapNotNull { it.id }) } returns menus
+
+        webTestClient.get().uri("/api/v1/stores?sort=id:desc")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.content.length()").isEqualTo(stores.size)
+            .jsonPath("$.content[4].id").isEqualTo(stores[0].id!!)
+            .jsonPath("$.content[4].categoryId").isEqualTo(stores[0].categoryId)
+            .jsonPath("$.content[4].deliveryType").isEqualTo(stores[0].deliveryType.name)
+            .jsonPath("$.content[4].name").isEqualTo(stores[0].name)
+            .jsonPath("$.content[4].deliveryFee").isEqualTo(stores[0].deliveryFee)
+            .jsonPath("$.content[4].minimumOrderAmount").isEqualTo(stores[0].minimumOrderAmount)
+            .jsonPath("$.content[4].menuGroups.length()").isEqualTo(1)
+            .jsonPath("$.content[4].menuGroups[0].id").isEqualTo(menuGroups[0].id!!)
+            .jsonPath("$.content[4].menuGroups[0].storeId").isEqualTo(menuGroups[0].storeId)
+            .jsonPath("$.content[4].menuGroups[0].menus.length()").isEqualTo(5)
+            .jsonPath("$.content[4].menuGroups[0].menus[0].id").isEqualTo(menus[0].id!!)
+            .jsonPath("$.content[4].menuGroups[0].menus[0].menuGroupId").isEqualTo(menus[0].menuGroupId)
+            .jsonPath("$.content[4].menuGroups[0].menus[0].name").isEqualTo(menus[0].name)
+            .jsonPath("$.content[4].menuGroups[0].menus[0].price").isEqualTo(menus[0].price)
+            .jsonPath("$.content[4].menuGroups[0].menus[0].imageUrl").isEqualTo(menus[0].imageUrl!!)
+            .jsonPath("$.pageNumber").isEqualTo(1)
+            .jsonPath("$.size").isEqualTo(15)
+            .jsonPath("$.last").isEqualTo(true)
+            .jsonPath("$.totalElements").isEqualTo(5)
     }
 
     private fun generateStore(id: Long): Store {
