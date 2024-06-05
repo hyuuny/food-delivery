@@ -12,6 +12,7 @@ class Category(
     name: String,
     priority: Int,
     iconImageUrl: String,
+    visible: Boolean = true,
     val createdAt: LocalDateTime,
     updatedAt: LocalDateTime
 ) {
@@ -26,6 +27,8 @@ class Category(
     var priority = priority
         private set
     var iconImageUrl = iconImageUrl
+        private set
+    var visible = visible
         private set
     var updatedAt = updatedAt
         private set
