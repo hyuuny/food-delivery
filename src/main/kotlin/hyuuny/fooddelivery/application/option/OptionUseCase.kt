@@ -1,8 +1,8 @@
 package hyuuny.fooddelivery.application.option
 
+import AdminOptionSearchCondition
 import CreateOptionCommand
 import CreateOptionRequest
-import OptionSearchCondition
 import UpdateOptionCommand
 import UpdateOptionRequest
 import hyuuny.fooddelivery.domain.option.Option
@@ -17,7 +17,10 @@ class OptionUseCase(
     private val repository: OptionRepository
 ) {
 
-    suspend fun getOptions(searchCondition: OptionSearchCondition, pageable: Pageable): PageImpl<Option> {
+    suspend fun getOptionsByAdminCondition(
+        searchCondition: AdminOptionSearchCondition,
+        pageable: Pageable
+    ): PageImpl<Option> {
         val page = repository.findAllOptions(searchCondition, pageable)
         return PageImpl(page.content, pageable, page.totalElements)
     }

@@ -285,7 +285,7 @@ class StoreHandlerTest : BaseIntegrationTest() {
 
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.DEFAULT_DIRECTION, "id"))
         val page = PageImpl(stores, pageable, stores.size.toLong())
-        coEvery { useCase.getStores(any(), any()) } returns page
+        coEvery { useCase.getStoresByAdminCondition(any(), any()) } returns page
 
         webTestClient.get().uri("/admin/v1/stores?sort:id:desc")
             .accept(MediaType.APPLICATION_JSON)

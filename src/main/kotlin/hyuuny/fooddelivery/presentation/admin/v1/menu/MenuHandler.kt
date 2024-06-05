@@ -1,10 +1,10 @@
 package hyuuny.fooddelivery.presentation.admin.v1.menu
 
+import AdminMenuSearchCondition
 import ChangeMenuStatusRequest
 import CreateMenuRequest
 import MenuResponse
 import MenuResponses
-import MenuSearchCondition
 import UpdateMenuRequest
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.menu.MenuUseCase
@@ -31,14 +31,14 @@ class MenuHandler(
             popularity.lowercase().takeIf { it == "true" || it == "false" }?.toBoolean()
         }
 
-        val searchCondition = MenuSearchCondition(name = name, status = status, popularity = popularity)
+        val searchCondition = AdminMenuSearchCondition(name = name, status = status, popularity = popularity)
 
         val sortParam = request.queryParamOrNull("sort")
         val sort = parseSort(sortParam)
         val (cursor, count) = extractCursorAndCount(request)
 
         val pageRequest = PageRequest.of(cursor, count, sort)
-        val page = useCase.getMenus(searchCondition, pageRequest)
+        val page = useCase.getMenusByAdminCondition(searchCondition, pageRequest)
         val responses = SimplePage(page.content.map { MenuResponses(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }

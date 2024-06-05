@@ -161,7 +161,7 @@ class StoreApiHandlerTest : BaseIntegrationTest() {
 
         val sortedByDescending = stores.sortedByDescending { it.id }
         val page = PageImpl(sortedByDescending, PageRequest.of(0, 15), stores.size.toLong())
-        coEvery { useCase.getStoresByApiSearchCondition(any(), any()) } returns page
+        coEvery { useCase.getStoresByApiCondition(any(), any()) } returns page
         coEvery { menuGroupUseCase.getAllByStoreIds(sortedByDescending.mapNotNull { it.id }) } returns menuGroups
         coEvery { menuUseCase.getAllByMenuGroupIds(menuGroups.mapNotNull { it.id }) } returns menus
 

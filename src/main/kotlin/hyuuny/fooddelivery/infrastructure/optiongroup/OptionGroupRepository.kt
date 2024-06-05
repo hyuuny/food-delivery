@@ -1,6 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.optiongroup
 
-import OptionGroupSearchCondition
+import AdminOptionGroupSearchCondition
 import hyuuny.fooddelivery.domain.optiongroup.OptionGroup
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -15,7 +15,7 @@ interface OptionGroupRepository {
 
     suspend fun delete(id: Long)
 
-    suspend fun findAllOptionGroups(searchCondition: OptionGroupSearchCondition, pageable: Pageable): Page<OptionGroup>
+    suspend fun findAllOptionGroups(searchCondition: AdminOptionGroupSearchCondition, pageable: Pageable): Page<OptionGroup>
 
     suspend fun findAllByMenuId(menuId: Long): List<OptionGroup>
 

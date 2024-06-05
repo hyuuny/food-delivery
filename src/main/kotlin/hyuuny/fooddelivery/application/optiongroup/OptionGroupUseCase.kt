@@ -1,8 +1,8 @@
 package hyuuny.fooddelivery.application.optiongroup
 
+import AdminOptionGroupSearchCondition
 import CreateOptionGroupCommand
 import CreateOptionGroupRequest
-import OptionGroupSearchCondition
 import ReOrderOptionGroupCommand
 import ReorderOptionGroupRequests
 import UpdateOptionGroupCommand
@@ -19,7 +19,10 @@ class OptionGroupUseCase(
     private val repository: OptionGroupRepository
 ) {
 
-    suspend fun getOptionGroups(searchCondition: OptionGroupSearchCondition, pageable: Pageable): PageImpl<OptionGroup> {
+    suspend fun getOptionGroupsByAdminCondition(
+        searchCondition: AdminOptionGroupSearchCondition,
+        pageable: Pageable
+    ): PageImpl<OptionGroup> {
         val page = repository.findAllOptionGroups(searchCondition, pageable)
         return PageImpl(page.content, pageable, page.totalElements)
     }

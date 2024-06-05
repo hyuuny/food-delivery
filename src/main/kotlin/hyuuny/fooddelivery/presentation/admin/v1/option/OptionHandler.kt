@@ -1,7 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.option
 
+import AdminOptionSearchCondition
 import CreateOptionRequest
-import OptionSearchCondition
 import UpdateOptionRequest
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.option.OptionUseCase
@@ -26,14 +26,14 @@ class OptionHandler(
     suspend fun getOptions(request: ServerRequest): ServerResponse {
         val optionGroupId = request.queryParamOrNull("optionGroupId")?.toLong()
         val name = request.queryParamOrNull("name")?.takeIf { it.isNotBlank() }
-        val searchCondition = OptionSearchCondition(optionGroupId = optionGroupId, name = name)
+        val searchCondition = AdminOptionSearchCondition(optionGroupId = optionGroupId, name = name)
 
         val sortParam = request.queryParamOrNull("sort")
         val sort = parseSort(sortParam)
         val (cursor, count) = extractCursorAndCount(request)
 
         val pageRequest = PageRequest.of(cursor, count, sort)
-        val page = useCase.getOptions(searchCondition, pageRequest)
+        val page = useCase.getOptionsByAdminCondition(searchCondition, pageRequest)
         val responses = SimplePage(page.content.map { OptionResponses(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }

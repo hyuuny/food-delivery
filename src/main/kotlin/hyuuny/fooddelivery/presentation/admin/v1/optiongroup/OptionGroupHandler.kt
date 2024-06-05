@@ -1,7 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.optiongroup
 
+import AdminOptionGroupSearchCondition
 import CreateOptionGroupRequest
-import OptionGroupSearchCondition
 import ReorderOptionGroupRequests
 import UpdateOptionGroupRequest
 import extractCursorAndCount
@@ -27,14 +27,14 @@ class OptionGroupHandler(
     suspend fun getOptionGroups(request: ServerRequest): ServerResponse {
         val menuId = request.queryParamOrNull("menuId")?.toLong()
         val name = request.queryParamOrNull("name")?.takeIf { it.isNotBlank() }
-        val searchCondition = OptionGroupSearchCondition(menuId = menuId, name = name)
+        val searchCondition = AdminOptionGroupSearchCondition(menuId = menuId, name = name)
 
         val sortParam = request.queryParamOrNull("sort")
         val sort = parseSort(sortParam)
         val (cursor, count) = extractCursorAndCount(request)
 
         val pageRequest = PageRequest.of(cursor, count, sort)
-        val page = useCase.getOptionGroups(searchCondition, pageRequest)
+        val page = useCase.getOptionGroupsByAdminCondition(searchCondition, pageRequest)
         val responses = SimplePage(page.content.map { OptionGroupResponses(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }

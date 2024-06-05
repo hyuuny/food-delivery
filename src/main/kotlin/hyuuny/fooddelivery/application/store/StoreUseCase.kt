@@ -1,9 +1,9 @@
 package hyuuny.fooddelivery.application.store
 
+import AdminStoreSearchCondition
+import ApiStoreSearchCondition
 import CreateStoreCommand
 import CreateStoreRequest
-import StoreApiSearchCondition
-import StoreSearchCondition
 import UpdateStoreCommand
 import UpdateStoreRequest
 import hyuuny.fooddelivery.domain.store.Store
@@ -19,15 +19,12 @@ class StoreUseCase(
     private val repository: StoreRepository,
 ) {
 
-    suspend fun getStores(searchCondition: StoreSearchCondition, pageable: Pageable): Page<Store> {
+    suspend fun getStoresByAdminCondition(searchCondition: AdminStoreSearchCondition, pageable: Pageable): Page<Store> {
         val page = repository.findAllStores(searchCondition, pageable)
         return PageImpl(page.content, pageable, page.totalElements)
     }
 
-    suspend fun getStoresByApiSearchCondition(
-        searchCondition: StoreApiSearchCondition,
-        pageable: Pageable
-    ): Page<Store> {
+    suspend fun getStoresByApiCondition(searchCondition: ApiStoreSearchCondition, pageable: Pageable): Page<Store> {
         val page = repository.findAllStores(searchCondition, pageable)
         return PageImpl(page.content, pageable, page.totalElements)
     }

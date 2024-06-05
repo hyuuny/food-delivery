@@ -1,6 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.option
 
-import OptionSearchCondition
+import AdminOptionSearchCondition
 import hyuuny.fooddelivery.domain.option.Option
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -15,7 +15,7 @@ interface OptionRepository {
 
     suspend fun delete(id: Long)
 
-    suspend fun findAllOptions(searchCondition: OptionSearchCondition, pageable: Pageable): Page<Option>
+    suspend fun findAllOptions(searchCondition: AdminOptionSearchCondition, pageable: Pageable): Page<Option>
 
     suspend fun existsById(id: Long): Boolean
 

@@ -1,7 +1,7 @@
 package hyuuny.fooddelivery.infrastructure.store
 
-import StoreApiSearchCondition
-import StoreSearchCondition
+import AdminStoreSearchCondition
+import ApiStoreSearchCondition
 import hyuuny.fooddelivery.domain.store.Store
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -51,7 +51,7 @@ class StoreRepositoryImpl(
 
     override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
-    override suspend fun findAllStores(searchCondition: StoreSearchCondition, pageable: Pageable): PageImpl<Store> {
+    override suspend fun findAllStores(searchCondition: AdminStoreSearchCondition, pageable: Pageable): PageImpl<Store> {
         val criteria = buildCriteria(searchCondition)
         val query = Query.query(criteria).with(pageable)
         return template.selectAndCount<Store>(query, criteria).let { (data, total) ->
@@ -59,7 +59,7 @@ class StoreRepositoryImpl(
         }
     }
 
-    private fun buildCriteria(searchCondition: StoreSearchCondition): Criteria {
+    private fun buildCriteria(searchCondition: AdminStoreSearchCondition): Criteria {
         var criteria = Criteria.empty()
 
         searchCondition.id?.let {
@@ -89,7 +89,7 @@ class StoreRepositoryImpl(
         return criteria
     }
 
-    override suspend fun findAllStores(searchCondition: StoreApiSearchCondition, pageable: Pageable): PageImpl<Store> {
+    override suspend fun findAllStores(searchCondition: ApiStoreSearchCondition, pageable: Pageable): PageImpl<Store> {
         val criteria = buildCriteria(searchCondition)
         val query = Query.query(criteria).with(pageable)
         return template.selectAndCount<Store>(query, criteria).let { (data, total) ->
@@ -97,7 +97,7 @@ class StoreRepositoryImpl(
         }
     }
 
-    private fun buildCriteria(searchCondition: StoreApiSearchCondition): Criteria {
+    private fun buildCriteria(searchCondition: ApiStoreSearchCondition): Criteria {
         var criteria = Criteria.empty()
 
         searchCondition.categoryId?.let {

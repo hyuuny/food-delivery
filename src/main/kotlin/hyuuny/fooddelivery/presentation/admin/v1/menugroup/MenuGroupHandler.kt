@@ -1,9 +1,9 @@
 package hyuuny.fooddelivery.presentation.admin.v1.menugroup
 
+import AdminMenuGroupSearchCondition
 import CreateMenuGroupRequest
 import MenuGroupResponse
 import MenuGroupResponses
-import MenuGroupSearchCondition
 import ReorderMenuGroupRequests
 import UpdateMenuGroupRequest
 import extractCursorAndCount
@@ -26,14 +26,14 @@ class MenuGroupHandler(
         val id = request.queryParamOrNull("id")?.toLong()
         val storeId = request.queryParamOrNull("storeId")?.toLong()
         val name = request.queryParamOrNull("name")?.takeIf { it.isNotBlank() }
-        val searchCondition = MenuGroupSearchCondition(id = id, storeId = storeId, name = name)
+        val searchCondition = AdminMenuGroupSearchCondition(id = id, storeId = storeId, name = name)
 
         val sortParam = request.queryParamOrNull("sort")
         val sort = parseSort(sortParam)
         val (cursor, count) = extractCursorAndCount(request)
 
         val pageRequest = PageRequest.of(cursor, count, sort)
-        val page = useCase.getMenuGroups(searchCondition, pageRequest)
+        val page = useCase.getMenuGroupsByAdminCondition(searchCondition, pageRequest)
         val responses = SimplePage(page.content.map { MenuGroupResponses(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }

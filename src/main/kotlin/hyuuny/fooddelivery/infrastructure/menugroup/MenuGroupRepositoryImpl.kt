@@ -1,6 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.menugroup
 
-import MenuGroupSearchCondition
+import AdminMenuGroupSearchCondition
 import hyuuny.fooddelivery.domain.menugroup.MenuGroup
 import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.PageImpl
@@ -42,7 +42,7 @@ class MenuGroupRepositoryImpl(
     override suspend fun delete(id: Long) = dao.deleteById(id)
 
     override suspend fun findAllMenuGroups(
-        searchCondition: MenuGroupSearchCondition,
+        searchCondition: AdminMenuGroupSearchCondition,
         pageable: Pageable
     ): PageImpl<MenuGroup> {
         val criteria = buildCriteria(searchCondition)
@@ -80,7 +80,7 @@ class MenuGroupRepositoryImpl(
 
     override suspend fun findAllByStoreIdIn(storeIds: List<Long>): List<MenuGroup> = dao.findAllByStoreIdIn(storeIds)
 
-    private fun buildCriteria(searchCondition: MenuGroupSearchCondition): Criteria {
+    private fun buildCriteria(searchCondition: AdminMenuGroupSearchCondition): Criteria {
         var criteria = Criteria.empty()
 
         searchCondition.id?.let {

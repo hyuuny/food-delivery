@@ -208,7 +208,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.Direction.DESC, "id"))
         val page = PageImpl(menus, pageable, menus.size.toLong())
 
-        coEvery { useCase.getMenus(any(), any()) } returns page
+        coEvery { useCase.getMenusByAdminCondition(any(), any()) } returns page
 
         webTestClient.get().uri("/admin/v1/menus?name=&status=&popularity=&sort=id:desc")
             .accept(MediaType.APPLICATION_JSON)
@@ -272,7 +272,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.Direction.ASC, "id"))
         val page = PageImpl(menus, pageable, menus.size.toLong())
 
-        coEvery { useCase.getMenus(any(), any()) } returns page
+        coEvery { useCase.getMenusByAdminCondition(any(), any()) } returns page
 
         webTestClient.get().uri("/admin/v1/menus?name=&status=&popularity=&sort=id:asc")
             .accept(MediaType.APPLICATION_JSON)

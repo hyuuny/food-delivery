@@ -20,7 +20,7 @@ data class ReorderOptionGroupRequest(
     val priority: Int,
 )
 
-data class OptionGroupSearchCondition(
+data class AdminOptionGroupSearchCondition(
     val menuId: Long? = null,
     val name: String? = null,
 )

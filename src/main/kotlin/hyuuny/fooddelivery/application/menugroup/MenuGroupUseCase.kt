@@ -1,8 +1,8 @@
 package hyuuny.fooddelivery.application.menugroup
 
+import AdminMenuGroupSearchCondition
 import CreateMenuGroupCommand
 import CreateMenuGroupRequest
-import MenuGroupSearchCondition
 import ReOrderMenuGroupCommand
 import ReorderMenuGroupRequests
 import UpdateMenuGroupCommand
@@ -19,7 +19,10 @@ class MenuGroupUseCase(
     private val repository: MenuGroupRepository
 ) {
 
-    suspend fun getMenuGroups(searchCondition: MenuGroupSearchCondition, pageable: Pageable): PageImpl<MenuGroup> {
+    suspend fun getMenuGroupsByAdminCondition(
+        searchCondition: AdminMenuGroupSearchCondition,
+        pageable: Pageable
+    ): PageImpl<MenuGroup> {
         val page = repository.findAllMenuGroups(searchCondition, pageable)
         return PageImpl(page.content, pageable, page.totalElements)
     }

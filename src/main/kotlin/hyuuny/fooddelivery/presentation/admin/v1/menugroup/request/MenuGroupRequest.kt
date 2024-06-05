@@ -19,7 +19,7 @@ data class ReorderMenuGroupRequest(
     val priority: Int,
 )
 
-data class MenuGroupSearchCondition(
+data class AdminMenuGroupSearchCondition(
     val id: Long? = null,
     val storeId: Long? = null,
     val name: String? = null,

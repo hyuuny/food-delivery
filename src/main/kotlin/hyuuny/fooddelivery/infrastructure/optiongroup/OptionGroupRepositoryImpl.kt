@@ -1,6 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.optiongroup
 
-import OptionGroupSearchCondition
+import AdminOptionGroupSearchCondition
 import hyuuny.fooddelivery.domain.optiongroup.OptionGroup
 import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.Page
@@ -43,7 +43,7 @@ class OptionGroupRepositoryImpl(
     override suspend fun delete(id: Long) = dao.deleteById(id)
 
     override suspend fun findAllOptionGroups(
-        searchCondition: OptionGroupSearchCondition,
+        searchCondition: AdminOptionGroupSearchCondition,
         pageable: Pageable
     ): Page<OptionGroup> {
         val criteria = buildCriteria(searchCondition)
@@ -80,7 +80,7 @@ class OptionGroupRepositoryImpl(
 
     override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
-    private fun buildCriteria(searchCondition: OptionGroupSearchCondition): Criteria {
+    private fun buildCriteria(searchCondition: AdminOptionGroupSearchCondition): Criteria {
         var criteria = Criteria.empty()
 
         searchCondition.menuId?.let {

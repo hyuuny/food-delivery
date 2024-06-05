@@ -1,6 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.menu
 
-import MenuSearchCondition
+import AdminMenuSearchCondition
 import hyuuny.fooddelivery.domain.menu.Menu
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -19,7 +19,7 @@ interface MenuRepository {
 
     suspend fun existsById(id: Long): Boolean
 
-    suspend fun findAllMenus(searchCondition: MenuSearchCondition, pageable: Pageable): Page<Menu>
+    suspend fun findAllMenus(searchCondition: AdminMenuSearchCondition, pageable: Pageable): Page<Menu>
 
     suspend fun findAllByMenuGroupIdIn(menuGroupIds: List<Long>): List<Menu>
 

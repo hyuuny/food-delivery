@@ -1,6 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.menugroup
 
-import MenuGroupSearchCondition
+import AdminMenuGroupSearchCondition
 import hyuuny.fooddelivery.domain.menugroup.MenuGroup
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -15,7 +15,7 @@ interface MenuGroupRepository {
 
     suspend fun delete(id: Long)
 
-    suspend fun findAllMenuGroups(searchCondition: MenuGroupSearchCondition, pageable: Pageable): PageImpl<MenuGroup>
+    suspend fun findAllMenuGroups(searchCondition: AdminMenuGroupSearchCondition, pageable: Pageable): PageImpl<MenuGroup>
 
     suspend fun findAllByStoreId(storeId: Long): List<MenuGroup>
 

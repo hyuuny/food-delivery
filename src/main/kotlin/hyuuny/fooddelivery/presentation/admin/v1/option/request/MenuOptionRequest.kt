@@ -9,7 +9,7 @@ data class UpdateOptionRequest(
     val price: Long,
 )
 
-data class OptionSearchCondition(
+data class AdminOptionSearchCondition(
     val optionGroupId: Long? = null,
     val name: String? = null,
 )

@@ -1,6 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.option
 
-import OptionSearchCondition
+import AdminOptionSearchCondition
 import hyuuny.fooddelivery.domain.option.Option
 import kotlinx.coroutines.flow.toList
 import org.springframework.data.domain.Page
@@ -42,7 +42,7 @@ class OptionRepositoryImpl(
     override suspend fun delete(id: Long) = dao.deleteById(id)
 
     override suspend fun findAllOptions(
-        searchCondition: OptionSearchCondition,
+        searchCondition: AdminOptionSearchCondition,
         pageable: Pageable
     ): Page<Option> {
         val criteria = buildCriteria(searchCondition)
@@ -58,7 +58,7 @@ class OptionRepositoryImpl(
     override suspend fun findAllByOptionGroupIdIn(optionGroupIds: List<Long>): List<Option> =
         dao.findAllByOptionGroupIdIn(optionGroupIds).toList()
 
-    private fun buildCriteria(searchCondition: OptionSearchCondition): Criteria {
+    private fun buildCriteria(searchCondition: AdminOptionSearchCondition): Criteria {
         var criteria = Criteria.empty()
 
         searchCondition.optionGroupId?.let {

@@ -1,10 +1,10 @@
 package hyuuny.fooddelivery.application.menu
 
+import AdminMenuSearchCondition
 import ChangeMenuStatusCommand
 import ChangeMenuStatusRequest
 import CreateMenuCommand
 import CreateMenuRequest
-import MenuSearchCondition
 import UpdateMenuCommand
 import UpdateMenuRequest
 import hyuuny.fooddelivery.domain.menu.Menu
@@ -19,7 +19,10 @@ class MenuUseCase(
     private val repository: MenuRepository
 ) {
 
-    suspend fun getMenus(searchCondition: MenuSearchCondition, pageable: Pageable): PageImpl<Menu> {
+    suspend fun getMenusByAdminCondition(
+        searchCondition: AdminMenuSearchCondition,
+        pageable: Pageable
+    ): PageImpl<Menu> {
         val page = repository.findAllMenus(searchCondition, pageable)
         return PageImpl(page.content, pageable, page.totalElements)
     }

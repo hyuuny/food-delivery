@@ -1,7 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.store
 
+import AdminStoreSearchCondition
 import CreateStoreRequest
-import StoreSearchCondition
 import UpdateStoreRequest
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.store.StoreDetailUseCase
@@ -39,14 +39,14 @@ class StoreHandler(
         val name = request.queryParamOrNull("name")?.takeIf { it.isNotBlank() }
         val taxId = request.queryParamOrNull("taxId")?.takeIf { it.isNotBlank() }
         val phoneNumber = request.queryParamOrNull("phoneNumber")?.takeIf { it.isNotBlank() }
-        val searchCondition = StoreSearchCondition(id, categoryId, deliveryType, name, taxId, phoneNumber)
+        val searchCondition = AdminStoreSearchCondition(id, categoryId, deliveryType, name, taxId, phoneNumber)
 
         val sortParam = request.queryParamOrNull("sort")
         val sort = parseSort(sortParam)
         val (cursor, count) = extractCursorAndCount(request)
 
         val pageRequest = PageRequest.of(cursor, count, sort)
-        val page = useCase.getStores(searchCondition, pageRequest)
+        val page = useCase.getStoresByAdminCondition(searchCondition, pageRequest)
         val responses = SimplePage(page.content.map { StoreResponses.from(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }

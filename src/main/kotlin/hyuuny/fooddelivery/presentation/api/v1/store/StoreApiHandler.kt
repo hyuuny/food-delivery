@@ -1,6 +1,6 @@
 package hyuuny.fooddelivery.presentation.api.v1.store
 
-import StoreApiSearchCondition
+import ApiStoreSearchCondition
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
@@ -37,7 +37,7 @@ class StoreApiHandler(
             ?.takeIf { it.isNotBlank() }
             ?.let { DeliveryType.valueOf(it.uppercase().trim()) }
         val name = request.queryParamOrNull("name")?.takeIf { it.isNotBlank() }
-        val searchCondition = StoreApiSearchCondition(
+        val searchCondition = ApiStoreSearchCondition(
             categoryId = categoryId,
             deliveryType = deliveryType,
             name = name
@@ -48,7 +48,7 @@ class StoreApiHandler(
         val (cursor, count) = extractCursorAndCount(request)
 
         val pageRequest = PageRequest.of(cursor, count, sort)
-        val page = useCase.getStoresByApiSearchCondition(searchCondition, pageRequest)
+        val page = useCase.getStoresByApiCondition(searchCondition, pageRequest)
 
         val menuGroups = menuGroupUseCase.getAllByStoreIds(page.content.mapNotNull { it.id })
         val menuGroupIds = menuGroups.groupBy { it.storeId }.values

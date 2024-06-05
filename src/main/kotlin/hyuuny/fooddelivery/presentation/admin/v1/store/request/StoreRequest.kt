@@ -44,7 +44,7 @@ data class UpdateStoreRequest(
     val storeImage: CreateStoreImageRequest?,
 )
 
-data class StoreSearchCondition(
+data class AdminStoreSearchCondition(
     val id: Long? = null,
     val categoryId: Long? = null,
     val deliveryType: DeliveryType? = null,

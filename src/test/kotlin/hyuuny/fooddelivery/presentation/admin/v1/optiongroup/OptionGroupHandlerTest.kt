@@ -140,7 +140,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
 
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.Direction.DESC, "id"))
         val page = PageImpl(optionGroups, pageable, optionGroups.size.toLong())
-        coEvery { useCase.getOptionGroups(any(), any()) } returns page
+        coEvery { useCase.getOptionGroupsByAdminCondition(any(), any()) } returns page
 
         webTestClient.get().uri("/admin/v1/option-groups?menu_id=&name=&sort=id:desc")
             .exchange()
@@ -197,7 +197,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
 
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.Direction.DESC, "id"))
         val page = PageImpl(optionGroups, pageable, optionGroups.size.toLong())
-        coEvery { useCase.getOptionGroups(any(), any()) } returns page
+        coEvery { useCase.getOptionGroupsByAdminCondition(any(), any()) } returns page
 
         webTestClient.get().uri("/admin/v1/option-groups?menu_id=1&name=&sort=id:desc")
             .exchange()

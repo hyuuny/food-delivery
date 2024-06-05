@@ -136,7 +136,7 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
 
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.DEFAULT_DIRECTION, "id"))
         val page = PageImpl(menuGroups, pageable, menuGroups.size.toLong())
-        coEvery { useCase.getMenuGroups(any(), any()) } returns page
+        coEvery { useCase.getMenuGroupsByAdminCondition(any(), any()) } returns page
 
         webTestClient.get().uri("/admin/v1/menu-groups?sort:id:desc")
             .accept(MediaType.APPLICATION_JSON)
