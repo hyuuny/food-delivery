@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.presentation.admin.v1
 
+import hyuuny.fooddelivery.presentation.admin.v1.category.CategoryHandler
 import hyuuny.fooddelivery.presentation.admin.v1.menu.MenuHandler
 import hyuuny.fooddelivery.presentation.admin.v1.menugroup.MenuGroupHandler
 import hyuuny.fooddelivery.presentation.admin.v1.option.OptionHandler
@@ -87,6 +88,15 @@ class AdminRoutes {
                 GET("", handler::getStores)
                 PUT("/{id}", handler::updateStore)
                 DELETE("/{id}", handler::deleteStore)
+            }
+        }
+    }
+
+    @Bean
+    fun categoryAdminApi(handler: CategoryHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/admin/v1/categories".nest {
+                POST("", handler::createCategory)
             }
         }
     }

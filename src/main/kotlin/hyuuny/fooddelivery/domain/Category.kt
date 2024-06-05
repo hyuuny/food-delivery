@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain
 
+import CreateCategoryCommand
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
@@ -32,5 +33,19 @@ class Category(
         private set
     var updatedAt = updatedAt
         private set
+
+    companion object {
+        fun handle(command: CreateCategoryCommand): Category {
+            return Category(
+                deliveryType = command.deliveryType,
+                name = command.name,
+                priority = command.priority,
+                iconImageUrl = command.iconImageUrl,
+                visible = command.visible,
+                createdAt = command.createdAt,
+                updatedAt = command.updatedAt
+            )
+        }
+    }
 
 }
