@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.domain.store
 
 import CreateStoreCommand
 import UpdateStoreCommand
+import hyuuny.fooddelivery.common.constant.DeliveryType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -87,10 +88,4 @@ class Store(
         updatedAt = command.updatedAt
     }
 
-}
-
-enum class DeliveryType(val title: String) {
-    SELF("자체배달"),
-    OUTSOURCING("배달업체 이용"),
-    TAKE_OUT("포장")
 }

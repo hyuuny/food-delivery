@@ -79,7 +79,7 @@ class MenuRepositoryImpl(
             criteria = criteria.and("name").like("%$it%")
         }
         condition.status?.let {
-            criteria = criteria.and("status").`is`(it.name)
+            criteria = criteria.and("status").`is`(it)
         }
         condition.popularity?.let {
             criteria = criteria.and("popularity").`is`(it)

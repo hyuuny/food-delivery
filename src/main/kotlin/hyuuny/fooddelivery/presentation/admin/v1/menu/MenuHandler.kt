@@ -8,8 +8,8 @@ import MenuResponses
 import UpdateMenuRequest
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.menu.MenuUseCase
+import hyuuny.fooddelivery.common.constant.MenuStatus
 import hyuuny.fooddelivery.common.response.SimplePage
-import hyuuny.fooddelivery.domain.menu.MenuStatus
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*

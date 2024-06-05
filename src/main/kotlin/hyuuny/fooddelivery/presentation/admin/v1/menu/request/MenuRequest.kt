@@ -1,4 +1,4 @@
-import hyuuny.fooddelivery.domain.menu.MenuStatus
+import hyuuny.fooddelivery.common.constant.MenuStatus
 
 data class CreateMenuRequest(
     val menuGroupId: Long,

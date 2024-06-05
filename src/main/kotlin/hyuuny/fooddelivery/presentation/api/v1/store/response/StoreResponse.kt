@@ -1,8 +1,8 @@
 package hyuuny.fooddelivery.presentation.api.v1.store.response
 
+import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.domain.menugroup.MenuGroup
-import hyuuny.fooddelivery.domain.store.DeliveryType
 import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.domain.store.StoreDetail
 import hyuuny.fooddelivery.domain.store.StoreImage

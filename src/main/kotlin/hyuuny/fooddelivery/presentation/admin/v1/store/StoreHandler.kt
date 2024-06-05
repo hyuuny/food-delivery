@@ -7,8 +7,8 @@ import extractCursorAndCount
 import hyuuny.fooddelivery.application.store.StoreDetailUseCase
 import hyuuny.fooddelivery.application.store.StoreImageUseCase
 import hyuuny.fooddelivery.application.store.StoreUseCase
+import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.response.SimplePage
-import hyuuny.fooddelivery.domain.store.DeliveryType
 import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreDetailResponse
 import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreImageResponse
 import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreResponse

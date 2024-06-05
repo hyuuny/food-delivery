@@ -3,6 +3,7 @@ package hyuuny.fooddelivery.domain.menu
 import ChangeMenuStatusCommand
 import CreateMenuCommand
 import UpdateMenuCommand
+import hyuuny.fooddelivery.common.constant.MenuStatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -73,10 +74,4 @@ class Menu(
         updatedAt = command.updatedAt
     }
 
-}
-
-enum class MenuStatus(val title: String) {
-    ON_SALE("판매중"),
-    SOLD_OUT("품절"),
-    STOP_SALE("판매 중지")
 }

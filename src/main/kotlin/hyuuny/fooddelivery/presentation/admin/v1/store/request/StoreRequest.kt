@@ -1,4 +1,4 @@
-import hyuuny.fooddelivery.domain.store.DeliveryType
+import hyuuny.fooddelivery.common.constant.DeliveryType
 
 data class CreateStoreRequest(
     val categoryId: Long,
