@@ -1,7 +1,7 @@
 package hyuuny.fooddelivery.application.menu
 
+import hyuuny.fooddelivery.common.constant.MenuStatus
 import hyuuny.fooddelivery.domain.menu.Menu
-import hyuuny.fooddelivery.domain.menu.MenuStatus
 import hyuuny.fooddelivery.infrastructure.menu.MenuRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec

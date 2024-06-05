@@ -5,8 +5,8 @@ import CreateMenuRequest
 import UpdateMenuRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.menu.MenuUseCase
+import hyuuny.fooddelivery.common.constant.MenuStatus
 import hyuuny.fooddelivery.domain.menu.Menu
-import hyuuny.fooddelivery.domain.menu.MenuStatus
 import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
 import io.mockk.coEvery
 import org.junit.jupiter.api.DisplayName

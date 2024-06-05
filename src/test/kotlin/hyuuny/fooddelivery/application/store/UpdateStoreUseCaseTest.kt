@@ -3,7 +3,7 @@ package hyuuny.fooddelivery.application.store
 import CreateStoreDetailRequest
 import CreateStoreImageRequest
 import UpdateStoreRequest
-import hyuuny.fooddelivery.domain.store.DeliveryType
+import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.infrastructure.store.StoreRepository
 import io.kotest.assertions.throwables.shouldThrow
