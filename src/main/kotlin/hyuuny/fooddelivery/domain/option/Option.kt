@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
-@Table("option")
+@Table("options")
 class Option(
     id: Long? = null,
     val optionGroupId: Long,

@@ -62,7 +62,7 @@ class MenuGroupRepositoryImpl(
             WITH updates (id, priority, updated_at) AS (
                 VALUES ${menuGroups.joinToString(", ") { "(${it.id}, ${it.priority}, '${it.updatedAt.format(formatter)}'::timestamp)" }}
             )
-            UPDATE menu_group
+            UPDATE menu_groups
             SET 
                 priority = updates.priority, 
                 updated_at = updates.updated_at

@@ -64,12 +64,12 @@ class OptionGroupRepositoryImpl(
             WITH updates (id, priority, updated_at) AS (
                 VALUES ${optionGroups.joinToString(", ") { "(${it.id}, ${it.priority}, '${it.updatedAt.format(formatter)}'::timestamp)" }}
             )
-            UPDATE option_group
+            UPDATE option_groups
             SET 
                 priority = updates.priority, 
                 updated_at = updates.updated_at
             FROM updates
-            WHERE option_group.id = updates.id
+            WHERE option_groups.id = updates.id
         """
 
         template.databaseClient.sql(query)

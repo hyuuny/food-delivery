@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
-@Table("store_image")
+@Table("store_images")
 class StoreImage(
     id: Long? = null,
     val storeId: Long,

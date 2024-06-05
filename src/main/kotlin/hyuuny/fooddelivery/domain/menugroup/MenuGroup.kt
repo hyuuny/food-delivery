@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
-@Table("menu_group")
+@Table("menu_groups")
 class MenuGroup(
     id: Long? = null,
     val storeId: Long,

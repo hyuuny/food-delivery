@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS menus
     updated_at    TIMESTAMP             NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS option_group
+CREATE TABLE IF NOT EXISTS option_groups
 (
     id         SERIAL PRIMARY KEY,
     menu_id    BIGINT                NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS option_group
     updated_at TIMESTAMP             NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS option
+CREATE TABLE IF NOT EXISTS options
 (
     id              SERIAL PRIMARY KEY,
     option_group_id BIGINT           NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS option
     updated_at      TIMESTAMP        NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS menu_group
+CREATE TABLE IF NOT EXISTS menu_groups
 (
     id          SERIAL PRIMARY KEY,
     store_id    BIGINT       NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS menu_group
     updated_at  TIMESTAMP    NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS store
+CREATE TABLE IF NOT EXISTS stores
 (
     id                   SERIAL PRIMARY KEY,
     category_id          BIGINT       NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS store
     updated_at           TIMESTAMP    NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS store_detail
+CREATE TABLE IF NOT EXISTS store_details
 (
     id               SERIAL PRIMARY KEY,
     store_id         BIGINT       NOT NULL,
@@ -73,15 +73,15 @@ CREATE TABLE IF NOT EXISTS store_detail
     closed_day       VARCHAR(255),
     created_at       TIMESTAMP    NOT NULL,
 
-    FOREIGN KEY (store_id) REFERENCES store (id) ON DELETE CASCADE
+    FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS store_image
+CREATE TABLE IF NOT EXISTS store_images
 (
     id         SERIAL PRIMARY KEY,
     store_id   BIGINT       NOT NULL,
     image_url  VARCHAR(255) NOT NULL,
     created_at TIMESTAMP    NOT NULL,
 
-    FOREIGN KEY (store_id) REFERENCES store (id) ON DELETE CASCADE
+    FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE
 );
