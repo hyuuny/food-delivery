@@ -85,3 +85,14 @@ CREATE TABLE IF NOT EXISTS store_images
 
     FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS categories
+(
+    id             SERIAL PRIMARY KEY,
+    delivery_type  VARCHAR(50)  NOT NULL,
+    name           VARCHAR(255) NOT NULL,
+    priority       INT          NOT NULL,
+    icon_image_url VARCHAR(255) NOT NULL,
+    created_at     TIMESTAMP    NOT NULL,
+    updated_at     TIMESTAMP    NOT NULL
+);
