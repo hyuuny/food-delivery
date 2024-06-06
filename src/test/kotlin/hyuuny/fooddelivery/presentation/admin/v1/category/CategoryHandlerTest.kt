@@ -51,6 +51,34 @@ class CategoryHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.updatedAt").exists()
     }
 
+    @DisplayName("카테고리를 상세조회 할 수 있다.")
+    @Test
+    fun getCategory() {
+        val request = CreateCategoryRequest(
+            deliveryType = DeliveryType.OUTSOURCING,
+            name = "족발/보쌈",
+            priority = 1,
+            iconImageUrl = "pig-foot-image-url",
+            visible = true
+        )
+        val category = generateCategory(request)
+        coEvery { useCase.getCategory(any()) } returns category
+
+        webTestClient.get().uri("/admin/v1/categories/${category.id}")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.id").isEqualTo(category.id!!)
+            .jsonPath("$.deliveryType").isEqualTo(category.deliveryType.name)
+            .jsonPath("$.name").isEqualTo(category.name)
+            .jsonPath("$.priority").isEqualTo(category.priority)
+            .jsonPath("$.visible").isEqualTo(category.visible)
+            .jsonPath("$.createdAt").exists()
+            .jsonPath("$.updatedAt").exists()
+    }
+
     private fun generateCategory(request: CreateCategoryRequest): Category {
         val now = LocalDateTime.now()
         return Category(
