@@ -15,9 +15,7 @@ class CategoryRepositoryImpl(
 
     override suspend fun insert(category: Category): Category = dao.save(category)
 
-    override suspend fun findById(id: Long): Category? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun findById(id: Long): Category? = dao.findById(id)
 
     override suspend fun update(category: Category) {
         TODO("Not yet implemented")

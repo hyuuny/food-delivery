@@ -28,4 +28,13 @@ class CategoryUseCase(
         return repository.insert(category)
     }
 
+    suspend fun getCategory(id: Long): Category {
+        return findCategoryByIdOrThrows(id)
+    }
+
+    private suspend fun findCategoryByIdOrThrows(id: Long): Category {
+        return repository.findById(id)
+            ?: throw NoSuchElementException("존재하지 않는 카테고리입니다.")
+    }
+
 }

@@ -97,6 +97,7 @@ class AdminRoutes {
         return coRouter {
             "/admin/v1/categories".nest {
                 POST("", handler::createCategory)
+                GET("/{id}", handler::getCategory)
             }
         }
     }

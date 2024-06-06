@@ -22,4 +22,11 @@ class CategoryHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun getCategory(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val category = useCase.getCategory(id)
+        val response = CategoryResponse.from(category)
+        return ok().bodyValueAndAwait(response)
+    }
+
 }
