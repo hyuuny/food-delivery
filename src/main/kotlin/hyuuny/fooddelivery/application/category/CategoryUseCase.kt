@@ -3,8 +3,11 @@ package hyuuny.fooddelivery.application.category
 import AdminCategorySearchCondition
 import CreateCategoryCommand
 import CreateCategoryRequest
+import ReOrderCategoryCommand
+import ReOrderCategoryRequests
 import UpdateCategoryCommand
 import UpdateCategoryRequest
+import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.domain.Category
 import hyuuny.fooddelivery.infrastructure.category.CategoryRepository
 import org.springframework.data.domain.Page
@@ -59,6 +62,25 @@ class CategoryUseCase(
             )
         )
         repository.update(category)
+    }
+
+    suspend fun reOrderCategories(deliveryType: DeliveryType, requests: ReOrderCategoryRequests) {
+        val now = LocalDateTime.now()
+        val categories = repository.findAllCategoriesByDeliveryType(deliveryType)
+
+        if (categories.size != requests.reOrderedCategories.size) throw IllegalStateException("카테고리 개수가 일치하지 않습니다.")
+
+        val categoryMap = categories.associateBy { it.id }
+        requests.reOrderedCategories.forEach {
+            val category = categoryMap[it.categoryId] ?: return@forEach
+            category.handle(
+                ReOrderCategoryCommand(
+                    priority = it.priority,
+                    updatedAt = now,
+                )
+            )
+        }
+        repository.bulkUpdatePriority(categories)
     }
 
     private suspend fun findCategoryByIdOrThrows(id: Long): Category {

@@ -18,3 +18,8 @@ data class UpdateCategoryCommand(
     val visible: Boolean,
     val updatedAt: LocalDateTime,
 )
+
+data class ReOrderCategoryCommand(
+    val priority: Int,
+    val updatedAt: LocalDateTime,
+)

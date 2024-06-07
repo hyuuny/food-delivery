@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.presentation.admin.v1.category
 
 import AdminCategorySearchCondition
 import CreateCategoryRequest
+import ReOrderCategoryRequests
 import UpdateCategoryRequest
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.category.CategoryUseCase
@@ -58,6 +59,13 @@ class CategoryHandler(
         val id = request.pathVariable("id").toLong()
         val body = request.awaitBody<UpdateCategoryRequest>()
         useCase.updateCategory(id, body)
+        return ok().buildAndAwait()
+    }
+
+    suspend fun reOrderCategories(request: ServerRequest): ServerResponse {
+        val deliveryType = request.pathVariable("deliveryType").let { DeliveryType.valueOf(it.uppercase().trim()) }
+        val body = request.awaitBody<ReOrderCategoryRequests>()
+        useCase.reOrderCategories(deliveryType, body)
         return ok().buildAndAwait()
     }
 

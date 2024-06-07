@@ -15,6 +15,16 @@ data class UpdateCategoryRequest(
     val visible: Boolean,
 )
 
+data class ReOrderCategoryRequests(
+    val reOrderedCategories: List<ReOrderCategoryRequest>,
+)
+
+data class ReOrderCategoryRequest(
+    val categoryId: Long,
+    val priority: Int,
+)
+
+
 data class AdminCategorySearchCondition(
     val id: Long?,
     val deliveryType: DeliveryType?,

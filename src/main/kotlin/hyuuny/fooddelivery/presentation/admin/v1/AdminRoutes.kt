@@ -100,6 +100,7 @@ class AdminRoutes {
                 GET("/{id}", handler::getCategory)
                 GET("", handler::getCategories)
                 PUT("/{id}", handler::updateCategory)
+                PATCH("/delivery-type/{deliveryType}/re-order", handler::reOrderCategories)
             }
         }
     }

@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.domain
 
 import CreateCategoryCommand
+import ReOrderCategoryCommand
 import UpdateCategoryCommand
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import org.springframework.data.annotation.Id
@@ -54,6 +55,11 @@ class Category(
         this.name = command.name
         this.iconImageUrl = command.iconImageUrl
         this.visible = command.visible
+        this.updatedAt = command.updatedAt
+    }
+
+    fun handle(command: ReOrderCategoryCommand) {
+        this.priority = command.priority
         this.updatedAt = command.updatedAt
     }
 
