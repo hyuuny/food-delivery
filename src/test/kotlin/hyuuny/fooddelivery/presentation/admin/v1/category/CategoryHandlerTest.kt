@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.category
 
 import CreateCategoryRequest
+import UpdateCategoryRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.category.CategoryUseCase
 import hyuuny.fooddelivery.common.constant.DeliveryType
@@ -187,6 +188,27 @@ class CategoryHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.size").isEqualTo(15)
             .jsonPath("$.last").isEqualTo(true)
             .jsonPath("$.totalElements").isEqualTo(5)
+    }
+
+    @DisplayName("카테고리를 수정할 수 있다.")
+    @Test
+    fun updateCategory() {
+        val request = UpdateCategoryRequest(
+            deliveryType = DeliveryType.OUTSOURCING,
+            name = "피자",
+            iconImageUrl = "icon-image-url.jpg",
+            visible = false,
+        )
+        coEvery { useCase.updateCategory(any(), any()) } returns Unit
+
+        webTestClient.put().uri("/admin/v1/categories/${1}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
     }
 
     private fun generateCategory(request: CreateCategoryRequest): Category {
