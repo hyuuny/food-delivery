@@ -8,6 +8,13 @@ data class CreateCategoryRequest(
     val visible: Boolean,
 )
 
+data class UpdateCategoryRequest(
+    val deliveryType: DeliveryType,
+    val name: String,
+    val iconImageUrl: String,
+    val visible: Boolean,
+)
+
 data class AdminCategorySearchCondition(
     val id: Long?,
     val deliveryType: DeliveryType?,

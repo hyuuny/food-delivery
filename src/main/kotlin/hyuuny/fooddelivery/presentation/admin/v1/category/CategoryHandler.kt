@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.presentation.admin.v1.category
 
 import AdminCategorySearchCondition
 import CreateCategoryRequest
+import UpdateCategoryRequest
 import extractCursorAndCount
 import hyuuny.fooddelivery.application.category.CategoryUseCase
 import hyuuny.fooddelivery.common.constant.DeliveryType
@@ -51,6 +52,13 @@ class CategoryHandler(
         val category = useCase.getCategory(id)
         val response = CategoryResponse.from(category)
         return ok().bodyValueAndAwait(response)
+    }
+
+    suspend fun updateCategory(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<UpdateCategoryRequest>()
+        useCase.updateCategory(id, body)
+        return ok().buildAndAwait()
     }
 
 }

@@ -5,8 +5,11 @@ import hyuuny.fooddelivery.domain.Category
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.r2dbc.core.applyAndAwait
+import org.springframework.data.r2dbc.core.update
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query
+import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
 import selectAndCount
 
@@ -21,7 +24,18 @@ class CategoryRepositoryImpl(
     override suspend fun findById(id: Long): Category? = dao.findById(id)
 
     override suspend fun update(category: Category) {
-        TODO("Not yet implemented")
+        template.update<Category>()
+            .matching(
+                Query.query(
+                    Criteria.where("id").`is`(category.id!!)
+                ),
+            ).applyAndAwait(
+                Update.update("deliveryType", category.deliveryType)
+                    .set("name", category.name)
+                    .set("iconImageUrl", category.iconImageUrl)
+                    .set("visible", category.visible)
+                    .set("updatedAt", category.updatedAt)
+            )
     }
 
     override suspend fun delete(id: Long) {

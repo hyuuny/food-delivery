@@ -10,3 +10,11 @@ data class CreateCategoryCommand(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
+
+data class UpdateCategoryCommand(
+    val deliveryType: DeliveryType,
+    val name: String,
+    val iconImageUrl: String,
+    val visible: Boolean,
+    val updatedAt: LocalDateTime,
+)

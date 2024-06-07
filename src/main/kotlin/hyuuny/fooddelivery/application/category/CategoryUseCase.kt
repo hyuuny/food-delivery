@@ -3,6 +3,8 @@ package hyuuny.fooddelivery.application.category
 import AdminCategorySearchCondition
 import CreateCategoryCommand
 import CreateCategoryRequest
+import UpdateCategoryCommand
+import UpdateCategoryRequest
 import hyuuny.fooddelivery.domain.Category
 import hyuuny.fooddelivery.infrastructure.category.CategoryRepository
 import org.springframework.data.domain.Page
@@ -42,6 +44,21 @@ class CategoryUseCase(
 
     suspend fun getCategory(id: Long): Category {
         return findCategoryByIdOrThrows(id)
+    }
+
+    suspend fun updateCategory(id: Long, request: UpdateCategoryRequest) {
+        val now = LocalDateTime.now()
+        val category = findCategoryByIdOrThrows(id)
+        category.handle(
+            UpdateCategoryCommand(
+                deliveryType = request.deliveryType,
+                name = request.name,
+                iconImageUrl = request.iconImageUrl,
+                visible = request.visible,
+                updatedAt = now,
+            )
+        )
+        repository.update(category)
     }
 
     private suspend fun findCategoryByIdOrThrows(id: Long): Category {

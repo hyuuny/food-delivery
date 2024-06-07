@@ -99,6 +99,7 @@ class AdminRoutes {
                 POST("", handler::createCategory)
                 GET("/{id}", handler::getCategory)
                 GET("", handler::getCategories)
+                PUT("/{id}", handler::updateCategory)
             }
         }
     }
