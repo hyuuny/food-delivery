@@ -21,3 +21,7 @@ fun parseSort(sortParam: String?): Sort {
         }
     } ?: Sort.by(Sort.Direction.DESC, "id")
 }
+
+fun parseBooleanQueryParam(queryParam: String?): Boolean? = queryParam?.let { param ->
+    param.lowercase().takeIf { it == "true" || it == "false" }?.toBoolean()
+}
