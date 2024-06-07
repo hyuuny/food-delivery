@@ -1,10 +1,13 @@
 package hyuuny.fooddelivery.presentation.admin.v1.category
 
 import CreateCategoryRequest
+import ReOrderCategoryRequest
+import ReOrderCategoryRequests
 import UpdateCategoryRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.category.CategoryUseCase
 import hyuuny.fooddelivery.common.constant.DeliveryType
+import hyuuny.fooddelivery.common.constant.DeliveryType.SELF
 import hyuuny.fooddelivery.domain.Category
 import hyuuny.fooddelivery.infrastructure.category.CategoryRepository
 import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
@@ -133,7 +136,7 @@ class CategoryHandlerTest : BaseIntegrationTest() {
 
         val fifthCategory = Category(
             id = 5,
-            deliveryType = DeliveryType.SELF,
+            deliveryType = SELF,
             name = "버거",
             priority = 5,
             iconImageUrl = "burger-image-url",
@@ -205,6 +208,64 @@ class CategoryHandlerTest : BaseIntegrationTest() {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("카테고리의 순서를 변경할 수 있다.")
+    @Test
+    fun reOrderCategories() {
+        val now = LocalDateTime.now()
+        val firstCategory = Category(
+            id = 1,
+            deliveryType = DeliveryType.TAKE_OUT,
+            name = "족발/보쌈",
+            priority = 1,
+            iconImageUrl = "pig-foot-image-url",
+            visible = true,
+            createdAt = now,
+            updatedAt = now
+        )
+
+        val secondCategory = Category(
+            id = 2,
+            deliveryType = DeliveryType.TAKE_OUT,
+            name = "돈까스/회/일식",
+            priority = 2,
+            iconImageUrl = "pork-cutlet-image-url",
+            visible = true,
+            createdAt = now,
+            updatedAt = now
+        )
+
+        val thirdCategory = Category(
+            id = 3,
+            deliveryType = DeliveryType.TAKE_OUT,
+            name = "치킨",
+            priority = 3,
+            iconImageUrl = "chicken-image-url",
+            visible = true,
+            createdAt = now,
+            updatedAt = now
+        )
+        val categories = listOf(firstCategory, secondCategory, thirdCategory)
+        coEvery { repository.findAllCategoriesByDeliveryType(any()) } returns categories
+
+        val requests = ReOrderCategoryRequests(
+            reOrderedCategories = listOf(
+                ReOrderCategoryRequest(3, 1),
+                ReOrderCategoryRequest(1, 2),
+                ReOrderCategoryRequest(2, 3),
+            )
+        )
+        coEvery { useCase.reOrderCategories(DeliveryType.TAKE_OUT, requests) } returns Unit
+
+        webTestClient.patch().uri("/admin/v1/categories/delivery-type/${DeliveryType.TAKE_OUT}/re-order")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(requests)
             .exchange()
             .expectStatus().isOk
             .expectBody()
