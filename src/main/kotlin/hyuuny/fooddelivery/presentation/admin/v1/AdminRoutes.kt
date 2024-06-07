@@ -98,6 +98,7 @@ class AdminRoutes {
             "/admin/v1/categories".nest {
                 POST("", handler::createCategory)
                 GET("/{id}", handler::getCategory)
+                GET("", handler::getCategories)
             }
         }
     }

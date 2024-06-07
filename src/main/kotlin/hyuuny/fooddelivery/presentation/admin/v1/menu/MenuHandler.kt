@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
+import parseBooleanQueryParam
 import parseSort
 
 @Component
@@ -26,10 +27,7 @@ class MenuHandler(
         val status = request.queryParamOrNull("status")
             ?.takeIf { it.isNotBlank() }
             ?.let { MenuStatus.valueOf(it.uppercase().trim()) }
-
-        val popularity = request.queryParamOrNull("popularity")?.let { popularity ->
-            popularity.lowercase().takeIf { it == "true" || it == "false" }?.toBoolean()
-        }
+        val popularity = parseBooleanQueryParam(request.queryParamOrNull("popularity"))
 
         val searchCondition = AdminMenuSearchCondition(name = name, status = status, popularity = popularity)
 

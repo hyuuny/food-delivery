@@ -5,7 +5,10 @@ import hyuuny.fooddelivery.domain.Category
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Query
 import org.springframework.stereotype.Component
+import selectAndCount
 
 @Component
 class CategoryRepositoryImpl(
@@ -33,7 +36,11 @@ class CategoryRepositoryImpl(
         searchCondition: AdminCategorySearchCondition,
         pageable: Pageable
     ): PageImpl<Category> {
-        TODO("Not yet implemented")
+        val criteria = buildCriteria(searchCondition)
+        val query = Query.query(criteria).with(pageable)
+        return template.selectAndCount<Category>(query, criteria).let { (data, total) ->
+            PageImpl(data, pageable, total)
+        }
     }
 
     override suspend fun findAllCategories(): List<Category> {
@@ -42,5 +49,27 @@ class CategoryRepositoryImpl(
 
     override suspend fun existsById(id: Long): Boolean {
         TODO("Not yet implemented")
+    }
+
+    private fun buildCriteria(searchCondition: AdminCategorySearchCondition): Criteria {
+        var criteria = Criteria.empty()
+
+        searchCondition.id?.let {
+            criteria = criteria.and("id").`is`(it)
+        }
+
+        searchCondition.deliveryType?.let {
+            criteria = criteria.and("deliveryType").`is`(it)
+        }
+
+        searchCondition.name?.let {
+            criteria = criteria.and("name").like("%$it%")
+        }
+
+        searchCondition.visible?.let {
+            criteria = criteria.and("visible").`is`(it)
+        }
+
+        return criteria
     }
 }
