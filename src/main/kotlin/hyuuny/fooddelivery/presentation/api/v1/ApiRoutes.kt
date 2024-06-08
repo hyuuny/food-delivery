@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.presentation.api.v1
 
+import hyuuny.fooddelivery.presentation.api.v1.category.CategoryApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.menu.MenuApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.store.StoreApiHandler
 import org.springframework.context.annotation.Bean
@@ -26,6 +27,15 @@ class ApiRoutes {
             "/api/v1/stores".nest {
                 GET("/{id}", handler::getStore)
                 GET("", handler::getStores)
+            }
+        }
+    }
+
+    @Bean
+    fun categoryApi(handler: CategoryApiHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/api/v1/categories".nest {
+                GET("/delivery-type/{deliveryType}", handler::getVisibleCategoriesByDeliveryTypeOrderByPriority)
             }
         }
     }
