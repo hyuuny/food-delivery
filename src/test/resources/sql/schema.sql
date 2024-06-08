@@ -97,3 +97,32 @@ CREATE TABLE IF NOT EXISTS categories
     created_at     TIMESTAMP            NOT NULL,
     updated_at     TIMESTAMP            NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS carts
+(
+    id         SERIAL PRIMARY KEY,
+    user_id    BIGINT    NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cart_items
+(
+    id         SERIAL PRIMARY KEY,
+    cart_id    BIGINT    NOT NULL,
+    menu_id    BIGINT    NOT NULL,
+    quantity   INT       NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (cart_id) REFERENCES carts (id)
+);
+
+CREATE TABLE IF NOT EXISTS cart_item_options
+(
+    id           SERIAL PRIMARY KEY,
+    cart_item_id BIGINT    NOT NULL,
+    option_id    BIGINT    NOT NULL,
+    created_at   TIMESTAMP NOT NULL,
+    updated_at   TIMESTAMP NOT NULL,
+    FOREIGN KEY (cart_item_id) REFERENCES cart_items (id)
+);
