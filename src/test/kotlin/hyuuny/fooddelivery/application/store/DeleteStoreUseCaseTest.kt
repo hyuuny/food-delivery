@@ -1,5 +1,7 @@
 package hyuuny.fooddelivery.application.store
 
+import hyuuny.fooddelivery.infrastructure.store.StoreDetailRepository
+import hyuuny.fooddelivery.infrastructure.store.StoreImageRepository
 import hyuuny.fooddelivery.infrastructure.store.StoreRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -10,11 +12,15 @@ import io.mockk.mockk
 class DeleteStoreUseCaseTest : BehaviorSpec({
 
     val repository = mockk<StoreRepository>()
-    val useCase = StoreUseCase(repository)
+    val detailRepository = mockk<StoreDetailRepository>()
+    val imageRepository = mockk<StoreImageRepository>()
+    val useCase = StoreUseCase(repository, detailRepository, imageRepository)
 
     Given("매장을 삭제할 때") {
         val storeId = 1L
         coEvery { repository.existsById(any()) } returns true
+        coEvery { imageRepository.deleteAllByStoreId(any()) } returns Unit
+        coEvery { detailRepository.deleteByStoreId(any()) } returns Unit
         coEvery { repository.delete(any()) } returns Unit
 
         `when`("존재하는 매장이면") {

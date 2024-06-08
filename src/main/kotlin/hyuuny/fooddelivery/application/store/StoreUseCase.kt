@@ -3,20 +3,30 @@ package hyuuny.fooddelivery.application.store
 import AdminStoreSearchCondition
 import ApiStoreSearchCondition
 import CreateStoreCommand
+import CreateStoreDetailCommand
+import CreateStoreImageCommand
 import CreateStoreRequest
 import UpdateStoreCommand
 import UpdateStoreRequest
 import hyuuny.fooddelivery.domain.store.Store
+import hyuuny.fooddelivery.domain.store.StoreDetail
+import hyuuny.fooddelivery.domain.store.StoreImage
+import hyuuny.fooddelivery.infrastructure.store.StoreDetailRepository
+import hyuuny.fooddelivery.infrastructure.store.StoreImageRepository
 import hyuuny.fooddelivery.infrastructure.store.StoreRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
+@Transactional(readOnly = true)
 @Service
 class StoreUseCase(
     private val repository: StoreRepository,
+    private val storeDetailRepository: StoreDetailRepository,
+    private val storeImageRepository: StoreImageRepository,
 ) {
 
     suspend fun getStoresByAdminCondition(searchCondition: AdminStoreSearchCondition, pageable: Pageable): Page<Store> {
@@ -29,7 +39,9 @@ class StoreUseCase(
         return PageImpl(page.content, pageable, page.totalElements)
     }
 
-    suspend fun createStore(request: CreateStoreRequest, now: LocalDateTime): Store {
+    @Transactional
+    suspend fun createStore(request: CreateStoreRequest): Store {
+        val now = LocalDateTime.now()
         val store = Store.handle(
             CreateStoreCommand(
                 categoryId = request.categoryId,
@@ -47,12 +59,40 @@ class StoreUseCase(
                 updatedAt = now
             )
         )
-        return repository.insert(store)
+        val savedStore = repository.insert(store)
+
+        StoreDetail.handle(
+            CreateStoreDetailCommand(
+                storeId = savedStore.id!!,
+                zipCode = request.storeDetail.zipCode,
+                address = request.storeDetail.address,
+                detailedAddress = request.storeDetail.detailedAddress,
+                openHours = request.storeDetail.openHours,
+                closedDay = request.storeDetail.closedDay,
+                createdAt = now,
+            )
+        ).apply {
+            storeDetailRepository.insert(this)
+        }
+
+        val storeImages = request.storeImage?.imageUrls?.map {
+            StoreImage.handle(
+                CreateStoreImageCommand(
+                    storeId = savedStore.id!!,
+                    imageUrl = it,
+                    createdAt = now
+                )
+            )
+        }
+        storeImages?.takeIf { it.isNotEmpty() }?.also { storeImageRepository.insertAll(it) }
+        return savedStore
     }
 
     suspend fun getStore(id: Long): Store = findStoreByIdOrThrows(id)
 
-    suspend fun updateStore(id: Long, request: UpdateStoreRequest, now: LocalDateTime) {
+    @Transactional
+    suspend fun updateStore(id: Long, request: UpdateStoreRequest): Store {
+        val now = LocalDateTime.now()
         val store = findStoreByIdOrThrows(id)
         store.handle(
             UpdateStoreCommand(
@@ -71,10 +111,42 @@ class StoreUseCase(
             )
         )
         repository.update(store)
+
+        storeDetailRepository.deleteByStoreId(id)
+        val storeDetail = StoreDetail.handle(
+            CreateStoreDetailCommand(
+                storeId = store.id!!,
+                zipCode = request.storeDetail.zipCode,
+                address = request.storeDetail.address,
+                detailedAddress = request.storeDetail.detailedAddress,
+                openHours = request.storeDetail.openHours,
+                closedDay = request.storeDetail.closedDay,
+                createdAt = now,
+            )
+        )
+        storeDetailRepository.insert(storeDetail)
+
+        storeImageRepository.deleteAllByStoreId(id)
+        val storeImages = request.storeImage?.imageUrls?.map {
+            StoreImage.handle(
+                CreateStoreImageCommand(
+                    storeId = store.id!!,
+                    imageUrl = it,
+                    createdAt = now
+                )
+            )
+        }
+        storeImages?.takeIf { it.isNotEmpty() }?.also {
+            storeImageRepository.insertAll(it)
+        }
+        return store
     }
 
+    @Transactional
     suspend fun deleteStore(id: Long) {
         if (!repository.existsById(id)) throw throw NoSuchElementException("존재하지 않는 매장입니다.")
+        storeImageRepository.deleteAllByStoreId(id)
+        storeDetailRepository.deleteByStoreId(id)
         repository.delete(id)
     }
 

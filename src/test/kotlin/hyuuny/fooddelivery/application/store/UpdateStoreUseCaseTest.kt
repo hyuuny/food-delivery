@@ -5,6 +5,10 @@ import CreateStoreImageRequest
 import UpdateStoreRequest
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.domain.store.Store
+import hyuuny.fooddelivery.domain.store.StoreDetail
+import hyuuny.fooddelivery.domain.store.StoreImage
+import hyuuny.fooddelivery.infrastructure.store.StoreDetailRepository
+import hyuuny.fooddelivery.infrastructure.store.StoreImageRepository
 import hyuuny.fooddelivery.infrastructure.store.StoreRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -16,7 +20,9 @@ import java.time.LocalDateTime
 class UpdateStoreUseCaseTest : BehaviorSpec({
 
     val repository = mockk<StoreRepository>()
-    val useCase = StoreUseCase(repository)
+    val detailRepository = mockk<StoreDetailRepository>()
+    val imageRepository = mockk<StoreImageRepository>()
+    val useCase = StoreUseCase(repository, detailRepository, imageRepository)
 
     Given("매장을 수정할 때") {
         val storeId = 1L
@@ -70,8 +76,29 @@ class UpdateStoreUseCaseTest : BehaviorSpec({
         coEvery { repository.findById(any()) } returns store
         coEvery { repository.update(any()) } returns Unit
 
+        val storeDetail = StoreDetail(
+            id = 1,
+            storeId = store.id!!,
+            zipCode = "12345",
+            address = "서울시 강남구 강남대로123길 12",
+            detailedAddress = "1층 101호",
+            openHours = "매일 오전 11:00 ~ 오후 11시 30분",
+            closedDay = null,
+            createdAt = now,
+        )
+        coEvery { detailRepository.deleteByStoreId(any()) } returns Unit
+        coEvery { detailRepository.insert(any()) } returns storeDetail
+
+        val storeImages = listOf(
+            StoreImage(id = 1, storeId = store.id!!, imageUrl = "image-url-1.jpg", createdAt = now),
+            StoreImage(id = 2, storeId = store.id!!, imageUrl = "image-url-2.jpg", createdAt = now),
+            StoreImage(id = 3, storeId = store.id!!, imageUrl = "image-url-3.jpg", createdAt = now),
+        )
+        coEvery { imageRepository.deleteAllByStoreId(any()) } returns Unit
+        coEvery { imageRepository.insertAll(any()) } returns storeImages
+
         `when`("입력한 매장 정보로") {
-            useCase.updateStore(storeId, request, now)
+            useCase.updateStore(storeId, request)
 
             then("매장을 수정할 수 있다.") {
                 coEvery { repository.update(any()) }
@@ -83,7 +110,7 @@ class UpdateStoreUseCaseTest : BehaviorSpec({
 
             then("존재하지 않는 매장이라는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
-                    useCase.updateStore(0, request, now)
+                    useCase.updateStore(0, request)
                 }
                 ex.message shouldBe "존재하지 않는 매장입니다."
             }

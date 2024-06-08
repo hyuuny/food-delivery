@@ -5,6 +5,10 @@ import CreateStoreImageRequest
 import CreateStoreRequest
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.domain.store.Store
+import hyuuny.fooddelivery.domain.store.StoreDetail
+import hyuuny.fooddelivery.domain.store.StoreImage
+import hyuuny.fooddelivery.infrastructure.store.StoreDetailRepository
+import hyuuny.fooddelivery.infrastructure.store.StoreImageRepository
 import hyuuny.fooddelivery.infrastructure.store.StoreRepository
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -16,7 +20,9 @@ import java.time.LocalDateTime
 class CreateStoreUseCaseTest : BehaviorSpec({
 
     val repository = mockk<StoreRepository>()
-    val useCase = StoreUseCase(repository)
+    val detailRepository = mockk<StoreDetailRepository>()
+    val imageRepository = mockk<StoreImageRepository>()
+    val useCase = StoreUseCase(repository, detailRepository, imageRepository)
 
     Given("매장을 등록하면서") {
         val request = CreateStoreRequest(
@@ -48,7 +54,7 @@ class CreateStoreUseCaseTest : BehaviorSpec({
         )
 
         val now = LocalDateTime.now()
-        val expectedStore = Store(
+        val store = Store(
             id = 1L,
             categoryId = 1L,
             deliveryType = DeliveryType.OUTSOURCING,
@@ -64,10 +70,29 @@ class CreateStoreUseCaseTest : BehaviorSpec({
             createdAt = now,
             updatedAt = now,
         )
-        coEvery { repository.insert(any()) } returns expectedStore
+        coEvery { repository.insert(any()) } returns store
+
+        val storeDetail = StoreDetail(
+            id = 1,
+            storeId = store.id!!,
+            zipCode = "12345",
+            address = "서울시 강남구 강남대로123길 12",
+            detailedAddress = "1층 101호",
+            openHours = "매일 오전 11:00 ~ 오후 11시 30분",
+            closedDay = null,
+            createdAt = now,
+        )
+        coEvery { detailRepository.insert(any()) } returns storeDetail
+
+        val storeImages = listOf(
+            StoreImage(id = 1, storeId = store.id!!, imageUrl = "image-url-1.jpg", createdAt = now),
+            StoreImage(id = 2, storeId = store.id!!, imageUrl = "image-url-2.jpg", createdAt = now),
+            StoreImage(id = 3, storeId = store.id!!, imageUrl = "image-url-3.jpg", createdAt = now),
+        )
+        coEvery { imageRepository.insertAll(any()) } returns storeImages
 
         `when`("입력한 매장 정보로") {
-            val result = useCase.createStore(request, now)
+            val result = useCase.createStore(request)
 
             then("매장을 등록할 수 있다.") {
                 result.id.shouldNotBeNull()

@@ -2,6 +2,8 @@ package hyuuny.fooddelivery.application.store
 
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.domain.store.Store
+import hyuuny.fooddelivery.infrastructure.store.StoreDetailRepository
+import hyuuny.fooddelivery.infrastructure.store.StoreImageRepository
 import hyuuny.fooddelivery.infrastructure.store.StoreRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -14,7 +16,9 @@ import java.time.LocalDateTime
 class GetStoreUseCaseTest : BehaviorSpec({
 
     val repository = mockk<StoreRepository>()
-    val useCase = StoreUseCase(repository)
+    val detailRepository = mockk<StoreDetailRepository>()
+    val imageRepository = mockk<StoreImageRepository>()
+    val useCase = StoreUseCase(repository, detailRepository, imageRepository)
 
     Given("매장을 상세조회 할 때") {
         val expectedStoreId = 1L

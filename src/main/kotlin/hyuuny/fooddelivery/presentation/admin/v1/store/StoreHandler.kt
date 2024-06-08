@@ -14,14 +14,12 @@ import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreImageRespon
 import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreResponse
 import hyuuny.fooddelivery.presentation.admin.v1.store.response.StoreResponses
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import parseSort
-import java.time.LocalDateTime
 
 @Component
 class StoreHandler(
@@ -54,17 +52,14 @@ class StoreHandler(
     suspend fun createStore(request: ServerRequest): ServerResponse {
         val body = request.awaitBody<CreateStoreRequest>()
 
-        val now = LocalDateTime.now()
+        val store = useCase.createStore(body)
+        val storeId = store.id!!
         return coroutineScope {
-            val storeDeferred = async { useCase.createStore(body, now) }
-
-            val store = storeDeferred.await()
-            val detailDeferred = async { storeDetailUseCase.createStoreDetail(store.id!!, body.storeDetail, now) }
-            val imageDeferred =
-                async { body.storeImage?.let { storeImageUseCase.createStoreImages(store.id!!, it, now) } }
+            val detailDeferred = async { storeDetailUseCase.getStoreDetailByStoreId(storeId) }
+            val imageDeferred = async { storeImageUseCase.getStoreImagesByStoreId(storeId) }
 
             val storeDetailResponse = StoreDetailResponse.from(detailDeferred.await())
-            val storeImageResponses = imageDeferred.await()?.map { StoreImageResponse.from(it) }
+            val storeImageResponses = imageDeferred.await().map { StoreImageResponse.from(it) }
             val response = StoreResponse.from(store, storeDetailResponse, storeImageResponses)
             ok().bodyValueAndAwait(response)
         }
@@ -90,28 +85,22 @@ class StoreHandler(
         val id = request.pathVariable("id").toLong()
         val body = request.awaitBody<UpdateStoreRequest>()
 
-        val now = LocalDateTime.now()
+        val store = useCase.updateStore(id, body)
         return coroutineScope {
-            val storeDeferred = async { useCase.updateStore(id, body, now) }
-            val detailDeferred = async { storeDetailUseCase.updateStoreDetail(id, body.storeDetail, now) }
-            val imageDeferred = async { body.storeImage?.let { storeImageUseCase.updateStoreImages(id, it, now) } }
+            val detailDeferred = async { storeDetailUseCase.getStoreDetailByStoreId(id) }
+            val imageDeferred = async { storeImageUseCase.getStoreImagesByStoreId(id) }
 
-            awaitAll(storeDeferred, detailDeferred, imageDeferred)
-            ok().buildAndAwait()
+            val storeDetailResponse = StoreDetailResponse.from(detailDeferred.await())
+            val storeImageResponses = imageDeferred.await().map { StoreImageResponse.from(it) }
+            val response = StoreResponse.from(store, storeDetailResponse, storeImageResponses)
+            ok().bodyValueAndAwait(response)
         }
     }
 
     suspend fun deleteStore(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
-
-        return coroutineScope {
-            val storeDeferred = async { useCase.deleteStore(id) }
-            val detailDeferred = async { storeDetailUseCase.deleteStoreDetailByStoreId(id) }
-            val imageDeferred = async { storeImageUseCase.deleteStoreImagesByStoreId(id) }
-
-            awaitAll(storeDeferred, detailDeferred, imageDeferred)
-            ok().buildAndAwait()
-        }
+        useCase.deleteStore(id)
+        return ok().buildAndAwait()
     }
 
 }

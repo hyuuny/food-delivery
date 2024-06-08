@@ -12,9 +12,6 @@ import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.domain.store.StoreDetail
 import hyuuny.fooddelivery.domain.store.StoreImage
-import hyuuny.fooddelivery.infrastructure.store.StoreDetailRepository
-import hyuuny.fooddelivery.infrastructure.store.StoreImageRepository
-import hyuuny.fooddelivery.infrastructure.store.StoreRepository
 import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
 import io.mockk.coEvery
 import org.junit.jupiter.api.DisplayName
@@ -35,15 +32,6 @@ class StoreHandlerTest : BaseIntegrationTest() {
 
     @MockkBean
     private lateinit var storeImageUseCase: StoreImageUseCase
-
-    @MockkBean
-    private lateinit var repository: StoreRepository
-
-    @MockkBean
-    private lateinit var storeDetailRepository: StoreDetailRepository
-
-    @MockkBean
-    private lateinit var storeImageRepository: StoreImageRepository
 
     @DisplayName("매장을 등록할 수 있다.")
     @Test
@@ -79,9 +67,9 @@ class StoreHandlerTest : BaseIntegrationTest() {
         val store = generateStore(request, now)
         val storeDetail = generateStoreDetail(store.id!!, request.storeDetail, now)
         val storeImages = generateStoreImage(store.id!!, request.storeImage!!, now)
-        coEvery { useCase.createStore(any(), any()) } returns store
-        coEvery { storeDetailUseCase.createStoreDetail(any(), any(), any()) } returns storeDetail
-        coEvery { storeImageUseCase.createStoreImages(any(), any(), any()) } returns storeImages
+        coEvery { useCase.createStore(any()) } returns store
+        coEvery { storeDetailUseCase.getStoreDetailByStoreId(any()) } returns storeDetail
+        coEvery { storeImageUseCase.getStoreImagesByStoreId(any()) } returns storeImages
 
         webTestClient.post().uri("/admin/v1/stores")
             .contentType(MediaType.APPLICATION_JSON)
@@ -356,6 +344,7 @@ class StoreHandlerTest : BaseIntegrationTest() {
     @Test
     fun updateStore() {
         val storeId = 1L
+        val now = LocalDateTime.now()
         val request = UpdateStoreRequest(
             categoryId = 2L,
             deliveryType = DeliveryType.SELF,
@@ -379,9 +368,45 @@ class StoreHandlerTest : BaseIntegrationTest() {
             ),
             storeImage = null
         )
-        coEvery { useCase.updateStore(any(), any(), any()) } returns Unit
-        coEvery { storeDetailUseCase.updateStoreDetail(any(), any(), any()) } returns Unit
-        coEvery { storeImageUseCase.updateStoreImages(any(), any(), any()) } returns Unit
+
+        val store = Store(
+            id = storeId,
+            categoryId = 2L,
+            deliveryType = DeliveryType.SELF,
+            name = "가종원의 빽보이피자 2",
+            ownerName = "기피자",
+            taxId = "125-21-38723",
+            deliveryFee = 2500,
+            minimumOrderAmount = 16000,
+            iconImageUrl = null,
+            description = "안녕하세요. 가종원이 빽보이피자 2입니다 :)\n" +
+                    " ★ 음료는 기본 제공되지 않습니다. 필요하신분은 추가 주문 부탁드립니다.\n" +
+                    " ★ 다양한 리뷰이베트는 리뷰칸을 확인해주세요!",
+            foodOrigin = "슈퍼빽보이'카나디언:돼지고기(국내산), 페퍼로니: 돼지고기(국내산과 외국산 섞음), 소고기(호주산), 베이컨:돼지고기(미국산)",
+            phoneNumber = "070-9278-8765",
+            createdAt = now,
+            updatedAt = now,
+        )
+        coEvery { useCase.updateStore(any(), any()) } returns store
+
+        val storeDetail = StoreDetail(
+            id = 1,
+            storeId = store.id!!,
+            zipCode = "12345",
+            address = "서울시 강남구 강남대로123길 12",
+            detailedAddress = "1층 101호",
+            openHours = "매일 오전 11:00 ~ 오후 11시 30분",
+            closedDay = null,
+            createdAt = now,
+        )
+        coEvery { storeDetailUseCase.getStoreDetailByStoreId(any()) } returns storeDetail
+
+        val storeImages = listOf(
+            StoreImage(id = 1, storeId = store.id!!, imageUrl = "image-url-1.jpg", createdAt = now),
+            StoreImage(id = 2, storeId = store.id!!, imageUrl = "image-url-2.jpg", createdAt = now),
+            StoreImage(id = 3, storeId = store.id!!, imageUrl = "image-url-3.jpg", createdAt = now),
+        )
+        coEvery { storeImageUseCase.getStoreImagesByStoreId(any()) } returns storeImages
 
         webTestClient.put().uri("/admin/v1/stores/${storeId}")
             .contentType(MediaType.APPLICATION_JSON)
@@ -391,6 +416,30 @@ class StoreHandlerTest : BaseIntegrationTest() {
             .expectStatus().isOk
             .expectBody()
             .consumeWith(::println)
+            .jsonPath("$.id").isEqualTo(store.id!!)
+            .jsonPath("$.categoryId").isEqualTo(store.categoryId)
+            .jsonPath("$.deliveryType").isEqualTo(store.deliveryType.name)
+            .jsonPath("$.name").isEqualTo(store.name)
+            .jsonPath("$.ownerName").isEqualTo(store.ownerName)
+            .jsonPath("$.taxId").isEqualTo(store.taxId)
+            .jsonPath("$.deliveryFee").isEqualTo(store.deliveryFee)
+            .jsonPath("$.minimumOrderAmount").isEqualTo(store.minimumOrderAmount)
+            .jsonPath("$.iconImageUrl").doesNotExist()
+            .jsonPath("$.description").isEqualTo(store.description)
+            .jsonPath("$.foodOrigin").isEqualTo(store.foodOrigin)
+            .jsonPath("$.phoneNumber").isEqualTo(store.phoneNumber)
+            .jsonPath("$.storeDetail.id").isEqualTo(storeDetail.id!!)
+            .jsonPath("$.storeDetail.storeId").isEqualTo(storeDetail.storeId)
+            .jsonPath("$.storeDetail.zipCode").isEqualTo(storeDetail.zipCode)
+            .jsonPath("$.storeDetail.address").isEqualTo(storeDetail.address)
+            .jsonPath("$.storeDetail.detailedAddress").isEqualTo(storeDetail.detailedAddress!!)
+            .jsonPath("$.storeDetail.openHours").isEqualTo(storeDetail.openHours!!)
+            .jsonPath("$.storeDetail.closedDay").isEqualTo(storeDetail.closedDay ?: "연중무휴")
+            .jsonPath("$.storeImages[0].imageUrl").isEqualTo(storeImages[0].imageUrl)
+            .jsonPath("$.storeImages[1].imageUrl").isEqualTo(storeImages[1].imageUrl)
+            .jsonPath("$.storeImages[2].imageUrl").isEqualTo(storeImages[2].imageUrl)
+            .jsonPath("$.createdAt").exists()
+            .jsonPath("$.updatedAt").exists()
     }
 
     @DisplayName("매장을 삭제할 수 있다.")
