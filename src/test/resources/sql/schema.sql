@@ -123,6 +123,5 @@ CREATE TABLE IF NOT EXISTS cart_item_options
     cart_item_id BIGINT    NOT NULL,
     option_id    BIGINT    NOT NULL,
     created_at   TIMESTAMP NOT NULL,
-    updated_at   TIMESTAMP NOT NULL,
     FOREIGN KEY (cart_item_id) REFERENCES cart_items (id)
 );

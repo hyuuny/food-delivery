@@ -10,7 +10,6 @@ class CartItemOption(
     val cartItemId: Long,
     val optionId: Long,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
 ) {
 
     @Id
