@@ -42,9 +42,7 @@ class CategoryRepositoryImpl(
             )
     }
 
-    override suspend fun delete(id: Long) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun delete(id: Long) = dao.deleteById(id)
 
     override suspend fun bulkUpdatePriority(categories: List<Category>) {
         if (categories.isEmpty()) return
@@ -84,9 +82,7 @@ class CategoryRepositoryImpl(
     override suspend fun findAllCategoriesByDeliveryType(deliveryType: DeliveryType): List<Category> =
         dao.findAllByDeliveryType(deliveryType)
 
-    override suspend fun existsById(id: Long): Boolean {
-        TODO("Not yet implemented")
-    }
+    override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
     private fun buildCriteria(searchCondition: AdminCategorySearchCondition): Criteria {
         var criteria = Criteria.empty()

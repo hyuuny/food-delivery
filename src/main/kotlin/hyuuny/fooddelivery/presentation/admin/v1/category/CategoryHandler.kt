@@ -76,4 +76,10 @@ class CategoryHandler(
         return ok().buildAndAwait()
     }
 
+    suspend fun deleteCategory(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        useCase.deleteCategory(id)
+        return ok().buildAndAwait()
+    }
+
 }

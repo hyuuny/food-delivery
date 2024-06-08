@@ -102,6 +102,7 @@ class AdminRoutes {
                 GET("/delivery-type/{deliveryType}", handler::getVisibleCategoriesByDeliveryTypeOrderByPriority)
                 PUT("/{id}", handler::updateCategory)
                 PATCH("/delivery-type/{deliveryType}/re-order", handler::reOrderCategories)
+                DELETE("/{id}", handler::deleteCategory)
             }
         }
     }
