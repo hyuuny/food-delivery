@@ -7,6 +7,7 @@ import UpdateCategoryRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.category.CategoryUseCase
 import hyuuny.fooddelivery.common.constant.DeliveryType
+import hyuuny.fooddelivery.common.constant.DeliveryType.OUTSOURCING
 import hyuuny.fooddelivery.common.constant.DeliveryType.SELF
 import hyuuny.fooddelivery.domain.Category
 import hyuuny.fooddelivery.infrastructure.category.CategoryRepository
@@ -32,7 +33,7 @@ class CategoryHandlerTest : BaseIntegrationTest() {
     @Test
     fun createCategory() {
         val request = CreateCategoryRequest(
-            deliveryType = DeliveryType.OUTSOURCING,
+            deliveryType = OUTSOURCING,
             name = "족발/보쌈",
             priority = 1,
             iconImageUrl = "pig-foot-image-url",
@@ -62,7 +63,7 @@ class CategoryHandlerTest : BaseIntegrationTest() {
     @Test
     fun getCategory() {
         val request = CreateCategoryRequest(
-            deliveryType = DeliveryType.OUTSOURCING,
+            deliveryType = OUTSOURCING,
             name = "족발/보쌈",
             priority = 1,
             iconImageUrl = "pig-foot-image-url",
@@ -92,7 +93,7 @@ class CategoryHandlerTest : BaseIntegrationTest() {
         val now = LocalDateTime.now()
         val firstCategory = Category(
             id = 1,
-            deliveryType = DeliveryType.OUTSOURCING,
+            deliveryType = OUTSOURCING,
             name = "족발/보쌈",
             priority = 1,
             iconImageUrl = "pig-foot-image-url",
@@ -103,7 +104,7 @@ class CategoryHandlerTest : BaseIntegrationTest() {
 
         val secondCategory = Category(
             id = 2,
-            deliveryType = DeliveryType.OUTSOURCING,
+            deliveryType = OUTSOURCING,
             name = "돈까스/회/일식",
             priority = 2,
             iconImageUrl = "pork-cutlet-image-url",
@@ -125,7 +126,7 @@ class CategoryHandlerTest : BaseIntegrationTest() {
 
         val fourthCategory = Category(
             id = 4,
-            deliveryType = DeliveryType.OUTSOURCING,
+            deliveryType = OUTSOURCING,
             name = "피자",
             priority = 4,
             iconImageUrl = "pizza-image-url",
@@ -197,7 +198,7 @@ class CategoryHandlerTest : BaseIntegrationTest() {
     @Test
     fun updateCategory() {
         val request = UpdateCategoryRequest(
-            deliveryType = DeliveryType.OUTSOURCING,
+            deliveryType = OUTSOURCING,
             name = "피자",
             iconImageUrl = "icon-image-url.jpg",
             visible = false,
@@ -270,6 +271,95 @@ class CategoryHandlerTest : BaseIntegrationTest() {
             .expectStatus().isOk
             .expectBody()
             .consumeWith(::println)
+    }
+
+    @DisplayName("우선 순위에 맞춰 정렬된 노출 카테고리 목록을 조회할 수 있다.")
+    @Test
+    fun getVisibleCategoriesByDeliveryTypeOrderByPriority() {
+        val now = LocalDateTime.now()
+        val firstCategory = Category(
+            id = 1,
+            deliveryType = OUTSOURCING,
+            name = "족발/보쌈",
+            priority = 2,
+            iconImageUrl = "pig-foot-image-url",
+            visible = true,
+            createdAt = now,
+            updatedAt = now
+        )
+
+        val secondCategory = Category(
+            id = 2,
+            deliveryType = OUTSOURCING,
+            name = "돈까스/회/일식",
+            priority = 3,
+            iconImageUrl = "pork-cutlet-image-url",
+            visible = false,
+            createdAt = now,
+            updatedAt = now
+        )
+
+        val thirdCategory = Category(
+            id = 3,
+            deliveryType = OUTSOURCING,
+            name = "치킨",
+            priority = 5,
+            iconImageUrl = "chicken-image-url",
+            visible = true,
+            createdAt = now,
+            updatedAt = now
+        )
+
+        val fourthCategory = Category(
+            id = 4,
+            deliveryType = OUTSOURCING,
+            name = "피자",
+            priority = 1,
+            iconImageUrl = "pizza-image-url",
+            visible = true,
+            createdAt = now,
+            updatedAt = now
+        )
+
+        val fifthCategory = Category(
+            id = 5,
+            deliveryType = OUTSOURCING,
+            name = "버거",
+            priority = 4,
+            iconImageUrl = "burger-image-url",
+            visible = false,
+            createdAt = now,
+            updatedAt = now
+        )
+        val categories = listOf(firstCategory, secondCategory, thirdCategory, fourthCategory, fifthCategory)
+            .filter { it.visible }.sortedBy { it.priority }
+        coEvery { useCase.getVisibleCategoriesByDeliveryTypeOrderByPriority(OUTSOURCING) } returns categories
+
+        webTestClient.get().uri("/admin/v1/categories/delivery-type/$OUTSOURCING")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.[0].id").isEqualTo(fourthCategory.id!!)
+            .jsonPath("$.[0].deliveryType").isEqualTo(fourthCategory.deliveryType.name)
+            .jsonPath("$.[0].name").isEqualTo(fourthCategory.name)
+            .jsonPath("$.[0].priority").isEqualTo(fourthCategory.priority)
+            .jsonPath("$.[0].visible").isEqualTo(fourthCategory.visible)
+            .jsonPath("$.[0].createdAt").exists()
+            .jsonPath("$.[1].id").isEqualTo(firstCategory.id!!)
+            .jsonPath("$.[1].deliveryType").isEqualTo(firstCategory.deliveryType.name)
+            .jsonPath("$.[1].name").isEqualTo(firstCategory.name)
+            .jsonPath("$.[1].priority").isEqualTo(firstCategory.priority)
+            .jsonPath("$.[1].visible").isEqualTo(firstCategory.visible)
+            .jsonPath("$.[1].createdAt").exists()
+            .jsonPath("$.[2].id").isEqualTo(thirdCategory.id!!)
+            .jsonPath("$.[2].deliveryType").isEqualTo(thirdCategory.deliveryType.name)
+            .jsonPath("$.[2].name").isEqualTo(thirdCategory.name)
+            .jsonPath("$.[2].priority").isEqualTo(thirdCategory.priority)
+            .jsonPath("$.[2].visible").isEqualTo(thirdCategory.visible)
+            .jsonPath("$.[2].createdAt").exists()
+
     }
 
     private fun generateCategory(request: CreateCategoryRequest): Category {
