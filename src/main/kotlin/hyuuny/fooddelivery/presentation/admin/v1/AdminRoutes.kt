@@ -99,6 +99,7 @@ class AdminRoutes {
                 POST("", handler::createCategory)
                 GET("/{id}", handler::getCategory)
                 GET("", handler::getCategories)
+                GET("/delivery-type/{deliveryType}", handler::getVisibleCategoriesByDeliveryTypeOrderByPriority)
                 PUT("/{id}", handler::updateCategory)
                 PATCH("/delivery-type/{deliveryType}/re-order", handler::reOrderCategories)
             }

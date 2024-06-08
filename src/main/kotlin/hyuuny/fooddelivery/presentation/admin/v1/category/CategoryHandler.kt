@@ -55,6 +55,13 @@ class CategoryHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun getVisibleCategoriesByDeliveryTypeOrderByPriority(request: ServerRequest): ServerResponse {
+        val deliveryType = request.pathVariable("deliveryType").let { DeliveryType.valueOf(it.uppercase().trim()) }
+        val categories = useCase.getVisibleCategoriesByDeliveryTypeOrderByPriority(deliveryType)
+        val responses = categories.map { CategoryResponses.from(it) }
+        return ok().bodyValueAndAwait(responses)
+    }
+
     suspend fun updateCategory(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
         val body = request.awaitBody<UpdateCategoryRequest>()

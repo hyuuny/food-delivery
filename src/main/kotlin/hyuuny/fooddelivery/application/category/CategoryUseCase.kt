@@ -83,6 +83,9 @@ class CategoryUseCase(
         repository.bulkUpdatePriority(categories)
     }
 
+    suspend fun getVisibleCategoriesByDeliveryTypeOrderByPriority(deliveryType: DeliveryType): List<Category> =
+        repository.findAllCategoriesByDeliveryType(deliveryType).sortedBy { it.priority }
+
     private suspend fun findCategoryByIdOrThrows(id: Long): Category {
         return repository.findById(id)
             ?: throw NoSuchElementException("존재하지 않는 카테고리입니다.")
