@@ -359,7 +359,19 @@ class CategoryHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.[2].priority").isEqualTo(thirdCategory.priority)
             .jsonPath("$.[2].visible").isEqualTo(thirdCategory.visible)
             .jsonPath("$.[2].createdAt").exists()
+    }
 
+    @DisplayName("카테고리를 삭제할 수 있다.")
+    @Test
+    fun deleteCategory() {
+        coEvery { useCase.deleteCategory(any()) } returns Unit
+
+        webTestClient.delete().uri("/admin/v1/categories/${1}")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
     }
 
     private fun generateCategory(request: CreateCategoryRequest): Category {
