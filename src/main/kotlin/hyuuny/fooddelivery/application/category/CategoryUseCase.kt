@@ -8,7 +8,7 @@ import ReOrderCategoryRequests
 import UpdateCategoryCommand
 import UpdateCategoryRequest
 import hyuuny.fooddelivery.common.constant.DeliveryType
-import hyuuny.fooddelivery.domain.Category
+import hyuuny.fooddelivery.domain.category.Category
 import hyuuny.fooddelivery.infrastructure.category.CategoryRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl

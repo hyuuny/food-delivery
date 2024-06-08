@@ -1,7 +1,7 @@
 package hyuuny.fooddelivery.presentation.api.v1.category.response
 
 import hyuuny.fooddelivery.common.constant.DeliveryType
-import hyuuny.fooddelivery.domain.Category
+import hyuuny.fooddelivery.domain.category.Category
 
 data class CategoryResponses(
     val id: Long,

@@ -9,7 +9,7 @@ import hyuuny.fooddelivery.application.category.CategoryUseCase
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.DeliveryType.OUTSOURCING
 import hyuuny.fooddelivery.common.constant.DeliveryType.SELF
-import hyuuny.fooddelivery.domain.Category
+import hyuuny.fooddelivery.domain.category.Category
 import hyuuny.fooddelivery.infrastructure.category.CategoryRepository
 import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
 import io.mockk.coEvery

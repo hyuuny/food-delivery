@@ -1,7 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.category.response
 
 import hyuuny.fooddelivery.common.constant.DeliveryType
-import hyuuny.fooddelivery.domain.Category
+import hyuuny.fooddelivery.domain.category.Category
 import java.time.LocalDateTime
 
 data class CategoryResponse(

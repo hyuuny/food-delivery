@@ -1,7 +1,7 @@
 package hyuuny.fooddelivery.application.category
 
 import hyuuny.fooddelivery.common.constant.DeliveryType
-import hyuuny.fooddelivery.domain.Category
+import hyuuny.fooddelivery.domain.category.Category
 import hyuuny.fooddelivery.infrastructure.category.CategoryRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec

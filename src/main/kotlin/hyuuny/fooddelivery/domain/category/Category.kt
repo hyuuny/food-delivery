@@ -1,4 +1,4 @@
-package hyuuny.fooddelivery.domain
+package hyuuny.fooddelivery.domain.category
 
 import CreateCategoryCommand
 import ReOrderCategoryCommand

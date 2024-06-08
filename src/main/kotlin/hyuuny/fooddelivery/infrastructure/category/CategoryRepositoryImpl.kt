@@ -2,7 +2,7 @@ package hyuuny.fooddelivery.infrastructure.category
 
 import AdminCategorySearchCondition
 import hyuuny.fooddelivery.common.constant.DeliveryType
-import hyuuny.fooddelivery.domain.Category
+import hyuuny.fooddelivery.domain.category.Category
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.PageImpl
