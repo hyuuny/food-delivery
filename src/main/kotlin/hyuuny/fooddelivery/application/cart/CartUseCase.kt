@@ -48,7 +48,7 @@ class CartUseCase(
             )
         )
 
-        request.item.optionIds?.takeIf { it.isNotEmpty() }?.map { optionId ->
+        request.item.optionIds.map { optionId ->
             CartItemOption.handle(
                 CreateCartItemOptionCommand(
                     cartItemId = cartItem.id!!,
@@ -56,7 +56,7 @@ class CartUseCase(
                     createdAt = now,
                 )
             )
-        }?.also { cartItemOptionRepository.insertAll(it) }
+        }.also { cartItemOptionRepository.insertAll(it) }
         return cart
     }
 

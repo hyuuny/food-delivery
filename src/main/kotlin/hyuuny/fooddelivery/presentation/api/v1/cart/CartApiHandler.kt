@@ -11,12 +11,14 @@ import hyuuny.fooddelivery.presentation.api.v1.cart.response.CartItemResponse
 import hyuuny.fooddelivery.presentation.api.v1.cart.response.CartResponse
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.awaitBody
 import org.springframework.web.reactive.function.server.bodyValueAndAwait
+import org.springframework.web.server.ResponseStatusException
 
 @Component
 class CartApiHandler(
@@ -31,6 +33,8 @@ class CartApiHandler(
         val userId = request.pathVariable("userId").toLong()
         val body = request.awaitBody<AddItemToCartRequest>()
 
+        if (body.item.optionIds.isEmpty()) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "옵션은 필수값입니다.")
+
         val cart = useCase.addItemToCart(userId, body)
         return coroutineScope {
             val cartItems = async { cartItemUseCase.getAllByCartId(cart.id!!) }.await()
@@ -39,11 +43,13 @@ class CartApiHandler(
             val cartItemOptions =
                 async { cartItemOptionUseCase.getAllByCartItemIds(cartItems.mapNotNull { it.id }) }.await()
             val optionMap = optionUseCase.getAllByIds(cartItemOptions.map { it.optionId }).associateBy { it.id }
+            val cartItemOptionGroup = cartItemOptions.groupBy { it.cartItemId }
 
             val cartItemResponses = cartItems.mapNotNull { cartItem ->
                 val menu = menuMap[cartItem.menuId] ?: return@mapNotNull null
+                val optionsOfCartItem = cartItemOptionGroup[cartItem.id] ?: return@mapNotNull null
 
-                val cartItemOptionResponse = cartItemOptions.mapNotNull optionMap@{ cartItemOption ->
+                val cartItemOptionResponse = optionsOfCartItem.mapNotNull optionMap@{ cartItemOption ->
                     val option = optionMap[cartItemOption.optionId] ?: return@optionMap null
                     CartItemOptionResponse.from(cartItemOption, option)
                 }

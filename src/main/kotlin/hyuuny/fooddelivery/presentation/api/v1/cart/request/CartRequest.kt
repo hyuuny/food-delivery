@@ -5,5 +5,5 @@ data class AddItemToCartRequest(
 data class AddItemAndOptionRequest(
     val menuId: Long,
     val quantity: Int,
-    val optionIds: List<Long>?,
+    val optionIds: List<Long>,
 )
