@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.presentation.api.v1
 
+import hyuuny.fooddelivery.presentation.api.v1.cart.CartApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.category.CategoryApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.menu.MenuApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.store.StoreApiHandler
@@ -36,6 +37,15 @@ class ApiRoutes {
         return coRouter {
             "/api/v1/categories".nest {
                 GET("/delivery-type/{deliveryType}", handler::getVisibleCategoriesByDeliveryTypeOrderByPriority)
+            }
+        }
+    }
+
+    @Bean
+    fun cartApi(handler: CartApiHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/api/v1/users/{userId}/carts".nest {
+                POST("", handler::addItemToCart)
             }
         }
     }

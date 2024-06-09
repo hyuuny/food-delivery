@@ -64,6 +64,8 @@ class OptionUseCase(
     suspend fun getAllByOptionGroupIds(optionGroupIds: List<Long>): List<Option> =
         repository.findAllByOptionGroupIdIn(optionGroupIds)
 
+    suspend fun getAllByIds(ids: List<Long>): List<Option> = repository.findAllByIdIn(ids)
+
     private suspend fun findOptionByIdOrThrow(id: Long): Option = repository.findById(id)
         ?: throw NoSuchElementException("옵션을 찾을 수 없습니다.")
 

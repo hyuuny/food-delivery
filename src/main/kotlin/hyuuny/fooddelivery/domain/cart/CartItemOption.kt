@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.cart
 
+import CreateCartItemOptionCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -15,5 +16,15 @@ class CartItemOption(
     @Id
     var id = id
         protected set
+
+    companion object {
+        fun handle(command: CreateCartItemOptionCommand): CartItemOption {
+            return CartItemOption(
+                cartItemId = command.cartItemId,
+                optionId = command.optionId,
+                createdAt = command.createdAt,
+            )
+        }
+    }
 
 }

@@ -87,6 +87,8 @@ class MenuUseCase(
     suspend fun getAllByMenuGroupIds(menuGroupIds: List<Long>): List<Menu> =
         repository.findAllByMenuGroupIdIn(menuGroupIds)
 
+    suspend fun getAllByIds(menuIds: List<Long>): List<Menu> = repository.findAllByIdIn(menuIds)
+
     private suspend fun findMenuByIdOrThrow(id: Long): Menu = repository.findById(id)
         ?: throw NoSuchElementException("${id}번 메뉴를 찾을 수 없습니다.")
 

@@ -58,6 +58,8 @@ class OptionRepositoryImpl(
     override suspend fun findAllByOptionGroupIdIn(optionGroupIds: List<Long>): List<Option> =
         dao.findAllByOptionGroupIdIn(optionGroupIds).toList()
 
+    override suspend fun findAllByIdIn(ids: List<Long>): List<Option> = dao.findAllById(ids).toList()
+
     private fun buildCriteria(searchCondition: AdminOptionSearchCondition): Criteria {
         var criteria = Criteria.empty()
 

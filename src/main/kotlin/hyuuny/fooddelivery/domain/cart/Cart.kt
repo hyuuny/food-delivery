@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.cart
 
+import CreateCartCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -18,4 +19,13 @@ class Cart(
     var updatedAt = updatedAt
         private set
 
+    companion object {
+        fun handle(command: CreateCartCommand): Cart {
+            return Cart(
+                userId = command.userId,
+                createdAt = command.createdAt,
+                updatedAt = command.updatedAt,
+            )
+        }
+    }
 }

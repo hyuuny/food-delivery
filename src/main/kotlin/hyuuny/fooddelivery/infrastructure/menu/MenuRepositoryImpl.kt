@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.infrastructure.menu
 
 import AdminMenuSearchCondition
 import hyuuny.fooddelivery.domain.menu.Menu
+import kotlinx.coroutines.flow.toList
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -71,6 +72,8 @@ class MenuRepositoryImpl(
 
     override suspend fun findAllByMenuGroupIdIn(menuGroupIds: List<Long>): List<Menu> =
         dao.findAllByMenuGroupIdIn(menuGroupIds)
+
+    override suspend fun findAllByIdIn(ids: List<Long>): List<Menu> = dao.findAllById(ids).toList()
 
     private fun buildCriteria(condition: AdminMenuSearchCondition): Criteria {
         var criteria = Criteria.empty()

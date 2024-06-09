@@ -23,4 +23,6 @@ interface MenuRepository {
 
     suspend fun findAllByMenuGroupIdIn(menuGroupIds: List<Long>): List<Menu>
 
+    suspend fun findAllByIdIn(ids: List<Long>): List<Menu>
+
 }

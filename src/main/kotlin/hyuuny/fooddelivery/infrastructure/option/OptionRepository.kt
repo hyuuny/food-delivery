@@ -21,4 +21,6 @@ interface OptionRepository {
 
     suspend fun findAllByOptionGroupIdIn(optionGroupIds: List<Long>): List<Option>
 
+    suspend fun findAllByIdIn(ids: List<Long>): List<Option>
+
 }
