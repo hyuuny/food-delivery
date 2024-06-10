@@ -11,12 +11,12 @@ class StoreDetailUseCase(
     private val repository: StoreDetailRepository
 ) {
 
-    suspend fun getStoreDetailByStoreId(storeId: Long): StoreDetail = findStoreDetailByStoreIdOrThrows(storeId)
+    suspend fun getStoreDetailByStoreId(storeId: Long): StoreDetail = findStoreDetailByStoreIdOrThrow(storeId)
 
     @Transactional
     suspend fun deleteStoreDetailByStoreId(storeId: Long) = repository.deleteByStoreId(storeId)
 
-    private suspend fun findStoreDetailByStoreIdOrThrows(storeId: Long) = repository.findByStoreId(storeId)
+    private suspend fun findStoreDetailByStoreIdOrThrow(storeId: Long) = repository.findByStoreId(storeId)
         ?: throw NoSuchElementException("존재하지 않는 매장 정보입니다.")
 
 }

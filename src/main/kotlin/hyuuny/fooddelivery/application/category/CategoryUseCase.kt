@@ -46,12 +46,12 @@ class CategoryUseCase(
     }
 
     suspend fun getCategory(id: Long): Category {
-        return findCategoryByIdOrThrows(id)
+        return findCategoryByIdOrThrow(id)
     }
 
     suspend fun updateCategory(id: Long, request: UpdateCategoryRequest) {
         val now = LocalDateTime.now()
-        val category = findCategoryByIdOrThrows(id)
+        val category = findCategoryByIdOrThrow(id)
         category.handle(
             UpdateCategoryCommand(
                 deliveryType = request.deliveryType,
@@ -91,7 +91,7 @@ class CategoryUseCase(
         repository.delete(id)
     }
 
-    private suspend fun findCategoryByIdOrThrows(id: Long): Category {
+    private suspend fun findCategoryByIdOrThrow(id: Long): Category {
         return repository.findById(id)
             ?: throw NoSuchElementException("존재하지 않는 카테고리입니다.")
     }

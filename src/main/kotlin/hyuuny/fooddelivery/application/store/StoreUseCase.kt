@@ -88,12 +88,12 @@ class StoreUseCase(
         return savedStore
     }
 
-    suspend fun getStore(id: Long): Store = findStoreByIdOrThrows(id)
+    suspend fun getStore(id: Long): Store = findStoreByIdOrThrow(id)
 
     @Transactional
     suspend fun updateStore(id: Long, request: UpdateStoreRequest): Store {
         val now = LocalDateTime.now()
-        val store = findStoreByIdOrThrows(id)
+        val store = findStoreByIdOrThrow(id)
         store.handle(
             UpdateStoreCommand(
                 categoryId = request.categoryId,
@@ -150,6 +150,6 @@ class StoreUseCase(
         repository.delete(id)
     }
 
-    private suspend fun findStoreByIdOrThrows(id: Long) = repository.findById(id)
+    private suspend fun findStoreByIdOrThrow(id: Long) = repository.findById(id)
         ?: throw NoSuchElementException("존재하지 않는 매장입니다.")
 }

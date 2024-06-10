@@ -42,11 +42,11 @@ class MenuGroupUseCase(
         return repository.insert(menuGroup)
     }
 
-    suspend fun getMenuGroup(id: Long): MenuGroup = findMenuGroupByIdOrThrows(id)
+    suspend fun getMenuGroup(id: Long): MenuGroup = findMenuGroupByIdOrThrow(id)
 
     suspend fun updateMenuGroup(id: Long, request: UpdateMenuGroupRequest) {
         val now = LocalDateTime.now()
-        val menuGroup = findMenuGroupByIdOrThrows(id)
+        val menuGroup = findMenuGroupByIdOrThrow(id)
         menuGroup.handle(
             UpdateMenuGroupCommand(
                 name = request.name,
@@ -85,7 +85,7 @@ class MenuGroupUseCase(
         repository.delete(id)
     }
 
-    private suspend fun findMenuGroupByIdOrThrows(id: Long): MenuGroup {
+    private suspend fun findMenuGroupByIdOrThrow(id: Long): MenuGroup {
         return repository.findById(id)
             ?: throw NoSuchElementException("메뉴그룹을 찾을 수 없습니다.")
     }
