@@ -25,16 +25,7 @@ class CartUseCase(
     @Transactional
     suspend fun addItemToCart(userId: Long, request: AddItemToCartRequest): Cart {
         val now = LocalDateTime.now()
-        val cart = repository.findByUserId(userId)
-            ?: repository.insert(
-                Cart.handle(
-                    CreateCartCommand(
-                        userId = userId,
-                        createdAt = now,
-                        updatedAt = now
-                    )
-                )
-            )
+        val cart = repository.findByUserId(userId) ?: insertCart(userId, now)
 
         val cartItem = cartItemRepository.insert(
             CartItem.handle(
@@ -59,5 +50,15 @@ class CartUseCase(
         }.also { cartItemOptionRepository.insertAll(it) }
         return cart
     }
+
+    @Transactional
+    suspend fun getOrInsertCart(userId: Long): Cart = repository.findByUserId(userId)
+        ?: insertCart(userId, LocalDateTime.now())
+
+    private suspend fun insertCart(userId: Long, now: LocalDateTime) = repository.insert(
+        Cart.handle(
+            CreateCartCommand(userId = userId, createdAt = now, updatedAt = now)
+        )
+    )
 
 }

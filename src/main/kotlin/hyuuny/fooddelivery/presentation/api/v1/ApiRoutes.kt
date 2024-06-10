@@ -46,6 +46,7 @@ class ApiRoutes {
         return coRouter {
             "/api/v1/users/{userId}/carts".nest {
                 POST("", handler::addItemToCart)
+                GET("", handler::getCart)
             }
         }
     }
