@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.domain.cart
 
 import CreateCartItemCommand
+import UpdateCartItemQuantityCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -33,6 +34,12 @@ class CartItem(
                 updatedAt = command.updatedAt
             )
         }
+    }
+
+    fun handle(command: UpdateCartItemQuantityCommand) {
+        if (command.quantity <= 0) throw IllegalArgumentException("수량은 0보다 커야합니다.")
+        this.quantity = command.quantity
+        this.updatedAt = command.updatedAt
     }
 
 }

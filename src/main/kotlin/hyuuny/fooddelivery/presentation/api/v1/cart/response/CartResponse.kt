@@ -33,13 +33,14 @@ data class CartItemResponse(
     val quantity: Int,
     val price: Long,
     val options: List<CartItemOptionResponse>,
+    val itemWithOptionsPrice: Long,
 ) {
     companion object {
         fun from(
             entity: CartItem,
             menu: Menu,
             itemOptions: List<CartItemOptionResponse>,
-            itemTotalPrice: Long
+            itemWithOptionsPrice: Long
         ): CartItemResponse {
             return CartItemResponse(
                 id = entity.id!!,
@@ -48,8 +49,9 @@ data class CartItemResponse(
                 menuName = menu.name,
                 imageUrl = menu.imageUrl,
                 quantity = entity.quantity,
-                price = itemTotalPrice,
-                options = itemOptions
+                price = menu.price,
+                options = itemOptions,
+                itemWithOptionsPrice = itemWithOptionsPrice,
             )
         }
     }

@@ -19,3 +19,8 @@ data class CreateCartItemOptionCommand(
     val optionId: Long,
     val createdAt: LocalDateTime,
 )
+
+data class UpdateCartItemQuantityCommand(
+    val quantity: Int,
+    val updatedAt: LocalDateTime,
+)

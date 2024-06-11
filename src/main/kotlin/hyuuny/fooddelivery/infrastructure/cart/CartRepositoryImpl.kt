@@ -12,9 +12,7 @@ class CartRepositoryImpl(
 
     override suspend fun insert(cart: Cart): Cart = dao.save(cart)
 
-    override suspend fun findById(id: String): Cart? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun findById(id: Long): Cart? = dao.findById(id)
 
     override suspend fun findByUserId(userId: Long): Cart? = dao.findByUserId(userId)
 
@@ -25,5 +23,7 @@ class CartRepositoryImpl(
     override suspend fun delete(id: Long) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
 }

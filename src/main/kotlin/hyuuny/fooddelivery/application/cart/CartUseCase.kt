@@ -4,6 +4,8 @@ import AddItemToCartRequest
 import CreateCartCommand
 import CreateCartItemCommand
 import CreateCartItemOptionCommand
+import UpdateCartItemQuantityCommand
+import UpdateCartItemQuantityRequest
 import hyuuny.fooddelivery.domain.cart.Cart
 import hyuuny.fooddelivery.domain.cart.CartItem
 import hyuuny.fooddelivery.domain.cart.CartItemOption
@@ -54,6 +56,30 @@ class CartUseCase(
     @Transactional
     suspend fun getOrInsertCart(userId: Long): Cart = repository.findByUserId(userId)
         ?: insertCart(userId, LocalDateTime.now())
+
+    suspend fun getCart(id: Long): Cart = findCartByIdOrThrow(id)
+
+    @Transactional
+    suspend fun updateCartItemQuantity(id: Long, cartItemId: Long, request: UpdateCartItemQuantityRequest) {
+        val now = LocalDateTime.now()
+
+        if (!repository.existsById(id)) throw NoSuchElementException("존재하지 않는 장바구니입니다.")
+
+        val cartItem = findCartItemByIdOrThrow(cartItemId)
+        cartItem.handle(
+            UpdateCartItemQuantityCommand(
+                quantity = request.quantity,
+                updatedAt = now,
+            )
+        )
+        cartItemRepository.update(cartItem)
+    }
+
+    private suspend fun findCartByIdOrThrow(id: Long) = repository.findById(id)
+        ?: throw NoSuchElementException("존재하지 않는 장바구니입니다.")
+
+    private suspend fun findCartItemByIdOrThrow(cartItemId: Long) = cartItemRepository.findById(cartItemId)
+        ?: throw NoSuchElementException("존재하지 않는 장바구니 품목입니다.")
 
     private suspend fun insertCart(userId: Long, now: LocalDateTime) = repository.insert(
         Cart.handle(

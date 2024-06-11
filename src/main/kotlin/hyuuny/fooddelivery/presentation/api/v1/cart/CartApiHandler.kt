@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.presentation.api.v1.cart
 
 import AddItemToCartRequest
+import UpdateCartItemQuantityRequest
 import hyuuny.fooddelivery.application.cart.CartItemOptionUseCase
 import hyuuny.fooddelivery.application.cart.CartItemUseCase
 import hyuuny.fooddelivery.application.cart.CartUseCase
@@ -54,11 +55,11 @@ class CartApiHandler(
                     CartItemOptionResponse.from(cartItemOption, option)
                 }
 
-                val itemTotalPrice = (menu.price + cartItemOptionResponse.sumOf { it.price }) * cartItem.quantity
-                CartItemResponse.from(cartItem, menu, cartItemOptionResponse, itemTotalPrice)
+                val itemWithOptionsPrice = (menu.price + cartItemOptionResponse.sumOf { it.price }) * cartItem.quantity
+                CartItemResponse.from(cartItem, menu, cartItemOptionResponse, itemWithOptionsPrice)
             }
 
-            val totalPrice = cartItemResponses.sumOf { it.price }
+            val totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice }
             val response = CartResponse.from(cart, cartItemResponses, totalPrice)
             ok().bodyValueAndAwait(response)
         }
@@ -86,11 +87,47 @@ class CartApiHandler(
                     CartItemOptionResponse.from(cartItemOption, option)
                 }
 
-                val itemTotalPrice = (menu.price + cartItemOptionResponse.sumOf { it.price }) * cartItem.quantity
-                CartItemResponse.from(cartItem, menu, cartItemOptionResponse, itemTotalPrice)
+                val itemWithOptionsPrice = (menu.price + cartItemOptionResponse.sumOf { it.price }) * cartItem.quantity
+                CartItemResponse.from(cartItem, menu, cartItemOptionResponse, itemWithOptionsPrice)
             }
 
-            val totalPrice = cartItemResponses.sumOf { it.price }
+            val totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice }
+            val response = CartResponse.from(cart, cartItemResponses, totalPrice)
+            ok().bodyValueAndAwait(response)
+        }
+    }
+
+    suspend fun updateCartItemQuantity(request: ServerRequest): ServerResponse {
+        val userId = request.pathVariable("userId").toLong()
+        val cartId = request.pathVariable("cartId").toLong()
+        val cartItemId = request.pathVariable("cartItemId").toLong()
+        val body = request.awaitBody<UpdateCartItemQuantityRequest>()
+
+        useCase.updateCartItemQuantity(cartId, cartItemId, body)
+        val cart = useCase.getCart(userId)
+        return coroutineScope {
+            val cartItems = async { cartItemUseCase.getAllByCartId(cart.id!!) }.await()
+            val menuMap = menuUseCase.getAllByIds(cartItems.map { it.menuId }).associateBy { it.id }
+
+            val cartItemOptions =
+                async { cartItemOptionUseCase.getAllByCartItemIds(cartItems.mapNotNull { it.id }) }.await()
+            val optionMap = optionUseCase.getAllByIds(cartItemOptions.map { it.optionId }).associateBy { it.id }
+            val cartItemOptionGroup = cartItemOptions.groupBy { it.cartItemId }
+
+            val cartItemResponses = cartItems.mapNotNull { cartItem ->
+                val menu = menuMap[cartItem.menuId] ?: return@mapNotNull null
+                val optionsOfCartItem = cartItemOptionGroup[cartItem.id] ?: return@mapNotNull null
+
+                val cartItemOptionResponse = optionsOfCartItem.mapNotNull optionMap@{ cartItemOption ->
+                    val option = optionMap[cartItemOption.optionId] ?: return@optionMap null
+                    CartItemOptionResponse.from(cartItemOption, option)
+                }
+
+                val itemWithOptionsPrice = (menu.price + cartItemOptionResponse.sumOf { it.price }) * cartItem.quantity
+                CartItemResponse.from(cartItem, menu, cartItemOptionResponse, itemWithOptionsPrice)
+            }
+
+            val totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice }
             val response = CartResponse.from(cart, cartItemResponses, totalPrice)
             ok().bodyValueAndAwait(response)
         }
