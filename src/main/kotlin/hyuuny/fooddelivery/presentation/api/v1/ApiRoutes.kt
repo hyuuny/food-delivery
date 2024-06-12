@@ -47,8 +47,9 @@ class ApiRoutes {
             "/api/v1/users/{userId}/carts".nest {
                 POST("", handler::addItemToCart)
                 GET("", handler::getCart)
-                PUT("/{cartId}/cart-item/{cartItemId}", handler::updateCartItemQuantity)
-                PUT("/{cartId}/cart-item/{cartItemId}/options", handler::updateCartItemOptions)
+                PUT("/{cartId}/cart-items/{cartItemId}", handler::updateCartItemQuantity)
+                PUT("/{cartId}/cart-items/{cartItemId}/options", handler::updateCartItemOptions)
+                DELETE("/{cartId}/cart-items/{cartItemId}", handler::deleteCartItem)
             }
         }
     }
