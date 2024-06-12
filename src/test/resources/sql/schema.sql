@@ -125,3 +125,18 @@ CREATE TABLE IF NOT EXISTS cart_item_options
     created_at   TIMESTAMP NOT NULL,
     FOREIGN KEY (cart_item_id) REFERENCES cart_items (id)
 );
+
+CREATE TABLE IF NOT EXISTS users
+(
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(50)  NOT NULL,
+    nickname    VARCHAR(50)  NOT NULL,
+    email       VARCHAR(100) NOT NULL,
+    phoneNumber VARCHAR(20)  NOT NULL,
+    imageUrl    VARCHAR(255),
+    createdAt   TIMESTAMP    NOT NULL,
+    updatedAt   TIMESTAMP    NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_name ON users (name);
+CREATE INDEX IF NOT EXISTS idx_users_phoneNumber ON users (phoneNumber);
