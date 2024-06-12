@@ -14,8 +14,10 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
+@Transactional(readOnly = true)
 @Service
 class CategoryUseCase(
     private val repository: CategoryRepository,
@@ -29,6 +31,7 @@ class CategoryUseCase(
         return PageImpl(page.content, pageable, page.totalElements)
     }
 
+    @Transactional
     suspend fun createCategory(request: CreateCategoryRequest): Category {
         val now = LocalDateTime.now()
         val category = Category.handle(
@@ -49,6 +52,7 @@ class CategoryUseCase(
         return findCategoryByIdOrThrow(id)
     }
 
+    @Transactional
     suspend fun updateCategory(id: Long, request: UpdateCategoryRequest) {
         val now = LocalDateTime.now()
         val category = findCategoryByIdOrThrow(id)
@@ -64,6 +68,7 @@ class CategoryUseCase(
         repository.update(category)
     }
 
+    @Transactional
     suspend fun reOrderCategories(deliveryType: DeliveryType, requests: ReOrderCategoryRequests) {
         val now = LocalDateTime.now()
         val categories = repository.findAllCategoriesByDeliveryType(deliveryType)
@@ -86,6 +91,7 @@ class CategoryUseCase(
     suspend fun getVisibleCategoriesByDeliveryTypeOrderByPriority(deliveryType: DeliveryType): List<Category> =
         repository.findAllCategoriesByDeliveryType(deliveryType).sortedBy { it.priority }
 
+    @Transactional
     suspend fun deleteCategory(id: Long) {
         if (!repository.existsById(id)) throw NoSuchElementException("${id}번 카테고리를 찾을 수 없습니다.")
         repository.delete(id)

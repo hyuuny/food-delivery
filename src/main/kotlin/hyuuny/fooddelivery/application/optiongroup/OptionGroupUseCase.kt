@@ -12,8 +12,10 @@ import hyuuny.fooddelivery.infrastructure.optiongroup.OptionGroupRepository
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
+@Transactional(readOnly = true)
 @Service
 class OptionGroupUseCase(
     private val repository: OptionGroupRepository
@@ -27,6 +29,7 @@ class OptionGroupUseCase(
         return PageImpl(page.content, pageable, page.totalElements)
     }
 
+    @Transactional
     suspend fun createOptionGroup(request: CreateOptionGroupRequest): OptionGroup {
         if (request.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
 
@@ -48,6 +51,7 @@ class OptionGroupUseCase(
         return findOptionGroupByIdOrThrow(id)
     }
 
+    @Transactional
     suspend fun updateOptionGroup(id: Long, request: UpdateOptionGroupRequest) {
         if (request.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
 
@@ -63,6 +67,7 @@ class OptionGroupUseCase(
         repository.update(optionGroup)
     }
 
+    @Transactional
     suspend fun reOrderOptionGroups(menuId: Long, request: ReorderOptionGroupRequests) {
         val now = LocalDateTime.now()
         val optionGroups = repository.findAllByMenuId(menuId)
@@ -82,6 +87,7 @@ class OptionGroupUseCase(
         repository.bulkUpdatePriority(optionGroups)
     }
 
+    @Transactional
     suspend fun deleteOptionGroup(id: Long) {
         if (!repository.existsById(id)) throw NoSuchElementException("${id}번 옵션그룹을 찾을 수 없습니다.")
         repository.delete(id)

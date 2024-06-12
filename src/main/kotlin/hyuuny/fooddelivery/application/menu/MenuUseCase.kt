@@ -12,8 +12,10 @@ import hyuuny.fooddelivery.infrastructure.menu.MenuRepository
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
+@Transactional(readOnly = true)
 @Service
 class MenuUseCase(
     private val repository: MenuRepository
@@ -27,6 +29,7 @@ class MenuUseCase(
         return PageImpl(page.content, pageable, page.totalElements)
     }
 
+    @Transactional
     suspend fun createMenu(request: CreateMenuRequest): Menu {
         if (request.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
 
@@ -51,6 +54,7 @@ class MenuUseCase(
         return findMenuByIdOrThrow(id)
     }
 
+    @Transactional
     suspend fun updateMenu(id: Long, request: UpdateMenuRequest) {
         if (request.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
 
@@ -69,6 +73,7 @@ class MenuUseCase(
         repository.update(menu)
     }
 
+    @Transactional
     suspend fun changeMenuStatus(id: Long, request: ChangeMenuStatusRequest) {
         val now = LocalDateTime.now()
         val menu = findMenuByIdOrThrow(id)
@@ -81,6 +86,7 @@ class MenuUseCase(
         repository.updateMenuStatus(menu)
     }
 
+    @Transactional
     suspend fun deleteMenu(id: Long) {
         if (!repository.existsById(id)) throw NoSuchElementException("${id}번 메뉴를 찾을 수 없습니다.")
         repository.delete(id)

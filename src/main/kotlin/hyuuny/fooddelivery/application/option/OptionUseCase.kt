@@ -10,8 +10,10 @@ import hyuuny.fooddelivery.infrastructure.option.OptionRepository
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
+@Transactional(readOnly = true)
 @Service
 class OptionUseCase(
     private val repository: OptionRepository
@@ -25,6 +27,7 @@ class OptionUseCase(
         return PageImpl(page.content, pageable, page.totalElements)
     }
 
+    @Transactional
     suspend fun createOption(request: CreateOptionRequest): Option {
         if (request.name.isBlank()) throw IllegalArgumentException("옵션명은 공백일수 없습니다.")
 
@@ -45,6 +48,7 @@ class OptionUseCase(
         return findOptionByIdOrThrow(id)
     }
 
+    @Transactional
     suspend fun updateOption(id: Long, request: UpdateOptionRequest) {
         if (request.name.isBlank()) throw IllegalArgumentException("옵션명은 공백일수 없습니다.")
 
@@ -60,6 +64,7 @@ class OptionUseCase(
         repository.update(option)
     }
 
+    @Transactional
     suspend fun deleteOption(id: Long) {
         if (!repository.existsById(id)) throw NoSuchElementException("${id}번 옵션을 찾을 수 없습니다.")
         repository.delete(id)
