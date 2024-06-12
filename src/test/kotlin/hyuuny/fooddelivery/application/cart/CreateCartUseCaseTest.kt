@@ -8,6 +8,7 @@ import hyuuny.fooddelivery.domain.cart.CartItemOption
 import hyuuny.fooddelivery.infrastructure.cart.CartItemOptionRepository
 import hyuuny.fooddelivery.infrastructure.cart.CartItemRepository
 import hyuuny.fooddelivery.infrastructure.cart.CartRepository
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -53,6 +54,22 @@ class CreateCartUseCaseTest : BehaviorSpec({
                 result.userId shouldBe result.userId
                 result.createdAt.shouldNotBeNull()
                 result.updatedAt shouldBe result.createdAt
+            }
+        }
+
+        `when`("옵션이 하나라도 없으면") {
+            val badRequest = AddItemToCartRequest(
+                item = AddItemAndOptionRequest(
+                    menuId = 5,
+                    quantity = 2,
+                    optionIds = emptyList()
+                )
+            )
+            then("품목 옵션은 필수값이라는 메세지가 반환된다.") {
+                val ex = shouldThrow<IllegalArgumentException> {
+                    useCase.addItemToCart(userId, badRequest)
+                }
+                ex.message shouldBe "품목 옵션은 필수값입니다."
             }
         }
     }

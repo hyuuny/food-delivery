@@ -26,6 +26,8 @@ class CartUseCase(
 
     @Transactional
     suspend fun addItemToCart(userId: Long, request: AddItemToCartRequest): Cart {
+        if (request.item.optionIds.isEmpty()) throw IllegalArgumentException("품목 옵션은 필수값입니다.")
+
         val now = LocalDateTime.now()
         val cart = repository.findByUserId(userId) ?: insertCart(userId, now)
 

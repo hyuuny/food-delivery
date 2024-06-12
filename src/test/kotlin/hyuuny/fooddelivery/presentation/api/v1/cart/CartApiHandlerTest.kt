@@ -124,24 +124,6 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
     }
 
-    @DisplayName("옵션을 선택하지 않으면 장바구니에 추가할 수 없다.")
-    @Test
-    fun addItemToCart_badRequest() {
-        val request = AddItemToCartRequest(
-            item = AddItemAndOptionRequest(
-                menuId = 1,
-                quantity = 1,
-                optionIds = emptyList()
-            )
-        )
-
-        webTestClient.post().uri("/api/v1/users/${1}/carts")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(request)
-            .exchange()
-            .expectStatus().isBadRequest
-    }
-
     @DisplayName("사용자는 장바구니에 담긴 메뉴를 조회할 수 있다.")
     @Test
     fun getCart() {
