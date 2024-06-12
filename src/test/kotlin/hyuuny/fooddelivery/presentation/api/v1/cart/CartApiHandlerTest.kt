@@ -288,7 +288,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice }
         )
 
-        webTestClient.put().uri("/api/v1/users/$userId/carts/$cartId/cart-item/$cartItemId")
+        webTestClient.put().uri("/api/v1/users/$userId/carts/$cartId/cart-items/$cartItemId")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -377,7 +377,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice }
         )
 
-        webTestClient.put().uri("/api/v1/users/$userId/carts/$cartId/cart-item/$cartItemId/options")
+        webTestClient.put().uri("/api/v1/users/$userId/carts/$cartId/cart-items/$cartItemId/options")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -402,6 +402,41 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.items[0].options[2].id").isEqualTo(expectedResponse.items[0].options[2].id)
             .jsonPath("$.items[0].options[2].optionName").isEqualTo(expectedResponse.items[0].options[2].optionName)
             .jsonPath("$.items[0].itemWithOptionsPrice").isEqualTo(expectedItemWithOptionPrice)
+            .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
+    }
+
+    @DisplayName("장바구니에 담긴 품목을 삭제할 수 있다.")
+    @Test
+    fun deleteCartItem() {
+        val userId = 1L
+        val cartId = 1L
+        val cartItemId = 1L
+
+        val cart = generateCart(cartId, userId)
+
+        coEvery { useCase.deleteCartItem(any(), any()) } returns Unit
+        coEvery { useCase.getOrInsertCart(any()) } returns cart
+        coEvery { cartItemUseCase.getAllByCartId(any()) } returns emptyList()
+        coEvery { menuUseCase.getAllByIds(any()) } returns emptyList()
+        coEvery { cartItemOptionUseCase.getAllByCartItemIds(any()) } returns emptyList()
+        coEvery { optionUseCase.getAllByIds(any()) } returns emptyList()
+
+        val expectedResponse = CartResponse(
+            id = cartId,
+            userId = cart.userId,
+            items = emptyList(),
+            totalPrice = 0
+        )
+
+        webTestClient.delete().uri("/api/v1/users/$userId/carts/$cartId/cart-items/$cartItemId")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.id").isEqualTo(expectedResponse.id)
+            .jsonPath("$.userId").isEqualTo(expectedResponse.userId)
+            .jsonPath("$.items.length()").isEqualTo(0)
             .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
     }
 
