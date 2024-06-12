@@ -68,7 +68,7 @@ class CartUseCase(
         if (request.quantity <= 0) throw IllegalArgumentException("수량은 0보다 커야합니다.")
 
         val now = LocalDateTime.now()
-        val cartItem = findCartItemByIdOrThrow(cartItemId)
+        val cartItem = findCartItemByCartItemIdAndCartIdOrThrow(cartItemId, id)
         cartItem.handle(
             UpdateCartItemQuantityCommand(
                 quantity = request.quantity,
@@ -84,7 +84,7 @@ class CartUseCase(
         if (!repository.existsById(id)) throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
 
         val now = LocalDateTime.now()
-        val cartItem = findCartItemByIdOrThrow(cartItemId)
+        val cartItem = findCartItemByCartItemIdAndCartIdOrThrow(cartItemId, id)
         cartItemOptionRepository.deleteAllByCartItemId(cartItemId)
         request.optionIds.map {
             CartItemOption.handle(
@@ -97,11 +97,21 @@ class CartUseCase(
         }.also { cartItemOptionRepository.insertAll(it) }
     }
 
+    @Transactional
+    suspend fun deleteCartItem(id: Long, cartItemId: Long) {
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
+
+        val cartItem = findCartItemByCartItemIdAndCartIdOrThrow(cartItemId, id)
+        cartItemOptionRepository.deleteAllByCartItemId(cartItem.id!!)
+        cartItemRepository.delete(cartItem.id!!)
+    }
+
     private suspend fun findCartByIdOrThrow(id: Long) = repository.findById(id)
         ?: throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
 
-    private suspend fun findCartItemByIdOrThrow(cartItemId: Long) = cartItemRepository.findById(cartItemId)
-        ?: throw NoSuchElementException("${cartItemId}번 장바구니 품목을 찾을 수 없습니다.")
+    private suspend fun findCartItemByCartItemIdAndCartIdOrThrow(cartItemId: Long, cartId: Long) =
+        cartItemRepository.findByIdAndCartId(cartItemId, cartId)
+            ?: throw NoSuchElementException("${cartId}번 장바구니의 ${cartItemId}번 품목을 찾을 수 없습니다.")
 
     private suspend fun insertCart(userId: Long, now: LocalDateTime) = repository.insert(
         Cart.handle(

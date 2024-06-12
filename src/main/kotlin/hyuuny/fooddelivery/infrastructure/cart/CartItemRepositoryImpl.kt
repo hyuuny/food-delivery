@@ -33,8 +33,8 @@ class CartItemRepositoryImpl(
             )
     }
 
-    override suspend fun delete(id: Long) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun delete(id: Long) = dao.deleteById(id)
+
+    override suspend fun findByIdAndCartId(id: Long, cartId: Long): CartItem? = dao.findByIdAndCartId(id, cartId)
 
 }

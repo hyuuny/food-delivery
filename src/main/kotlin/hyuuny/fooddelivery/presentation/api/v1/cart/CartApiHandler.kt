@@ -58,4 +58,15 @@ class CartApiHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun deleteCartItem(request: ServerRequest): ServerResponse {
+        val userId = request.pathVariable("userId").toLong()
+        val cartId = request.pathVariable("cartId").toLong()
+        val cartItemId = request.pathVariable("cartItemId").toLong()
+
+        useCase.deleteCartItem(cartId, cartItemId)
+        val cart = useCase.getOrInsertCart(userId)
+        val response = responseMapper.mapToCartResponse(cart)
+        return ok().bodyValueAndAwait(response)
+    }
+
 }

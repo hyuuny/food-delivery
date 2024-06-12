@@ -14,4 +14,6 @@ interface CartItemRepository {
 
     suspend fun delete(id: Long)
 
+    suspend fun findByIdAndCartId(id: Long, cartId: Long): CartItem?
+
 }
