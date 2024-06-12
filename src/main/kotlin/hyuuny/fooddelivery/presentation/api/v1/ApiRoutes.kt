@@ -48,6 +48,7 @@ class ApiRoutes {
                 POST("", handler::addItemToCart)
                 GET("", handler::getCart)
                 PUT("/{cartId}/cart-item/{cartItemId}", handler::updateCartItemQuantity)
+                PUT("/{cartId}/cart-item/{cartItemId}/options", handler::updateCartItemOptions)
             }
         }
     }

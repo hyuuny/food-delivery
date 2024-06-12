@@ -20,8 +20,6 @@ class CartItemOptionRepositoryImpl(
     override suspend fun findAllByCartItemIdIn(cartItemIds: List<Long>): List<CartItemOption> =
         dao.findAllByCartItemIdIn(cartItemIds)
 
-    override suspend fun deleteAllByCartItemId(cartItemId: Long) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun deleteAllByCartItemId(cartItemId: Long) = dao.deleteAllByCartItemId(cartItemId)
 
 }

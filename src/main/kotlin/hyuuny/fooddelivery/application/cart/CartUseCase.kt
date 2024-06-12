@@ -4,6 +4,7 @@ import AddItemToCartRequest
 import CreateCartCommand
 import CreateCartItemCommand
 import CreateCartItemOptionCommand
+import UpdateCartItemOptionsRequest
 import UpdateCartItemQuantityCommand
 import UpdateCartItemQuantityRequest
 import hyuuny.fooddelivery.domain.cart.Cart
@@ -75,6 +76,25 @@ class CartUseCase(
             )
         )
         cartItemRepository.update(cartItem)
+    }
+
+    @Transactional
+    suspend fun updateCartItemOptions(id: Long, cartItemId: Long, request: UpdateCartItemOptionsRequest) {
+        if (request.optionIds.isEmpty()) throw IllegalArgumentException("품목 옵션은 필수값입니다.")
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
+
+        val now = LocalDateTime.now()
+        val cartItem = findCartItemByIdOrThrow(cartItemId)
+        cartItemOptionRepository.deleteAllByCartItemId(cartItemId)
+        request.optionIds.map {
+            CartItemOption.handle(
+                CreateCartItemOptionCommand(
+                    cartItemId = cartItem.id!!,
+                    optionId = it,
+                    createdAt = now,
+                )
+            )
+        }.also { cartItemOptionRepository.insertAll(it) }
     }
 
     private suspend fun findCartByIdOrThrow(id: Long) = repository.findById(id)

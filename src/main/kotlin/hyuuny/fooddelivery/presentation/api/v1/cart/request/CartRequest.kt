@@ -11,3 +11,7 @@ data class AddItemAndOptionRequest(
 data class UpdateCartItemQuantityRequest(
     val quantity: Int,
 )
+
+data class UpdateCartItemOptionsRequest(
+    val optionIds: List<Long>,
+)

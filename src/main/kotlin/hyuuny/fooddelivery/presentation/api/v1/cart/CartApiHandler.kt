@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.presentation.api.v1.cart
 
 import AddItemToCartRequest
+import UpdateCartItemOptionsRequest
 import UpdateCartItemQuantityRequest
 import hyuuny.fooddelivery.application.cart.CartUseCase
 import org.springframework.stereotype.Component
@@ -40,6 +41,18 @@ class CartApiHandler(
         val body = request.awaitBody<UpdateCartItemQuantityRequest>()
 
         useCase.updateCartItemQuantity(cartId, cartItemId, body)
+        val cart = useCase.getOrInsertCart(userId)
+        val response = responseMapper.mapToCartResponse(cart)
+        return ok().bodyValueAndAwait(response)
+    }
+
+    suspend fun updateCartItemOptions(request: ServerRequest): ServerResponse {
+        val userId = request.pathVariable("userId").toLong()
+        val cartId = request.pathVariable("cartId").toLong()
+        val cartItemId = request.pathVariable("cartItemId").toLong()
+        val body = request.awaitBody<UpdateCartItemOptionsRequest>()
+
+        useCase.updateCartItemOptions(cartId, cartItemId, body)
         val cart = useCase.getOrInsertCart(userId)
         val response = responseMapper.mapToCartResponse(cart)
         return ok().bodyValueAndAwait(response)

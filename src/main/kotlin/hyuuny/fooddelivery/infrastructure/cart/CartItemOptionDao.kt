@@ -9,4 +9,6 @@ interface CartItemOptionDao : CoroutineCrudRepository<CartItemOption, Long> {
 
     suspend fun findAllByCartItemIdIn(cartItemIds: List<Long>): List<CartItemOption>
 
+    suspend fun deleteAllByCartItemId(cartItemId: Long)
+
 }

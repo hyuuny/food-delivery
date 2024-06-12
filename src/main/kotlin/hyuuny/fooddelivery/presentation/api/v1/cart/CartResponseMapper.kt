@@ -39,7 +39,7 @@ class CartResponseMapper(
 
             val itemWithOptionsPrice = (menu.price + cartItemOptionResponse.sumOf { it.price }) * cartItem.quantity
             CartItemResponse.from(cartItem, menu, cartItemOptionResponse, itemWithOptionsPrice)
-        }
+        }.sortedByDescending { it.id }
 
         val totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice }
         CartResponse.from(cart, cartItemResponses, totalPrice)
