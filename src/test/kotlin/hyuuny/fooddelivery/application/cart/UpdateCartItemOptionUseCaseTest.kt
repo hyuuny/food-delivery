@@ -28,7 +28,7 @@ class UpdateCartItemOptionUseCaseTest : BehaviorSpec({
         val now = LocalDateTime.now()
         coEvery { repository.existsById(any()) } returns true
         val cartItem = CartItem(id = 1, cartId = cartId, menuId = 1, quantity = 1, createdAt = now, updatedAt = now)
-        coEvery { itemRepository.findById(any()) } returns cartItem
+        coEvery { itemRepository.findByIdAndCartId(any(), any()) } returns cartItem
         coEvery { itemOptionRepository.deleteAllByCartItemId(any()) } returns Unit
         coEvery { itemOptionRepository.insertAll(any()) } returns listOf(
             CartItemOption(id = 6, cartItemId = cartItemId, optionId = 7, createdAt = now),
@@ -69,13 +69,13 @@ class UpdateCartItemOptionUseCaseTest : BehaviorSpec({
 
         `when`("존재하지 않는 장바구니 품목 아이디이면") {
             coEvery { repository.existsById(any()) } returns true
-            coEvery { itemRepository.findById(any()) } returns null
+            coEvery { itemRepository.findByIdAndCartId(any(), any()) } returns null
 
             then("장바구니 품목을 찾을 수 없다는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
                     useCase.updateCartItemOptions(cartId, 0, request)
                 }
-                ex.message shouldBe "0번 장바구니 품목을 찾을 수 없습니다."
+                ex.message shouldBe "1번 장바구니의 0번 품목을 찾을 수 없습니다."
             }
         }
     }

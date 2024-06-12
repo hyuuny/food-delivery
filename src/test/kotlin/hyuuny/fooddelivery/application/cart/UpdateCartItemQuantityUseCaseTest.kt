@@ -27,7 +27,7 @@ class UpdateCartItemQuantityUseCaseTest : BehaviorSpec({
             CartItem(id = cartItemId, cartId = cartId, menuId = 1, quantity = 1, createdAt = now, updatedAt = now)
         val request = UpdateCartItemQuantityRequest(quantity = 2)
         coEvery { repository.existsById(any()) } returns true
-        coEvery { itemRepository.findById(any()) } returns cartItem
+        coEvery { itemRepository.findByIdAndCartId(any(), any()) } returns cartItem
         coEvery { itemRepository.update(any()) } returns Unit
 
 
