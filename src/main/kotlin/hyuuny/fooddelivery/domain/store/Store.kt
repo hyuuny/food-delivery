@@ -54,23 +54,21 @@ class Store(
         private set
 
     companion object {
-        fun handle(command: CreateStoreCommand): Store {
-            return Store(
-                categoryId = command.categoryId,
-                deliveryType = command.deliveryType,
-                name = command.name,
-                ownerName = command.ownerName,
-                taxId = command.taxId,
-                deliveryFee = command.deliveryFee,
-                minimumOrderAmount = command.minimumOrderAmount,
-                iconImageUrl = command.iconImageUrl,
-                description = command.description,
-                foodOrigin = command.foodOrigin,
-                phoneNumber = command.phoneNumber,
-                createdAt = command.createdAt,
-                updatedAt = command.updatedAt
-            )
-        }
+        fun handle(command: CreateStoreCommand): Store = Store(
+            categoryId = command.categoryId,
+            deliveryType = command.deliveryType,
+            name = command.name,
+            ownerName = command.ownerName,
+            taxId = command.taxId,
+            deliveryFee = command.deliveryFee,
+            minimumOrderAmount = command.minimumOrderAmount,
+            iconImageUrl = command.iconImageUrl,
+            description = command.description,
+            foodOrigin = command.foodOrigin,
+            phoneNumber = command.phoneNumber,
+            createdAt = command.createdAt,
+            updatedAt = command.updatedAt
+        )
     }
 
     fun handle(command: UpdateStoreCommand) {

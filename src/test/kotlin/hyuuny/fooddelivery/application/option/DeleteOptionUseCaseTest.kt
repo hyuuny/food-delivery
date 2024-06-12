@@ -33,7 +33,7 @@ internal class DeleteOptionUseCaseTest : BehaviorSpec({
                 val ex = shouldThrow<NoSuchElementException> {
                     useCase.deleteOption(0)
                 }
-                ex.message shouldBe "옵션을 찾을 수 없습니다."
+                ex.message shouldBe "0번 옵션을 찾을 수 없습니다."
             }
         }
     }

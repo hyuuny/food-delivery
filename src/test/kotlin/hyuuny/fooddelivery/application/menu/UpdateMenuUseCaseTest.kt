@@ -6,6 +6,7 @@ import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.infrastructure.menu.MenuRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -52,15 +53,18 @@ internal class UpdateMenuUseCaseTest : BehaviorSpec({
             coEvery { repository.findById(any()) } returns existingMenu
 
             then("메뉴를 수정 할 수 없다.") {
-                shouldThrow<IllegalArgumentException> {
-                    useCase.updateMenu(menuId, UpdateMenuRequest(
-                        name = "후라이드 치킨",
-                        price = 0,
-                        popularity = false,
-                        imageUrl = "chicken-image-url",
-                        description = "맛있는 양념치킨"
-                    ))
+                val ex = shouldThrow<IllegalArgumentException> {
+                    useCase.updateMenu(
+                        menuId, UpdateMenuRequest(
+                            name = "후라이드 치킨",
+                            price = 0,
+                            popularity = false,
+                            imageUrl = "chicken-image-url",
+                            description = "맛있는 양념치킨"
+                        )
+                    )
                 }
+                ex.message shouldBe "금액은 0이상이여야 합니다."
             }
         }
     }

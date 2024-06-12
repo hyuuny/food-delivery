@@ -26,6 +26,8 @@ class OptionUseCase(
     }
 
     suspend fun createOption(request: CreateOptionRequest): Option {
+        if (request.name.isBlank()) throw IllegalArgumentException("옵션명은 공백일수 없습니다.")
+
         val now = LocalDateTime.now()
         val option = Option.handle(
             CreateOptionCommand(
@@ -44,6 +46,8 @@ class OptionUseCase(
     }
 
     suspend fun updateOption(id: Long, request: UpdateOptionRequest) {
+        if (request.name.isBlank()) throw IllegalArgumentException("옵션명은 공백일수 없습니다.")
+
         val now = LocalDateTime.now()
         val option = findOptionByIdOrThrow(id)
         option.handle(
@@ -57,7 +61,7 @@ class OptionUseCase(
     }
 
     suspend fun deleteOption(id: Long) {
-        if (!repository.existsById(id)) throw NoSuchElementException("옵션을 찾을 수 없습니다.")
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 옵션을 찾을 수 없습니다.")
         repository.delete(id)
     }
 
@@ -67,6 +71,6 @@ class OptionUseCase(
     suspend fun getAllByIds(ids: List<Long>): List<Option> = repository.findAllByIdIn(ids)
 
     private suspend fun findOptionByIdOrThrow(id: Long): Option = repository.findById(id)
-        ?: throw NoSuchElementException("옵션을 찾을 수 없습니다.")
+        ?: throw NoSuchElementException("${id}번 옵션을 찾을 수 없습니다.")
 
 }

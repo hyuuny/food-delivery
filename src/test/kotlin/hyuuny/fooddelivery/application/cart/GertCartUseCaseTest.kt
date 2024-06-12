@@ -27,7 +27,7 @@ class GertCartUseCaseTest : BehaviorSpec({
         `when`("장바구니에") {
             val result = useCase.getOrInsertCart(userId)
 
-            then("담겨있는 메뉴와 옵션을 볼 수 있다.") {
+            then("담겨있는 품목과 옵션을 볼 수 있다.") {
                 result.id.shouldNotBeNull()
                 result.userId shouldBe result.userId
                 result.createdAt.shouldNotBeNull()

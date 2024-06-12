@@ -46,11 +46,11 @@ internal class GetOptionGroupUseCaseTest : BehaviorSpec({
         `when`("존재하지 않는 아이디이면") {
             coEvery { repository.findById(any()) } returns null
 
-            then("존재하지 않는 옵션그룹이라는 메세지가 반환된다.") {
+            then("옵션그룹을 찾을 수 없다는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
                     useCase.getOptionGroup(0)
                 }
-                ex.message shouldBe "존재하지 않는 옵션그룹입니다."
+                ex.message shouldBe "0번 옵션그룹을 찾을 수 없습니다."
             }
         }
     }

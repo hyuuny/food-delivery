@@ -20,12 +20,10 @@ class Cart(
         private set
 
     companion object {
-        fun handle(command: CreateCartCommand): Cart {
-            return Cart(
-                userId = command.userId,
-                createdAt = command.createdAt,
-                updatedAt = command.updatedAt,
-            )
-        }
+        fun handle(command: CreateCartCommand): Cart = Cart(
+            userId = command.userId,
+            createdAt = command.createdAt,
+            updatedAt = command.updatedAt,
+        )
     }
 }

@@ -28,6 +28,8 @@ class MenuGroupUseCase(
     }
 
     suspend fun createMenuGroup(request: CreateMenuGroupRequest): MenuGroup {
+        if (request.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
+
         val now = LocalDateTime.now()
         val menuGroup = MenuGroup.handle(
             CreateMenuGroupCommand(
@@ -45,6 +47,8 @@ class MenuGroupUseCase(
     suspend fun getMenuGroup(id: Long): MenuGroup = findMenuGroupByIdOrThrow(id)
 
     suspend fun updateMenuGroup(id: Long, request: UpdateMenuGroupRequest) {
+        if (request.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
+
         val now = LocalDateTime.now()
         val menuGroup = findMenuGroupByIdOrThrow(id)
         menuGroup.handle(
@@ -81,13 +85,13 @@ class MenuGroupUseCase(
     suspend fun getAllByStoreIds(storeIds: List<Long>) = repository.findAllByStoreIdIn(storeIds)
 
     suspend fun deleteMenuGroup(id: Long) {
-        if (!repository.existsById(id)) throw NoSuchElementException("메뉴그룹을 찾을 수 없습니다.")
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 메뉴그룹을 찾을 수 없습니다.")
         repository.delete(id)
     }
 
     private suspend fun findMenuGroupByIdOrThrow(id: Long): MenuGroup {
         return repository.findById(id)
-            ?: throw NoSuchElementException("메뉴그룹을 찾을 수 없습니다.")
+            ?: throw NoSuchElementException("${id}번 메뉴그룹을 찾을 수 없습니다.")
     }
 
 }

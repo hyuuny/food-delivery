@@ -48,7 +48,7 @@ internal class GetMenuGroupUseCaseTest : BehaviorSpec({
                 val ex = shouldThrow<NoSuchElementException> {
                     useCase.getMenuGroup(0)
                 }
-                ex.message shouldBe "메뉴그룹을 찾을 수 없습니다."
+                ex.message shouldBe "0번 메뉴그룹을 찾을 수 없습니다."
             }
         }
     }

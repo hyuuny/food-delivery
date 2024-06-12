@@ -87,13 +87,13 @@ class CategoryUseCase(
         repository.findAllCategoriesByDeliveryType(deliveryType).sortedBy { it.priority }
 
     suspend fun deleteCategory(id: Long) {
-        if (!repository.existsById(id)) throw NoSuchElementException("존재하지 않는 카테고리입니다.")
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 카테고리를 찾을 수 없습니다.")
         repository.delete(id)
     }
 
     private suspend fun findCategoryByIdOrThrow(id: Long): Category {
         return repository.findById(id)
-            ?: throw NoSuchElementException("존재하지 않는 카테고리입니다.")
+            ?: throw NoSuchElementException("${id}번 카테고리를 찾을 수 없습니다.")
     }
 
 }

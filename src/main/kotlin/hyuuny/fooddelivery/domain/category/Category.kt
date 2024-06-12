@@ -37,17 +37,15 @@ class Category(
         private set
 
     companion object {
-        fun handle(command: CreateCategoryCommand): Category {
-            return Category(
-                deliveryType = command.deliveryType,
-                name = command.name,
-                priority = command.priority,
-                iconImageUrl = command.iconImageUrl,
-                visible = command.visible,
-                createdAt = command.createdAt,
-                updatedAt = command.updatedAt
-            )
-        }
+        fun handle(command: CreateCategoryCommand): Category = Category(
+            deliveryType = command.deliveryType,
+            name = command.name,
+            priority = command.priority,
+            iconImageUrl = command.iconImageUrl,
+            visible = command.visible,
+            createdAt = command.createdAt,
+            updatedAt = command.updatedAt
+        )
     }
 
     fun handle(command: UpdateCategoryCommand) {

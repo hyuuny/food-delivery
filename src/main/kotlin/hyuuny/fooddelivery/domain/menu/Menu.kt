@@ -41,26 +41,20 @@ class Menu(
         private set
 
     companion object {
-        fun handle(command: CreateMenuCommand): Menu {
-            if (command.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
-
-            return Menu(
-                menuGroupId = command.menuGroupId,
-                name = command.name,
-                price = command.price,
-                status = MenuStatus.ON_SALE,
-                popularity = command.popularity,
-                imageUrl = command.imageUrl,
-                description = command.description,
-                createdAt = command.createdAt,
-                updatedAt = command.updatedAt
-            )
-        }
+        fun handle(command: CreateMenuCommand): Menu = Menu(
+            menuGroupId = command.menuGroupId,
+            name = command.name,
+            price = command.price,
+            status = MenuStatus.ON_SALE,
+            popularity = command.popularity,
+            imageUrl = command.imageUrl,
+            description = command.description,
+            createdAt = command.createdAt,
+            updatedAt = command.updatedAt
+        )
     }
 
     fun handle(command: UpdateMenuCommand) {
-        if (command.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
-
         name = command.name
         price = command.price
         popularity = command.popularity

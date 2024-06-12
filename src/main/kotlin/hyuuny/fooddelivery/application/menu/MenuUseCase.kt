@@ -28,6 +28,8 @@ class MenuUseCase(
     }
 
     suspend fun createMenu(request: CreateMenuRequest): Menu {
+        if (request.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
+
         val now = LocalDateTime.now()
         val menu = Menu.handle(
             CreateMenuCommand(
@@ -50,6 +52,8 @@ class MenuUseCase(
     }
 
     suspend fun updateMenu(id: Long, request: UpdateMenuRequest) {
+        if (request.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
+
         val now = LocalDateTime.now()
         val menu = findMenuByIdOrThrow(id)
         menu.handle(
@@ -78,7 +82,7 @@ class MenuUseCase(
     }
 
     suspend fun deleteMenu(id: Long) {
-        if (!repository.existsById(id)) throw NoSuchElementException("존재하지 않는 메뉴입니다.")
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 메뉴를 찾을 수 없습니다.")
         repository.delete(id)
     }
 

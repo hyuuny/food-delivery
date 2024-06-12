@@ -29,11 +29,11 @@ internal class DeleteCategoryGroupUseCaseTest : BehaviorSpec({
         `when`("존재하지 않는 카테고리이면") {
             coEvery { repository.existsById(any()) } returns false
 
-            then("존재하지 않는 카테고리라는 메세지가 반환된다.") {
+            then("카테고리를 찾을 수 없다는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
                     useCase.deleteCategory(0)
                 }
-                ex.message shouldBe "존재하지 않는 카테고리입니다."
+                ex.message shouldBe "0번 카테고리를 찾을 수 없습니다."
             }
         }
     }

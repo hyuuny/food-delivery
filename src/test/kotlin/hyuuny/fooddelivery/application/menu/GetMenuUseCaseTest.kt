@@ -52,10 +52,11 @@ internal class GetMenuUseCaseTest : BehaviorSpec({
         `when`("존재하지 않는 아이디이면") {
             coEvery { repository.findById(any()) } returns null
 
-            then("메뉴를 상세조회 할 수 없다.") {
-                shouldThrow<NoSuchElementException> {
+            then("존재하지 않는 메뉴라는 메세지가 반환된다.") {
+                val ex = shouldThrow<NoSuchElementException> {
                     useCase.getMenu(0)
                 }
+                ex.message shouldBe "0번 메뉴를 찾을 수 없습니다."
             }
         }
     }

@@ -18,13 +18,11 @@ class StoreImage(
         protected set
 
     companion object {
-        fun handle(command: CreateStoreImageCommand): StoreImage {
-            return StoreImage(
-                storeId = command.storeId,
-                imageUrl = command.imageUrl,
-                createdAt = command.createdAt,
-            )
-        }
+        fun handle(command: CreateStoreImageCommand): StoreImage = StoreImage(
+            storeId = command.storeId,
+            imageUrl = command.imageUrl,
+            createdAt = command.createdAt,
+        )
     }
 
 }

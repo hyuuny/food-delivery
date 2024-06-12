@@ -31,23 +31,17 @@ class MenuGroup(
         private set
 
     companion object {
-        fun handle(command: CreateMenuGroupCommand): MenuGroup {
-            if (command.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
-
-            return MenuGroup(
-                storeId = command.storeId,
-                name = command.name,
-                priority = command.priority,
-                description = command.description,
-                createdAt = command.createdAt,
-                updatedAt = command.updatedAt,
-            )
-        }
+        fun handle(command: CreateMenuGroupCommand): MenuGroup = MenuGroup(
+            storeId = command.storeId,
+            name = command.name,
+            priority = command.priority,
+            description = command.description,
+            createdAt = command.createdAt,
+            updatedAt = command.updatedAt,
+        )
     }
 
     fun handle(command: UpdateMenuGroupCommand) {
-        if (command.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
-
         this.name = command.name
         this.description = command.description
         this.updatedAt = command.updatedAt

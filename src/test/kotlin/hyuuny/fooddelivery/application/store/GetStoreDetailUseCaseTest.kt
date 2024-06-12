@@ -47,11 +47,11 @@ class GetStoreDetailUseCaseTest : BehaviorSpec({
         `when`("존재하지 않는 매장 아이디이면") {
             coEvery { repository.findByStoreId(any()) } returns null
 
-            then("존재하지 않는 매장 정보라는 메세지가 반환된다.") {
+            then("매장 정보를 찾을 수 없다는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
                     useCase.getStoreDetailByStoreId(0)
                 }
-                ex.message shouldBe "존재하지 않는 매장 정보입니다."
+                ex.message shouldBe "0번 매장 정보를 찾을 수 없습니다."
             }
         }
     }

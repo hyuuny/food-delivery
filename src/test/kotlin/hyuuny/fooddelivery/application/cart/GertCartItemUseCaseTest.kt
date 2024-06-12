@@ -23,7 +23,7 @@ class GertCartItemUseCaseTest : BehaviorSpec({
         )
         coEvery { repository.findAllByCartId(any()) } returns cartItems
 
-        `when`("아이템들을") {
+        `when`("품목들을") {
             val result = useCase.getAllByCartId(cartId)
 
             then("조회할 수 있다.") {

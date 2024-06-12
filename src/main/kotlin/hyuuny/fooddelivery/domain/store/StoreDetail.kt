@@ -22,17 +22,15 @@ class StoreDetail(
         protected set
 
     companion object {
-        fun handle(command: CreateStoreDetailCommand): StoreDetail {
-            return StoreDetail(
-                storeId = command.storeId,
-                zipCode = command.zipCode,
-                address = command.address,
-                detailedAddress = command.detailedAddress,
-                openHours = command.openHours,
-                closedDay = command.closedDay,
-                createdAt = command.createdAt,
-            )
-        }
+        fun handle(command: CreateStoreDetailCommand): StoreDetail = StoreDetail(
+            storeId = command.storeId,
+            zipCode = command.zipCode,
+            address = command.address,
+            detailedAddress = command.detailedAddress,
+            openHours = command.openHours,
+            closedDay = command.closedDay,
+            createdAt = command.createdAt,
+        )
     }
 
 }

@@ -28,6 +28,8 @@ class OptionGroupUseCase(
     }
 
     suspend fun createOptionGroup(request: CreateOptionGroupRequest): OptionGroup {
+        if (request.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
+
         val now = LocalDateTime.now()
         val optionGroup = OptionGroup.handle(
             CreateOptionGroupCommand(
@@ -47,6 +49,8 @@ class OptionGroupUseCase(
     }
 
     suspend fun updateOptionGroup(id: Long, request: UpdateOptionGroupRequest) {
+        if (request.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
+
         val now = LocalDateTime.now()
         val optionGroup = findOptionGroupByIdOrThrow(id)
         optionGroup.handle(
@@ -79,7 +83,7 @@ class OptionGroupUseCase(
     }
 
     suspend fun deleteOptionGroup(id: Long) {
-        if (!repository.existsById(id)) throw NoSuchElementException("존재하지 않는 옵션그룹입니다.")
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 옵션그룹을 찾을 수 없습니다.")
         repository.delete(id)
     }
 
@@ -88,6 +92,6 @@ class OptionGroupUseCase(
     suspend fun getAllByMenuId(menuId: Long): List<OptionGroup> = repository.findAllByMenuId(menuId)
 
     private suspend fun findOptionGroupByIdOrThrow(id: Long): OptionGroup = repository.findById(id)
-        ?: throw NoSuchElementException("존재하지 않는 옵션그룹입니다.")
+        ?: throw NoSuchElementException("${id}번 옵션그룹을 찾을 수 없습니다.")
 
 }

@@ -45,7 +45,7 @@ class CreateCartUseCaseTest : BehaviorSpec({
         }
         coEvery { itemOptionRepository.insertAll(any()) } returns cartItemOptions
 
-        `when`("선택한 메뉴와 옵션에 맞게") {
+        `when`("선택한 품목과 옵션에 맞게") {
             val result = useCase.addItemToCart(userId, request)
 
             then("장바구니에 등록된다.") {

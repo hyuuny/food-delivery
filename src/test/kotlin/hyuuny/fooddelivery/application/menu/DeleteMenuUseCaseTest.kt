@@ -33,7 +33,7 @@ internal class DeleteMenuUseCaseTest : BehaviorSpec({
                 val ex = shouldThrow<NoSuchElementException> {
                     useCase.deleteMenu(0)
                 }
-                ex.message shouldBe "존재하지 않는 메뉴입니다."
+                ex.message shouldBe "0번 메뉴를 찾을 수 없습니다."
             }
         }
     }

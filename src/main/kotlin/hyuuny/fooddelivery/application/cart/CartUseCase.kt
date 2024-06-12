@@ -61,10 +61,10 @@ class CartUseCase(
 
     @Transactional
     suspend fun updateCartItemQuantity(id: Long, cartItemId: Long, request: UpdateCartItemQuantityRequest) {
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
+        if (request.quantity <= 0) throw IllegalArgumentException("수량은 0보다 커야합니다.")
+
         val now = LocalDateTime.now()
-
-        if (!repository.existsById(id)) throw NoSuchElementException("존재하지 않는 장바구니입니다.")
-
         val cartItem = findCartItemByIdOrThrow(cartItemId)
         cartItem.handle(
             UpdateCartItemQuantityCommand(
@@ -76,10 +76,10 @@ class CartUseCase(
     }
 
     private suspend fun findCartByIdOrThrow(id: Long) = repository.findById(id)
-        ?: throw NoSuchElementException("존재하지 않는 장바구니입니다.")
+        ?: throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
 
     private suspend fun findCartItemByIdOrThrow(cartItemId: Long) = cartItemRepository.findById(cartItemId)
-        ?: throw NoSuchElementException("존재하지 않는 장바구니 품목입니다.")
+        ?: throw NoSuchElementException("${cartItemId}번 장바구니 품목을 찾을 수 없습니다.")
 
     private suspend fun insertCart(userId: Long, now: LocalDateTime) = repository.insert(
         Cart.handle(

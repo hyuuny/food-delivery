@@ -47,7 +47,7 @@ internal class GetOptionUseCaseTest : BehaviorSpec({
                 val ex = shouldThrow<NoSuchElementException> {
                     useCase.getOption(0)
                 }
-                ex.message shouldBe "옵션을 찾을 수 없습니다."
+                ex.message shouldBe "0번 옵션을 찾을 수 없습니다."
             }
         }
     }

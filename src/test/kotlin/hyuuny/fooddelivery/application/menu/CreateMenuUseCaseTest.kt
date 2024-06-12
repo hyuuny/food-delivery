@@ -62,7 +62,7 @@ internal class CreateMenuUseCaseTest : BehaviorSpec({
 
         `when`("금액을 0원 이하로 입력하면") {
             then("메뉴를 등록할 수 없다.") {
-                shouldThrow<IllegalArgumentException> {
+                val ex = shouldThrow<IllegalArgumentException> {
                     useCase.createMenu(
                         CreateMenuRequest(
                             menuGroupId = 1L,
@@ -75,6 +75,7 @@ internal class CreateMenuUseCaseTest : BehaviorSpec({
                         )
                     )
                 }
+                ex.message shouldBe "금액은 0이상이여야 합니다."
             }
         }
     }

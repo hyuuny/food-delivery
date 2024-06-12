@@ -27,22 +27,16 @@ class Option(
         private set
 
     companion object {
-        fun handle(command: CreateOptionCommand): Option {
-            if (command.name.isBlank()) throw IllegalArgumentException("옵션명은 공백일수 없습니다.")
-
-            return Option(
-                optionGroupId = command.optionGroupId,
-                name = command.name,
-                price = command.price,
-                createdAt = command.createdAt,
-                updatedAt = command.updatedAt
-            )
-        }
+        fun handle(command: CreateOptionCommand): Option = Option(
+            optionGroupId = command.optionGroupId,
+            name = command.name,
+            price = command.price,
+            createdAt = command.createdAt,
+            updatedAt = command.updatedAt
+        )
     }
 
     fun handle(command: UpdateOptionCommand) {
-        if (command.name.isBlank()) throw IllegalArgumentException("옵션명은 공백일수 없습니다.")
-
         name = command.name
         price = command.price
         updatedAt = command.updatedAt

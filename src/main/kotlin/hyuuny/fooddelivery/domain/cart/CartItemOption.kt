@@ -18,13 +18,11 @@ class CartItemOption(
         protected set
 
     companion object {
-        fun handle(command: CreateCartItemOptionCommand): CartItemOption {
-            return CartItemOption(
-                cartItemId = command.cartItemId,
-                optionId = command.optionId,
-                createdAt = command.createdAt,
-            )
-        }
+        fun handle(command: CreateCartItemOptionCommand): CartItemOption = CartItemOption(
+            cartItemId = command.cartItemId,
+            optionId = command.optionId,
+            createdAt = command.createdAt,
+        )
     }
 
 }

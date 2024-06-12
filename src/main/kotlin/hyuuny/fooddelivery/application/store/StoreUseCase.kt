@@ -144,12 +144,12 @@ class StoreUseCase(
 
     @Transactional
     suspend fun deleteStore(id: Long) {
-        if (!repository.existsById(id)) throw throw NoSuchElementException("존재하지 않는 매장입니다.")
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 매장을 찾을 수 없습니다.")
         storeImageRepository.deleteAllByStoreId(id)
         storeDetailRepository.deleteByStoreId(id)
         repository.delete(id)
     }
 
     private suspend fun findStoreByIdOrThrow(id: Long) = repository.findById(id)
-        ?: throw NoSuchElementException("존재하지 않는 매장입니다.")
+        ?: throw NoSuchElementException("${id}번 매장을 찾을 수 없습니다.")
 }
