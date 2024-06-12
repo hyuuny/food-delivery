@@ -13,7 +13,4 @@ class StoreImageUseCase(
 
     suspend fun getStoreImagesByStoreId(storeId: Long): List<StoreImage> = repository.findAllByStoreId(storeId)
 
-    @Transactional
-    suspend fun deleteStoreImagesByStoreId(storeId: Long) = repository.deleteAllByStoreId(storeId)
-
 }

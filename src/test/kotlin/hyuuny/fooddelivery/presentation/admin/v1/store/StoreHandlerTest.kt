@@ -447,8 +447,6 @@ class StoreHandlerTest : BaseIntegrationTest() {
     fun deleteStore() {
         val storeId = 1L
         coEvery { useCase.deleteStore(storeId) } returns Unit
-        coEvery { storeDetailUseCase.deleteStoreDetailByStoreId(storeId) } returns Unit
-        coEvery { storeImageUseCase.deleteStoreImagesByStoreId(storeId) } returns Unit
 
         webTestClient.delete().uri("/admin/v1/stores/${storeId}")
             .accept(MediaType.APPLICATION_JSON)
