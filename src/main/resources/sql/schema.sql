@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS users
     id          SERIAL PRIMARY KEY,
     name        VARCHAR(50)  NOT NULL,
     nickname    VARCHAR(50)  NOT NULL,
-    email       VARCHAR(100) NOT NULL,
+    email       VARCHAR(100) NOT NULL UNIQUE,
     phoneNumber VARCHAR(20)  NOT NULL,
     imageUrl    VARCHAR(255),
     createdAt   TIMESTAMP    NOT NULL,
@@ -140,5 +140,22 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE INDEX IF NOT EXISTS idx_users_name ON users (name);
 CREATE INDEX IF NOT EXISTS idx_users_phoneNumber ON users (phoneNumber);
+
+CREATE TABLE IF NOT EXISTS user_addresses
+(
+    id                SERIAL PRIMARY KEY,
+    user_id           BIGINT       NOT NULL,
+    name              VARCHAR(255),
+    zip_code          VARCHAR(255) NOT NULL,
+    address           VARCHAR(255) NOT NULL,
+    detail_address    VARCHAR(255) NOT NULL,
+    message_to_rider  VARCHAR(255),
+    entrance_password VARCHAR(255),
+    route_guidance    VARCHAR(255),
+    created_at        TIMESTAMP    NOT NULL,
+    updated_at        TIMESTAMP    NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_id ON user_addresses (user_id);
 
 
