@@ -4,6 +4,7 @@ import hyuuny.fooddelivery.presentation.api.v1.cart.CartApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.category.CategoryApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.menu.MenuApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.store.StoreApiHandler
+import hyuuny.fooddelivery.presentation.api.v1.user.UserApiHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.server.RouterFunction
@@ -50,6 +51,18 @@ class ApiRoutes {
                 PUT("/{cartId}/cart-items/{cartItemId}", handler::updateCartItemQuantity)
                 PUT("/{cartId}/cart-items/{cartItemId}/options", handler::updateCartItemOptions)
                 DELETE("/{cartId}/cart-items/{cartItemId}", handler::deleteCartItem)
+            }
+        }
+    }
+
+    @Bean
+    fun userApi(handler: UserApiHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/api/v1/users".nest {
+                POST("/sign-up", handler::signUp)
+                GET("/{id}", handler::getUser)
+                PATCH("/{id}/change-name", handler::changeName)
+                PATCH("/{id}/change-nickname", handler::changeNickname)
             }
         }
     }

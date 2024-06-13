@@ -1,5 +1,8 @@
 package hyuuny.fooddelivery.domain.user
 
+import ChangeUserNameCommand
+import ChangeUserNicknameCommand
+import SignUpUserCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -31,4 +34,27 @@ class User(
         private set
     var updatedAt = updatedAt
         private set
+
+    companion object {
+        fun handle(command: SignUpUserCommand): User = User(
+            name = command.name,
+            nickname = command.nickname,
+            email = command.email,
+            phoneNumber = command.phoneNumber,
+            imageUrl = command.imageUrl,
+            createdAt = command.createdAt,
+            updatedAt = command.updatedAt,
+        )
+    }
+
+    fun handle(command: ChangeUserNameCommand) {
+        this.name = command.name
+        this.updatedAt = command.updatedAt
+    }
+
+    fun handle(command: ChangeUserNicknameCommand) {
+        this.nickname = command.nickname
+        this.updatedAt = command.updatedAt
+    }
+
 }
