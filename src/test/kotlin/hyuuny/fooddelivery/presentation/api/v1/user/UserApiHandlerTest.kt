@@ -1,5 +1,6 @@
-package hyuuny.fooddelivery.presentation.api.user
+package hyuuny.fooddelivery.presentation.api.v1.user
 
+import ChangeEmailRequest
 import ChangeUserNameRequest
 import ChangeUserNicknameRequest
 import SignUpUserRequest
@@ -103,6 +104,23 @@ class UserApiHandlerTest : BaseIntegrationTest() {
         coEvery { useCase.changeNickname(any(), any()) } returns Unit
 
         webTestClient.patch().uri("/api/v1/users/$id/change-nickname")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("회원은 자신의 이메일을 변경할 수 있다.")
+    @Test
+    fun changeEmail() {
+        val id = 1
+        val request = ChangeEmailRequest(email = "hyuuny@naver.com")
+        coEvery { useCase.changeEmail(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/api/v1/users/$id/change-email")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
