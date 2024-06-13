@@ -34,6 +34,7 @@ class UserRepositoryImpl(
                 ),
             ).applyAndAwait(
                 Update.update("name", user.name)
+                    .set("updatedAt", user.updatedAt)
             )
     }
 
@@ -45,6 +46,7 @@ class UserRepositoryImpl(
                 ),
             ).applyAndAwait(
                 Update.update("nickname", user.nickname)
+                    .set("updatedAt", user.updatedAt)
             )
     }
 
