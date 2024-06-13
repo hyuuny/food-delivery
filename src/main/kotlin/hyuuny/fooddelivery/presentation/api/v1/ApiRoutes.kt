@@ -63,6 +63,7 @@ class ApiRoutes {
                 GET("/{id}", handler::getUser)
                 PATCH("/{id}/change-name", handler::changeName)
                 PATCH("/{id}/change-nickname", handler::changeNickname)
+                PATCH("/{id}/change-email", handler::changeEmail)
             }
         }
     }

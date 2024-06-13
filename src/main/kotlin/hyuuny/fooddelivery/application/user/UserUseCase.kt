@@ -1,5 +1,7 @@
 package hyuuny.fooddelivery.application.user
 
+import ChangeEmailCommand
+import ChangeEmailRequest
 import ChangeUserNameCommand
 import ChangeUserNameRequest
 import ChangeUserNicknameCommand
@@ -68,6 +70,21 @@ class UserUseCase(
             )
         )
         repository.updateNickname(user)
+    }
+
+    @Transactional
+    suspend fun changeEmail(id: Long, request: ChangeEmailRequest) {
+        UserVerifier.verifyEmail(request.email)
+        val user = findUserByIdOrThrow(id)
+
+        val now = LocalDateTime.now()
+        user.handle(
+            ChangeEmailCommand(
+                email = request.email,
+                updatedAt = now,
+            )
+        )
+        repository.updateEmail(user)
     }
 
     private suspend fun findUserByIdOrThrow(id: Long): User =

@@ -51,7 +51,15 @@ class UserRepositoryImpl(
     }
 
     override suspend fun updateEmail(user: User) {
-        TODO("Not yet implemented")
+        template.update<User>()
+            .matching(
+                Query.query(
+                    where("id").`is`(user.id!!)
+                ),
+            ).applyAndAwait(
+                Update.update("email", user.email)
+                    .set("updatedAt", user.updatedAt)
+            )
     }
 
     override suspend fun updatePhoneNumber(user: User) {

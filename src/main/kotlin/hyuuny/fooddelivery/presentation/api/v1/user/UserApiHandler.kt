@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.presentation.api.v1.user
 
+import ChangeEmailRequest
 import ChangeUserNameRequest
 import ChangeUserNicknameRequest
 import SignUpUserRequest
@@ -42,4 +43,12 @@ class UserApiHandler(
         return ok().buildAndAwait()
     }
 
+    suspend fun changeEmail(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<ChangeEmailRequest>()
+        useCase.changeEmail(id, body)
+        return ok().buildAndAwait()
+    }
+
 }
+

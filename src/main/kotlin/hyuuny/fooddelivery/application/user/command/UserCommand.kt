@@ -19,3 +19,8 @@ data class ChangeUserNicknameCommand(
     val nickname: String,
     val updatedAt: LocalDateTime,
 )
+
+data class ChangeEmailCommand(
+    val email: String,
+    val updatedAt: LocalDateTime,
+)

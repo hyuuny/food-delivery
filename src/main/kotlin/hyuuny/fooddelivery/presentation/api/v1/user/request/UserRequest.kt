@@ -13,3 +13,7 @@ data class ChangeUserNameRequest(
 data class ChangeUserNicknameRequest(
     val nickname: String
 )
+
+data class ChangeEmailRequest(
+    val email: String
+)

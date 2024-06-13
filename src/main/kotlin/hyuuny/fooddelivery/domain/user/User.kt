@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.user
 
+import ChangeEmailCommand
 import ChangeUserNameCommand
 import ChangeUserNicknameCommand
 import SignUpUserCommand
@@ -54,6 +55,11 @@ class User(
 
     fun handle(command: ChangeUserNicknameCommand) {
         this.nickname = command.nickname
+        this.updatedAt = command.updatedAt
+    }
+
+    fun handle(command: ChangeEmailCommand) {
+        this.email = command.email
         this.updatedAt = command.updatedAt
     }
 
