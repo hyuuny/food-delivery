@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS stores
     icon_image_url       VARCHAR(255),
     description          TEXT         NOT NULL,
     food_origin          TEXT         NOT NULL,
-    phone_number         VARCHAR(255),
+    phone_number         VARCHAR(20),
     created_at           TIMESTAMP    NOT NULL,
     updated_at           TIMESTAMP    NOT NULL
 );
@@ -128,18 +128,18 @@ CREATE TABLE IF NOT EXISTS cart_item_options
 
 CREATE TABLE IF NOT EXISTS users
 (
-    id          SERIAL PRIMARY KEY,
-    name        VARCHAR(50)  NOT NULL,
-    nickname    VARCHAR(50)  NOT NULL,
-    email       VARCHAR(100) NOT NULL UNIQUE,
-    phoneNumber VARCHAR(20)  NOT NULL,
-    imageUrl    VARCHAR(255),
-    createdAt   TIMESTAMP    NOT NULL,
-    updatedAt   TIMESTAMP    NOT NULL
+    id           SERIAL PRIMARY KEY,
+    name         VARCHAR(50)  NOT NULL,
+    nickname     VARCHAR(50)  NOT NULL,
+    email        VARCHAR(100) NOT NULL UNIQUE,
+    phone_number VARCHAR(20)  NOT NULL,
+    image_url    VARCHAR(255),
+    created_at   TIMESTAMP    NOT NULL,
+    updated_at   TIMESTAMP    NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_name ON users (name);
-CREATE INDEX IF NOT EXISTS idx_users_phoneNumber ON users (phoneNumber);
+CREATE INDEX IF NOT EXISTS idx_users_phoneNumber ON users (phone_number);
 
 CREATE TABLE IF NOT EXISTS user_addresses
 (
