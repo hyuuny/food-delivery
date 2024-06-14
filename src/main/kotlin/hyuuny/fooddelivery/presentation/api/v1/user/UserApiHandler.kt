@@ -1,8 +1,10 @@
 package hyuuny.fooddelivery.presentation.api.v1.user
 
-import ChangeEmailRequest
+import ChangeUserEmailRequest
+import ChangeUserImageUrlRequest
 import ChangeUserNameRequest
 import ChangeUserNicknameRequest
+import ChangeUserPhoneNumberRequest
 import SignUpUserRequest
 import hyuuny.fooddelivery.application.user.UserUseCase
 import hyuuny.fooddelivery.presentation.api.v1.user.response.UserResponse
@@ -45,8 +47,28 @@ class UserApiHandler(
 
     suspend fun changeEmail(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
-        val body = request.awaitBody<ChangeEmailRequest>()
+        val body = request.awaitBody<ChangeUserEmailRequest>()
         useCase.changeEmail(id, body)
+        return ok().buildAndAwait()
+    }
+
+    suspend fun changePhoneNumber(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<ChangeUserPhoneNumberRequest>()
+        useCase.changePhoneNumber(id, body)
+        return ok().buildAndAwait()
+    }
+
+    suspend fun changeImageUrl(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<ChangeUserImageUrlRequest>()
+        useCase.changeImageUrl(id, body)
+        return ok().buildAndAwait()
+    }
+
+    suspend fun deleteUser(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        useCase.deleteUser(id)
         return ok().buildAndAwait()
     }
 

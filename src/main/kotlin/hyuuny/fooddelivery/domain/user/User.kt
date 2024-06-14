@@ -1,8 +1,10 @@
 package hyuuny.fooddelivery.domain.user
 
-import ChangeEmailCommand
+import ChangeUserEmailCommand
+import ChangeUserImageUrlCommand
 import ChangeUserNameCommand
 import ChangeUserNicknameCommand
+import ChangeUserPhoneNumberCommand
 import SignUpUserCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
@@ -37,6 +39,10 @@ class User(
         private set
 
     companion object {
+
+        const val USER_DEFAULT_IMAGE_URL =
+            "https://my-s3-bucket.s3.ap-northeast-2.amazonaws.com/images/user-default.jpeg"
+
         fun handle(command: SignUpUserCommand): User = User(
             name = command.name,
             nickname = command.nickname,
@@ -58,9 +64,21 @@ class User(
         this.updatedAt = command.updatedAt
     }
 
-    fun handle(command: ChangeEmailCommand) {
+    fun handle(command: ChangeUserEmailCommand) {
         this.email = command.email
         this.updatedAt = command.updatedAt
     }
+
+    fun handle(command: ChangeUserPhoneNumberCommand) {
+        this.phoneNumber = command.phoneNumber
+        this.updatedAt = command.updatedAt
+    }
+
+    fun handle(command: ChangeUserImageUrlCommand) {
+        this.imageUrl = command.imageUrl
+        this.updatedAt = command.updatedAt
+    }
+
+    fun getImageUrlOrDefault(): String = imageUrl ?: USER_DEFAULT_IMAGE_URL
 
 }

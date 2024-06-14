@@ -63,17 +63,33 @@ class UserRepositoryImpl(
     }
 
     override suspend fun updatePhoneNumber(user: User) {
-        TODO("Not yet implemented")
+        template.update<User>()
+            .matching(
+                Query.query(
+                    where("id").`is`(user.id!!)
+                ),
+            ).applyAndAwait(
+                Update.update("phoneNumber", user.phoneNumber)
+                    .set("updatedAt", user.updatedAt)
+            )
     }
 
     override suspend fun updateImageUrl(user: User) {
-        TODO("Not yet implemented")
+        template.update<User>()
+            .matching(
+                Query.query(
+                    where("id").`is`(user.id!!)
+                ),
+            ).applyAndAwait(
+                Update.update("imageUrl", user.imageUrl)
+                    .set("updatedAt", user.updatedAt)
+            )
     }
 
-    override suspend fun delete(id: Long) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun delete(id: Long) = dao.deleteById(id)
 
     override suspend fun existsByEmail(email: String): Boolean = dao.existsByEmail(email)
+
+    override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
 }

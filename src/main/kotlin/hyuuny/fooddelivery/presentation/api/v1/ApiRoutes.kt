@@ -64,6 +64,9 @@ class ApiRoutes {
                 PATCH("/{id}/change-name", handler::changeName)
                 PATCH("/{id}/change-nickname", handler::changeNickname)
                 PATCH("/{id}/change-email", handler::changeEmail)
+                PATCH("/{id}/change-phone-number", handler::changePhoneNumber)
+                PATCH("/{id}/change-image-url", handler::changeImageUrl)
+                DELETE("/{id}", handler::deleteUser)
             }
         }
     }

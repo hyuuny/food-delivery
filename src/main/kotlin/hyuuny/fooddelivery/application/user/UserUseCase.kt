@@ -1,11 +1,15 @@
 package hyuuny.fooddelivery.application.user
 
-import ChangeEmailCommand
-import ChangeEmailRequest
+import ChangeUserEmailCommand
+import ChangeUserEmailRequest
+import ChangeUserImageUrlCommand
+import ChangeUserImageUrlRequest
 import ChangeUserNameCommand
 import ChangeUserNameRequest
 import ChangeUserNicknameCommand
 import ChangeUserNicknameRequest
+import ChangeUserPhoneNumberCommand
+import ChangeUserPhoneNumberRequest
 import SignUpUserCommand
 import SignUpUserRequest
 import hyuuny.fooddelivery.domain.user.User
@@ -73,18 +77,53 @@ class UserUseCase(
     }
 
     @Transactional
-    suspend fun changeEmail(id: Long, request: ChangeEmailRequest) {
+    suspend fun changeEmail(id: Long, request: ChangeUserEmailRequest) {
         UserVerifier.verifyEmail(request.email)
         val user = findUserByIdOrThrow(id)
 
         val now = LocalDateTime.now()
         user.handle(
-            ChangeEmailCommand(
+            ChangeUserEmailCommand(
                 email = request.email,
                 updatedAt = now,
             )
         )
         repository.updateEmail(user)
+    }
+
+    @Transactional
+    suspend fun changePhoneNumber(id: Long, request: ChangeUserPhoneNumberRequest) {
+        UserVerifier.verifyPhoneNumber(request.phoneNumber)
+        val user = findUserByIdOrThrow(id)
+
+        val now = LocalDateTime.now()
+        user.handle(
+            ChangeUserPhoneNumberCommand(
+                phoneNumber = request.phoneNumber,
+                updatedAt = now,
+            )
+        )
+        repository.updatePhoneNumber(user)
+    }
+
+    @Transactional
+    suspend fun changeImageUrl(id: Long, request: ChangeUserImageUrlRequest) {
+        val user = findUserByIdOrThrow(id)
+
+        val now = LocalDateTime.now()
+        user.handle(
+            ChangeUserImageUrlCommand(
+                imageUrl = request.imageUrl,
+                updatedAt = now,
+            )
+        )
+        repository.updateImageUrl(user)
+    }
+
+    @Transactional
+    suspend fun deleteUser(id: Long) {
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 회원을 찾을 수 없습니다.")
+        repository.delete(id)
     }
 
     private suspend fun findUserByIdOrThrow(id: Long): User =

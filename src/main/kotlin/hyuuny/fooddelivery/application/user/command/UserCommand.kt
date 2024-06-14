@@ -20,7 +20,17 @@ data class ChangeUserNicknameCommand(
     val updatedAt: LocalDateTime,
 )
 
-data class ChangeEmailCommand(
+data class ChangeUserEmailCommand(
     val email: String,
+    val updatedAt: LocalDateTime,
+)
+
+data class ChangeUserPhoneNumberCommand(
+    val phoneNumber: String,
+    val updatedAt: LocalDateTime,
+)
+
+data class ChangeUserImageUrlCommand(
+    val imageUrl: String?,
     val updatedAt: LocalDateTime,
 )

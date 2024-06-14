@@ -21,7 +21,7 @@ data class UserResponse(
                 nickname = entity.nickname,
                 email = entity.email,
                 phoneNumber = entity.phoneNumber,
-                imageUrl = entity.imageUrl,
+                imageUrl = entity.getImageUrlOrDefault(),
                 createdAt = entity.createdAt,
                 updatedAt = entity.updatedAt,
             )

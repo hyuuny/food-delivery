@@ -27,4 +27,6 @@ interface UserRepository {
 
     suspend fun existsByEmail(email: String): Boolean
 
+    suspend fun existsById(id: Long): Boolean
+
 }
