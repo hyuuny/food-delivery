@@ -1,8 +1,10 @@
 package hyuuny.fooddelivery.presentation.api.v1.user
 
-import ChangeEmailRequest
+import ChangeUserEmailRequest
+import ChangeUserImageUrlRequest
 import ChangeUserNameRequest
 import ChangeUserNicknameRequest
+import ChangeUserPhoneNumberRequest
 import SignUpUserRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.user.UserUseCase
@@ -117,13 +119,61 @@ class UserApiHandlerTest : BaseIntegrationTest() {
     @Test
     fun changeEmail() {
         val id = 1
-        val request = ChangeEmailRequest(email = "hyuuny@naver.com")
+        val request = ChangeUserEmailRequest(email = "hyuuny@naver.com")
         coEvery { useCase.changeEmail(any(), any()) } returns Unit
 
         webTestClient.patch().uri("/api/v1/users/$id/change-email")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("회원은 자신의 휴대폰 번호를 변경할 수 있다.")
+    @Test
+    fun changePhoneNumber() {
+        val id = 1
+        val request = ChangeUserPhoneNumberRequest(phoneNumber = "010-1234-5678")
+        coEvery { useCase.changePhoneNumber(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/api/v1/users/$id/change-phone-number")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("회원은 자신의 이미지를 변경할 수 있다.")
+    @Test
+    fun changeImageUrl() {
+        val id = 1
+        val request =
+            ChangeUserImageUrlRequest(imageUrl = "https://my-s3-bucket.s3.ap-northeast-2.amazonaws.com/images/star.jpeg")
+        coEvery { useCase.changeImageUrl(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/api/v1/users/$id/change-image-url")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("회원은 서비스를 탈퇴할 수 있다.")
+    @Test
+    fun deleteUser() {
+        val id = 1
+        coEvery { useCase.deleteUser(any()) } returns Unit
+
+        webTestClient.delete().uri("/api/v1/users/$id")
             .exchange()
             .expectStatus().isOk
             .expectBody()
