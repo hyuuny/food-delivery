@@ -152,6 +152,7 @@ CREATE TABLE IF NOT EXISTS user_addresses
     message_to_rider  VARCHAR(255),
     entrance_password VARCHAR(255),
     route_guidance    VARCHAR(255),
+    selected          BOOLEAN      NOT NULL,
     created_at        TIMESTAMP    NOT NULL,
     updated_at        TIMESTAMP    NOT NULL
 );

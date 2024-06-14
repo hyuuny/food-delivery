@@ -15,6 +15,7 @@ class UserAddress(
     messageToRider: String? = null,
     entrancePassword: String? = null,
     routeGuidance: String? = null,
+    selected: Boolean = false,
     val createdAt: LocalDateTime,
     updatedAt: LocalDateTime,
 ) {
@@ -35,6 +36,8 @@ class UserAddress(
     var entrancePassword = entrancePassword
         private set
     var routeGuidance = routeGuidance
+        private set
+    var selected = selected
         private set
     var updatedAt = updatedAt
         private set
