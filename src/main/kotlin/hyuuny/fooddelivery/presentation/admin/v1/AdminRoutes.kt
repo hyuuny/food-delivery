@@ -6,6 +6,7 @@ import hyuuny.fooddelivery.presentation.admin.v1.menugroup.MenuGroupHandler
 import hyuuny.fooddelivery.presentation.admin.v1.option.OptionHandler
 import hyuuny.fooddelivery.presentation.admin.v1.optiongroup.OptionGroupHandler
 import hyuuny.fooddelivery.presentation.admin.v1.store.StoreHandler
+import hyuuny.fooddelivery.presentation.admin.v1.user.UserHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.server.RouterFunction
@@ -103,6 +104,16 @@ class AdminRoutes {
                 PUT("/{id}", handler::updateCategory)
                 PATCH("/delivery-type/{deliveryType}/re-order", handler::reOrderCategories)
                 DELETE("/{id}", handler::deleteCategory)
+            }
+        }
+    }
+
+    @Bean
+    fun userAdminApi(handler: UserHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/admin/v1/users".nest {
+                GET("", handler::getUsers)
+                GET("/{id}", handler::getUser)
             }
         }
     }

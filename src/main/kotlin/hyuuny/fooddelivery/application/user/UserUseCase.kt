@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.application.user
 
+import AdminUserSearchCondition
 import ChangeUserEmailCommand
 import ChangeUserEmailRequest
 import ChangeUserImageUrlCommand
@@ -14,6 +15,9 @@ import SignUpUserCommand
 import SignUpUserRequest
 import hyuuny.fooddelivery.domain.user.User
 import hyuuny.fooddelivery.infrastructure.user.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -23,6 +27,11 @@ import java.time.LocalDateTime
 class UserUseCase(
     private val repository: UserRepository,
 ) {
+
+    suspend fun getUsersByAdminCondition(searchCondition: AdminUserSearchCondition, pageable: Pageable): Page<User> {
+        val page = repository.findAllUsers(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
 
     @Transactional
     suspend fun signUp(request: SignUpUserRequest): User {
