@@ -1,4 +1,4 @@
-package hyuuny.fooddelivery.domain.user
+package hyuuny.fooddelivery.domain.useraddress
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
