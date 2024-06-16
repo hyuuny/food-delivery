@@ -5,6 +5,7 @@ import hyuuny.fooddelivery.presentation.api.v1.category.CategoryApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.menu.MenuApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.store.StoreApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.user.UserApiHandler
+import hyuuny.fooddelivery.presentation.api.v1.useraddress.UserAddressApiHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.server.RouterFunction
@@ -67,6 +68,18 @@ class ApiRoutes {
                 PATCH("/{id}/change-phone-number", handler::changePhoneNumber)
                 PATCH("/{id}/change-image-url", handler::changeImageUrl)
                 DELETE("/{id}", handler::deleteUser)
+            }
+        }
+    }
+
+    @Bean
+    fun userAddressApi(handler: UserAddressApiHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/api/v1/users/{userId}/addresses".nest {
+                POST("", handler::createUserAddress)
+                GET("", handler::getAllUserAddresses)
+                GET("/{id}", handler::getUserAddress)
+                PUT("/{id}", handler::updateUserAddress)
             }
         }
     }

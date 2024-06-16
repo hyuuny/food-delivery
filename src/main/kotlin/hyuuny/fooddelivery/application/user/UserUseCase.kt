@@ -135,6 +135,8 @@ class UserUseCase(
         repository.delete(id)
     }
 
+    suspend fun existsById(id: Long): Boolean = repository.existsById(id)
+
     private suspend fun findUserByIdOrThrow(id: Long): User =
         repository.findById(id) ?: throw NoSuchElementException("${id}번 회원을 찾을 수 없습니다.")
 
