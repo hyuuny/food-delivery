@@ -214,6 +214,35 @@ class UserAddressApiHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
+    @DisplayName("회원은 배달받을 주소를 자신의 주소목록에서 선택해서 변경할 수 있다.")
+    @Test
+    fun changeUserAddressSelectedToTrue() {
+        val userId = 1L
+        val id = 2L
+        coEvery { useCase.changeUserAddressSelectedToTrue(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/api/v1/users/$userId/addresses/$id/change-selected")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
+    @DisplayName("회원은 자신이 등록한 주소를 삭제할 수 있다.")
+    @Test
+    fun deleteUserAddress() {
+        val userId = 1L
+        val id = 2L
+        coEvery { useCase.deleteUserAddress(any()) } returns Unit
+
+        webTestClient.delete().uri("/api/v1/users/$userId/addresses/$id")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
     private fun generateUserAddress(request: CreateUserAddressRequest, selected: Boolean): UserAddress {
         val now = LocalDateTime.now()
         return UserAddress(
