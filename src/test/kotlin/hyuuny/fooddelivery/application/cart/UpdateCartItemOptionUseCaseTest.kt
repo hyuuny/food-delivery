@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.application.cart
 
 import UpdateCartItemOptionsRequest
+import hyuuny.fooddelivery.domain.cart.Cart
 import hyuuny.fooddelivery.domain.cart.CartItem
 import hyuuny.fooddelivery.domain.cart.CartItemOption
 import hyuuny.fooddelivery.infrastructure.cart.CartItemOptionRepository
@@ -26,8 +27,9 @@ class UpdateCartItemOptionUseCaseTest : BehaviorSpec({
         val request = UpdateCartItemOptionsRequest(optionIds = listOf(7, 13, 89, 20))
 
         val now = LocalDateTime.now()
-        coEvery { repository.existsById(any()) } returns true
+        val cart = Cart(id = 1L, userId = 1, createdAt = now, updatedAt = now)
         val cartItem = CartItem(id = 1, cartId = cartId, menuId = 1, quantity = 1, createdAt = now, updatedAt = now)
+        coEvery { repository.findById(any()) } returns cart
         coEvery { itemRepository.findByIdAndCartId(any(), any()) } returns cartItem
         coEvery { itemOptionRepository.deleteAllByCartItemId(any()) } returns Unit
         coEvery { itemOptionRepository.insertAll(any()) } returns listOf(
@@ -36,6 +38,8 @@ class UpdateCartItemOptionUseCaseTest : BehaviorSpec({
             CartItemOption(id = 8, cartItemId = cartItemId, optionId = 89, createdAt = now),
             CartItemOption(id = 9, cartItemId = cartItemId, optionId = 20, createdAt = now),
         )
+        coEvery { itemRepository.updateUpdatedAt(any()) } returns Unit
+        coEvery { repository.update(any()) } returns Unit
 
         `when`("올바른 옵션을 입력하면서") {
             useCase.updateCartItemOptions(cartId, cartItemId, request)
@@ -57,7 +61,7 @@ class UpdateCartItemOptionUseCaseTest : BehaviorSpec({
         }
 
         `when`("존재하지 않는 장바구니 아이디이면") {
-            coEvery { repository.existsById(any()) } returns false
+            coEvery { repository.findById(any()) } returns null
 
             then("장바구니를 찾을 수 없다는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
@@ -68,7 +72,7 @@ class UpdateCartItemOptionUseCaseTest : BehaviorSpec({
         }
 
         `when`("존재하지 않는 장바구니 품목 아이디이면") {
-            coEvery { repository.existsById(any()) } returns true
+            coEvery { repository.findById(any()) } returns cart
             coEvery { itemRepository.findByIdAndCartId(any(), any()) } returns null
 
             then("장바구니 품목을 찾을 수 없다는 메세지가 반환된다.") {

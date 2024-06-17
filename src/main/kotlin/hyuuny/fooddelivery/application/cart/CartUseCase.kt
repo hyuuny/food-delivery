@@ -7,6 +7,8 @@ import CreateCartItemOptionCommand
 import UpdateCartItemOptionsRequest
 import UpdateCartItemQuantityCommand
 import UpdateCartItemQuantityRequest
+import UpdateCartItemUpdatedCommand
+import UpdateCartUpdatedAtCommand
 import hyuuny.fooddelivery.domain.cart.Cart
 import hyuuny.fooddelivery.domain.cart.CartItem
 import hyuuny.fooddelivery.domain.cart.CartItemOption
@@ -30,7 +32,8 @@ class CartUseCase(
         if (request.item.optionIds.isEmpty()) throw IllegalArgumentException("품목 옵션은 필수값입니다.")
 
         val now = LocalDateTime.now()
-        val cart = repository.findByUserId(userId) ?: insertCart(userId, now)
+        val existingCart = repository.findByUserId(userId)
+        val cart = existingCart ?: insertCart(userId, now)
 
         val cartItem = cartItemRepository.insert(
             CartItem.handle(
@@ -53,6 +56,8 @@ class CartUseCase(
                 )
             )
         }.also { cartItemOptionRepository.insertAll(it) }
+
+        if (existingCart != null) updateCartUpdatedAt(cart, now)
         return cart
     }
 
@@ -60,14 +65,12 @@ class CartUseCase(
     suspend fun getOrInsertCart(userId: Long): Cart = repository.findByUserId(userId)
         ?: insertCart(userId, LocalDateTime.now())
 
-    suspend fun getCart(id: Long): Cart = findCartByIdOrThrow(id)
-
     @Transactional
     suspend fun updateCartItemQuantity(id: Long, cartItemId: Long, request: UpdateCartItemQuantityRequest) {
-        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
         if (request.quantity <= 0) throw IllegalArgumentException("수량은 0보다 커야합니다.")
 
         val now = LocalDateTime.now()
+        val cart = findCartByIdOrThrow(id)
         val cartItem = findCartItemByCartItemIdAndCartIdOrThrow(cartItemId, id)
         cartItem.handle(
             UpdateCartItemQuantityCommand(
@@ -76,14 +79,17 @@ class CartUseCase(
             )
         )
         cartItemRepository.update(cartItem)
+
+        cart.handle(UpdateCartUpdatedAtCommand(updatedAt = now))
+        repository.update(cart)
     }
 
     @Transactional
     suspend fun updateCartItemOptions(id: Long, cartItemId: Long, request: UpdateCartItemOptionsRequest) {
         if (request.optionIds.isEmpty()) throw IllegalArgumentException("품목 옵션은 필수값입니다.")
-        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
 
         val now = LocalDateTime.now()
+        val cart = findCartByIdOrThrow(id)
         val cartItem = findCartItemByCartItemIdAndCartIdOrThrow(cartItemId, id)
         cartItemOptionRepository.deleteAllByCartItemId(cartItemId)
         request.optionIds.map {
@@ -95,6 +101,9 @@ class CartUseCase(
                 )
             )
         }.also { cartItemOptionRepository.insertAll(it) }
+
+        updateCartItemUpdatedAt(cartItem, now)
+        updateCartUpdatedAt(cart, now)
     }
 
     @Transactional
@@ -104,6 +113,16 @@ class CartUseCase(
         val cartItem = findCartItemByCartItemIdAndCartIdOrThrow(cartItemId, id)
         cartItemOptionRepository.deleteAllByCartItemId(cartItem.id!!)
         cartItemRepository.delete(cartItem.id!!)
+    }
+
+    private suspend fun updateCartItemUpdatedAt(cartItem: CartItem, updatedAt: LocalDateTime) {
+        cartItem.handle(UpdateCartItemUpdatedCommand(updatedAt = updatedAt))
+        cartItemRepository.updateUpdatedAt(cartItem)
+    }
+
+    private suspend fun updateCartUpdatedAt(cart: Cart, updatedAt: LocalDateTime) {
+        cart.handle(UpdateCartUpdatedAtCommand(updatedAt = updatedAt))
+        repository.update(cart)
     }
 
     private suspend fun findCartByIdOrThrow(id: Long) = repository.findById(id)

@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.domain.cart
 
 import CreateCartCommand
+import UpdateCartUpdatedAtCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -26,4 +27,9 @@ class Cart(
             updatedAt = command.updatedAt,
         )
     }
+
+    fun handle(command: UpdateCartUpdatedAtCommand) {
+        this.updatedAt = command.updatedAt
+    }
+
 }

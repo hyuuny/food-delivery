@@ -4,7 +4,7 @@ import hyuuny.fooddelivery.domain.cart.CartItem
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.core.applyAndAwait
 import org.springframework.data.r2dbc.core.update
-import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
 import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
@@ -25,11 +25,22 @@ class CartItemRepositoryImpl(
         template.update<CartItem>()
             .matching(
                 Query.query(
-                    Criteria.where("id").`is`(cartItem.id!!)
+                    where("id").`is`(cartItem.id!!)
                 ),
             ).applyAndAwait(
                 Update.update("quantity", cartItem.quantity)
                     .set("updated_at", cartItem.updatedAt)
+            )
+    }
+
+    override suspend fun updateUpdatedAt(cartItem: CartItem) {
+        template.update<CartItem>()
+            .matching(
+                Query.query(
+                    where("id").`is`(cartItem.id!!)
+                ),
+            ).applyAndAwait(
+                Update.update("updatedAt", cartItem.updatedAt)
             )
     }
 

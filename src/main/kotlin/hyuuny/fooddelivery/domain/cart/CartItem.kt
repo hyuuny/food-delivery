@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.domain.cart
 
 import CreateCartItemCommand
 import UpdateCartItemQuantityCommand
+import UpdateCartItemUpdatedCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -36,6 +37,10 @@ class CartItem(
 
     fun handle(command: UpdateCartItemQuantityCommand) {
         this.quantity = command.quantity
+        this.updatedAt = command.updatedAt
+    }
+
+    fun handle(command: UpdateCartItemUpdatedCommand) {
         this.updatedAt = command.updatedAt
     }
 

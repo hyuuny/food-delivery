@@ -24,3 +24,11 @@ data class UpdateCartItemQuantityCommand(
     val quantity: Int,
     val updatedAt: LocalDateTime,
 )
+
+data class UpdateCartUpdatedAtCommand(
+    val updatedAt: LocalDateTime,
+)
+
+data class UpdateCartItemUpdatedCommand(
+    val updatedAt: LocalDateTime,
+)

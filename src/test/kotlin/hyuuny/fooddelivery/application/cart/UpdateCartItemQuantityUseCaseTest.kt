@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.application.cart
 
 import UpdateCartItemQuantityRequest
+import hyuuny.fooddelivery.domain.cart.Cart
 import hyuuny.fooddelivery.domain.cart.CartItem
 import hyuuny.fooddelivery.infrastructure.cart.CartItemOptionRepository
 import hyuuny.fooddelivery.infrastructure.cart.CartItemRepository
@@ -23,12 +24,14 @@ class UpdateCartItemQuantityUseCaseTest : BehaviorSpec({
         val cartId = 1L
         val cartItemId = 1L
         val now = LocalDateTime.now()
+        val cart = Cart(id = 1L, userId = 1, createdAt = now, updatedAt = now)
         val cartItem =
             CartItem(id = cartItemId, cartId = cartId, menuId = 1, quantity = 1, createdAt = now, updatedAt = now)
         val request = UpdateCartItemQuantityRequest(quantity = 2)
-        coEvery { repository.existsById(any()) } returns true
+        coEvery { repository.findById(any()) } returns cart
         coEvery { itemRepository.findByIdAndCartId(any(), any()) } returns cartItem
         coEvery { itemRepository.update(any()) } returns Unit
+        coEvery { repository.update(any()) } returns Unit
 
 
         `when`("수량이 0보다 크면") {
@@ -51,7 +54,7 @@ class UpdateCartItemQuantityUseCaseTest : BehaviorSpec({
         }
 
         `when`("존재하지 않는 장바구니의 품목 수량을 변경하면") {
-            coEvery { repository.existsById(any()) } returns false
+            coEvery { repository.findById(any()) } returns null
 
             then("장바구니를 찾을 수 없다는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
