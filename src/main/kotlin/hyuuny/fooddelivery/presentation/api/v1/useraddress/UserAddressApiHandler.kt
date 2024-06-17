@@ -48,4 +48,19 @@ class UserAddressApiHandler(
         return ok().buildAndAwait()
     }
 
+    suspend fun changeUserAddressSelectedToTrue(request: ServerRequest): ServerResponse {
+        val userId = request.pathVariable("userId").toLong()
+        val id = request.pathVariable("id").toLong()
+
+        useCase.changeUserAddressSelectedToTrue(userId, id)
+        return ok().buildAndAwait()
+    }
+
+    suspend fun deleteUserAddress(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+
+        useCase.deleteUserAddress(id)
+        return ok().buildAndAwait()
+    }
+
 }

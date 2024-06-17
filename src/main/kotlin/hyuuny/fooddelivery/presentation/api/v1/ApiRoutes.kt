@@ -80,6 +80,8 @@ class ApiRoutes {
                 GET("", handler::getAllUserAddresses)
                 GET("/{id}", handler::getUserAddress)
                 PUT("/{id}", handler::updateUserAddress)
+                PATCH("/{id}/change-selected", handler::changeUserAddressSelectedToTrue)
+                DELETE("/{id}", handler::deleteUserAddress)
             }
         }
     }

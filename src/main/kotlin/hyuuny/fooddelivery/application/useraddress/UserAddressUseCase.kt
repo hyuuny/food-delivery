@@ -25,8 +25,7 @@ class UserAddressUseCase(
         val userAddresses = repository.findAllByUserId(userId)
         if (userAddresses.size >= MAX_USER_ADDRESS_COUNT) throw IllegalArgumentException("주소는 최대 10개까지만 등록할 수 있습니다.")
 
-        updateExistingAddressesToFalse(userId, now)
-
+        updateExistingAddressesSelectedToFalse(userId, now)
         val newUserAddress = UserAddress.handle(
             CreateUserAddressCommand(
                 userId = userId,
@@ -69,10 +68,31 @@ class UserAddressUseCase(
         repository.update(userAddress)
     }
 
+    @Transactional
+    suspend fun changeUserAddressSelectedToTrue(userId: Long, id: Long) {
+        val now = LocalDateTime.now()
+        val userAddress = findUserAddressByIdOrThrow(id)
+
+        updateExistingAddressesSelectedToFalse(userId, now)
+        userAddress.handle(
+            ChangeUserAddressSelectedCommand(
+                selected = true,
+                updatedAt = now
+            )
+        )
+        repository.updateSelectedAddresses(listOf(userAddress))
+    }
+
+    @Transactional
+    suspend fun deleteUserAddress(id: Long) {
+        val userAddress = findUserAddressByIdOrThrow(id)
+        repository.delete(userAddress.id!!)
+    }
+
     private suspend fun findUserAddressByIdOrThrow(id: Long) =
         repository.findById(id) ?: throw NoSuchElementException("회원의 ${id}번 주소를 찾을 수 없습니다.")
 
-    private suspend fun updateExistingAddressesToFalse(userId: Long, updatedAt: LocalDateTime) {
+    private suspend fun updateExistingAddressesSelectedToFalse(userId: Long, updatedAt: LocalDateTime) {
         val userAddresses = repository.findAllByUserId(userId)
         userAddresses.forEach { userAddress ->
             userAddress.handle(ChangeUserAddressSelectedCommand(selected = false, updatedAt = updatedAt))
