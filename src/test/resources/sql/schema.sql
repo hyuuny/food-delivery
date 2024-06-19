@@ -158,3 +158,56 @@ CREATE TABLE IF NOT EXISTS user_addresses
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_id ON user_addresses (user_id);
+
+CREATE TABLE IF NOT EXISTS orders
+(
+    id               SERIAL PRIMARY KEY,
+    order_number     VARCHAR(255) NOT NULL UNIQUE,
+    user_id          BIGINT       NOT NULL,
+    store_id         BIGINT       NOT NULL,
+    payment_id       VARCHAR(255) NOT NULL,
+    payment_method   VARCHAR(50)  NOT NULL,
+    status           VARCHAR(50)  NOT NULL,
+    delivery_type    VARCHAR(50)  NOT NULL,
+    zip_code         VARCHAR(20)  NOT NULL,
+    address          VARCHAR(255) NOT NULL,
+    detail_address   VARCHAR(255) NOT NULL,
+    phone_number     VARCHAR(20)  NOT NULL,
+    message_to_rider VARCHAR(255),
+    message_to_store VARCHAR(255),
+    total_price      BIGINT       NOT NULL,
+    delivery_fee     BIGINT DEFAULT 0,
+    created_at       TIMESTAMP    NOT NULL,
+    updated_at       TIMESTAMP    NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders (user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_store_id ON orders (store_id);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_id ON orders (payment_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders (status);
+
+CREATE TABLE IF NOT EXISTS order_items
+(
+    id         SERIAL PRIMARY KEY,
+    order_id   BIGINT       NOT NULL,
+    menu_id    BIGINT       NOT NULL,
+    menu_name  VARCHAR(255) NOT NULL,
+    menu_price BIGINT       NOT NULL,
+    quantity   INT          NOT NULL,
+    created_at TIMESTAMP    NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders (id)
+);
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items (order_id);
+
+CREATE TABLE IF NOT EXISTS order_item_options
+(
+    id            SERIAL PRIMARY KEY,
+    order_item_id BIGINT       NOT NULL,
+    option_id     BIGINT       NOT NULL,
+    option_name   VARCHAR(255) NOT NULL,
+    option_price  BIGINT       NOT NULL,
+    created_at    TIMESTAMP    NOT NULL,
+    FOREIGN KEY (order_item_id) REFERENCES order_items (id)
+);
+CREATE INDEX IF NOT EXISTS idx_order_item_options_order_item_id ON order_item_options (order_item_id);
+
