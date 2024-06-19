@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.order
 
+import CreateOrderItemOptionCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -17,5 +18,15 @@ class OrderItemOption(
     @Id
     var id = id
         protected set
+
+    companion object {
+        fun handle(command: CreateOrderItemOptionCommand): OrderItemOption = OrderItemOption(
+            orderItemId = command.orderItemId,
+            optionId = command.optionId,
+            optionName = command.optionName,
+            optionPrice = command.optionPrice,
+            createdAt = command.createdAt,
+        )
+    }
 
 }

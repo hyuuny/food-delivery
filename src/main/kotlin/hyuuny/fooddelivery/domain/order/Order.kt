@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.order
 
+import CreateOrderCommand
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.OrderStatus
 import hyuuny.fooddelivery.common.constant.PaymentMethod
@@ -34,5 +35,27 @@ class Order(
         protected set
     var status = status
         private set
+
+    companion object {
+        fun handle(command: CreateOrderCommand): Order = Order(
+            orderNumber = command.orderNumber,
+            userId = command.userId,
+            storeId = command.storeId,
+            paymentId = command.paymentId,
+            paymentMethod = command.paymentMethod,
+            status = command.status,
+            deliveryType = command.deliveryType,
+            zipCode = command.zipCode,
+            address = command.address,
+            detailAddress = command.detailAddress,
+            phoneNumber = command.phoneNumber,
+            messageToRider = command.messageToRider,
+            messageToStore = command.messageToStore,
+            totalPrice = command.totalPrice,
+            deliveryFee = command.deliveryFee,
+            createdAt = command.createdAt,
+            updatedAt = command.updatedAt,
+        )
+    }
 
 }

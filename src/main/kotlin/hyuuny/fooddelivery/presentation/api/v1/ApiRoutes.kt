@@ -3,6 +3,7 @@ package hyuuny.fooddelivery.presentation.api.v1
 import hyuuny.fooddelivery.presentation.api.v1.cart.CartApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.category.CategoryApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.menu.MenuApiHandler
+import hyuuny.fooddelivery.presentation.api.v1.order.OrderApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.store.StoreApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.user.UserApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.useraddress.UserAddressApiHandler
@@ -82,6 +83,15 @@ class ApiRoutes {
                 PUT("/{id}", handler::updateUserAddress)
                 PATCH("/{id}/change-selected", handler::changeUserAddressSelectedToTrue)
                 DELETE("/{id}", handler::deleteUserAddress)
+            }
+        }
+    }
+
+    @Bean
+    fun orderApi(handler: OrderApiHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/api/v1/users/{userId}/carts/{cartId}/orders".nest {
+                POST("", handler::createOrder)
             }
         }
     }

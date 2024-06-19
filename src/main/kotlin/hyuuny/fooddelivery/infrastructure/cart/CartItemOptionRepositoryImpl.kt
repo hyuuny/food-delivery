@@ -22,4 +22,6 @@ class CartItemOptionRepositoryImpl(
 
     override suspend fun deleteAllByCartItemId(cartItemId: Long) = dao.deleteAllByCartItemId(cartItemId)
 
+    override suspend fun deleteAllByCartItemIdIn(cartItemIds: List<Long>) = dao.deleteAllByCartItemIdIn(cartItemIds)
+
 }

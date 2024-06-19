@@ -12,4 +12,6 @@ interface CartItemOptionRepository {
 
     suspend fun deleteAllByCartItemId(cartItemId: Long)
 
+    suspend fun deleteAllByCartItemIdIn(cartItemIds: List<Long>)
+
 }

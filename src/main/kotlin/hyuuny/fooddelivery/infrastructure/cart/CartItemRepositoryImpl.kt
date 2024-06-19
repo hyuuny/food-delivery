@@ -48,4 +48,6 @@ class CartItemRepositoryImpl(
 
     override suspend fun findByIdAndCartId(id: Long, cartId: Long): CartItem? = dao.findByIdAndCartId(id, cartId)
 
+    override suspend fun deleteAllByCartId(cartId: Long) = dao.deleteAllByCartId(cartId)
+
 }

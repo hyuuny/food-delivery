@@ -115,6 +115,15 @@ class CartUseCase(
         cartItemRepository.delete(cartItem.id!!)
     }
 
+    @Transactional
+    suspend fun clearCart(id: Long) {
+        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
+
+        val cartItems = cartItemRepository.findAllByCartId(id)
+        cartItemOptionRepository.deleteAllByCartItemIdIn(cartItems.mapNotNull { it.id })
+        cartItemRepository.deleteAllByCartId(id)
+    }
+
     private suspend fun updateCartItemUpdatedAt(cartItem: CartItem, updatedAt: LocalDateTime) {
         cartItem.handle(UpdateCartItemUpdatedCommand(updatedAt = updatedAt))
         cartItemRepository.updateUpdatedAt(cartItem)
