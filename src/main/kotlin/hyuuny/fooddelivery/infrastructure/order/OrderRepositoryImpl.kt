@@ -15,9 +15,9 @@ class OrderRepositoryImpl(
 
     override suspend fun insert(order: Order): Order = dao.save(order)
 
-    override suspend fun findById(id: Long): Order? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun findById(id: Long): Order? = dao.findById(id)
+
+    override suspend fun findByIdAndUserId(id: Long, userId: Long): Order? = dao.findByIdAndUserId(id, userId)
 
     override suspend fun updateStatus(order: Order) {
         TODO("Not yet implemented")

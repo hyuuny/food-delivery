@@ -102,4 +102,12 @@ class OrderUseCase(
         return savedOrder
     }
 
+    suspend fun getOrder(id: Long, getUser: suspend () -> User): Order {
+        val user = getUser()
+        return findOrderByIdAndUserIdOrThrow(id, user.id!!)
+    }
+
+    private suspend fun findOrderByIdAndUserIdOrThrow(id: Long, userId: Long) =
+        repository.findByIdAndUserId(id, userId) ?: throw NoSuchElementException("${id}번 주문을 찾을 수 없습니다.")
+
 }

@@ -11,6 +11,8 @@ interface OrderRepository {
 
     suspend fun findById(id: Long): Order?
 
+    suspend fun findByIdAndUserId(id: Long, userId: Long): Order?
+
     suspend fun updateStatus(order: Order)
 
     suspend fun findAllOrders(searchCondition: ApiOrderSearchCondition, pageable: Pageable): PageImpl<Order>

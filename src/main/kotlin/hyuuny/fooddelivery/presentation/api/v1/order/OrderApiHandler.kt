@@ -40,5 +40,17 @@ class OrderApiHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun getOrder(request: ServerRequest): ServerResponse {
+        val userId = request.pathVariable("userId").toLong()
+        val id = request.pathVariable("id").toLong()
+
+        val order = useCase.getOrder(
+            id = id,
+            getUser = { userUseCase.getUser(userId) }
+        )
+        val response = responseMapper.mapToOrderResponse(order)
+        return ok().bodyValueAndAwait(response)
+    }
+
 
 }

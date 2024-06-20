@@ -4,7 +4,7 @@ import java.util.*
 
 fun generatePaymentId(): String {
     val uuid = UUID.randomUUID()
-    return "PAY_${uuid.toString().replace("-", "")}"
+    return "PAY_${uuid.toString().replace("-", "").substring(0, 10)}"
 }
 
 fun generateOrderNumber(now: LocalDateTime = LocalDateTime.now()): String {

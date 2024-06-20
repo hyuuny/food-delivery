@@ -93,6 +93,10 @@ class ApiRoutes {
             "/api/v1/users/{userId}/carts/{cartId}/orders".nest {
                 POST("", handler::createOrder)
             }
+
+            "/api/v1/users/{userId}/orders".nest {
+                GET("/{id}", handler::getOrder)
+            }
         }
     }
 
