@@ -37,6 +37,7 @@ class GetOrderUseCaseTest : BehaviorSpec({
         val userId = 1L
         val storeId = 1L
         val orderId = 130L
+        val categoryId = 37L
 
         val now = LocalDateTime.now()
         val user = User(
@@ -57,6 +58,7 @@ class GetOrderUseCaseTest : BehaviorSpec({
             orderNumber = orderNumber,
             userId = userId,
             storeId = storeId,
+            categoryId = categoryId,
             paymentId = paymentId,
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -84,6 +86,7 @@ class GetOrderUseCaseTest : BehaviorSpec({
                 result.orderNumber shouldBe orderNumber
                 result.userId shouldBe order.userId
                 result.storeId shouldBe order.storeId
+                result.categoryId shouldBe order.categoryId
                 result.paymentId shouldBe order.paymentId
                 result.paymentMethod shouldBe order.paymentMethod
                 result.status shouldBe order.status

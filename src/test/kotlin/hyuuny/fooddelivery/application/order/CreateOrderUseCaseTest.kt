@@ -63,6 +63,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
 
         val request = CreateOrderRequest(
             storeId = 1,
+            categoryId = 1L,
             paymentMethod = PaymentMethod.NAVER_PAY,
             deliveryType = DeliveryType.OUTSOURCING,
             zipCode = "12345",
@@ -86,6 +87,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
             orderNumber = orderNumber,
             userId = userId,
             storeId = storeId,
+            categoryId = 1L,
             paymentId = paymentId,
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -146,6 +148,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
                 result.orderNumber shouldBe orderNumber
                 result.userId shouldBe userId
                 result.storeId shouldBe request.storeId
+                result.categoryId shouldBe request.categoryId
                 result.paymentId shouldBe paymentId
                 result.paymentMethod shouldBe request.paymentMethod
                 result.status shouldBe OrderStatus.CREATED

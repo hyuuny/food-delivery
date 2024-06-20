@@ -165,6 +165,7 @@ CREATE TABLE IF NOT EXISTS orders
     order_number     VARCHAR(255) NOT NULL UNIQUE,
     user_id          BIGINT       NOT NULL,
     store_id         BIGINT       NOT NULL,
+    category_id      BIGINT       NOT NULL,
     payment_id       VARCHAR(255) NOT NULL,
     payment_method   VARCHAR(50)  NOT NULL,
     status           VARCHAR(50)  NOT NULL,
