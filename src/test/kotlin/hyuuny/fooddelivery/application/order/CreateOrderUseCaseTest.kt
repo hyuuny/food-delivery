@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class CreateCartUseCaseTest : BehaviorSpec({
+class CreateOrderUseCaseTest : BehaviorSpec({
 
     val orderRepository = mockk<OrderRepository>()
     val orderItemRepository = mockk<OrderItemRepository>()
