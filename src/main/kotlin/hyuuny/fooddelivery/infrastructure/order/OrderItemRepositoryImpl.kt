@@ -19,4 +19,6 @@ class OrderItemRepositoryImpl(
 
     override suspend fun findAllByOrderId(orderId: Long): List<OrderItem> = dao.findAllByOrderId(orderId).toList()
 
+    override suspend fun findAllByOrderIds(orderIds: List<Long>): List<OrderItem> = dao.findAllByOrderIdIn(orderIds)
+
 }

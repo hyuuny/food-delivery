@@ -1,15 +1,22 @@
 package hyuuny.fooddelivery.infrastructure.order
 
+import AdminOrderSearchCondition
 import ApiOrderSearchCondition
 import hyuuny.fooddelivery.domain.order.Order
+import hyuuny.fooddelivery.infrastructure.store.StoreDao
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Query
 import org.springframework.stereotype.Component
+import selectAndCount
 
 @Component
 class OrderRepositoryImpl(
     private val dao: OrderDao,
+    private val storeDao: StoreDao,
+    private val orderItemDao: OrderItemDao,
     private val template: R2dbcEntityTemplate,
 ) : OrderRepository {
 
@@ -23,7 +30,54 @@ class OrderRepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    override suspend fun findAllOrders(searchCondition: ApiOrderSearchCondition, pageable: Pageable): PageImpl<Order> {
+    override suspend fun findAllOrders(
+        searchCondition: AdminOrderSearchCondition,
+        pageable: Pageable
+    ): PageImpl<Order> {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun findAllOrders(searchCondition: ApiOrderSearchCondition, pageable: Pageable): PageImpl<Order> {
+        val criteria = buildCriteria(searchCondition)
+        val query = Query.query(criteria).with(pageable)
+        return template.selectAndCount<Order>(query, criteria).let { (data, total) ->
+            PageImpl(data, pageable, total)
+        }
+    }
+
+    private suspend fun buildCriteria(searchCondition: ApiOrderSearchCondition): Criteria {
+        var criteria = Criteria.empty()
+
+        searchCondition.categoryIds?.let {
+            criteria = criteria.and("categoryId").`in`(it)
+        }
+
+        searchCondition.deliveryType?.let {
+            criteria = criteria.and("deliveryType").`is`(it)
+        }
+
+        searchCondition.orderStatus?.let {
+            criteria = criteria.and("status").`is`(it)
+        }
+
+        searchCondition.storeName?.let {
+            val storeIds = storeDao.findAllByNameContaining(it).mapNotNull { store -> store.id }
+            criteria = criteria.and("storeId").`in`(storeIds)
+        }
+
+        searchCondition.menuName?.let {
+            val orderIds = orderItemDao.findAllByMenuNameContains(it).map { item -> item.orderId }
+            criteria = criteria.and("id").`in`(orderIds)
+        }
+
+        searchCondition.fromDate?.let {
+            criteria = criteria.and("createdAt").greaterThanOrEquals(it)
+        }
+
+        searchCondition.toDate?.let {
+            criteria = criteria.and("createdAt").lessThanOrEquals(it)
+        }
+
+        return criteria
     }
 }

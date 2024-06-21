@@ -96,6 +96,7 @@ class ApiRoutes {
 
             "/api/v1/users/{userId}/orders".nest {
                 GET("/{id}", handler::getOrder)
+                GET("", handler::getOrders)
             }
         }
     }

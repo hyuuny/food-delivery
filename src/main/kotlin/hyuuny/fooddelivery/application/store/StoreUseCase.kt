@@ -150,6 +150,8 @@ class StoreUseCase(
         repository.delete(id)
     }
 
+    suspend fun getAllByIds(ids: List<Long>): List<Store> = repository.findAllByIdIn(ids)
+
     private suspend fun findStoreByIdOrThrow(id: Long) = repository.findById(id)
         ?: throw NoSuchElementException("${id}번 매장을 찾을 수 없습니다.")
 }

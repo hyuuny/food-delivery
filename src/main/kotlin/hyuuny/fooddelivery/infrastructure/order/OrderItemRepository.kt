@@ -12,4 +12,6 @@ interface OrderItemRepository {
 
     suspend fun findAllByOrderId(orderId: Long): List<OrderItem>
 
+    suspend fun findAllByOrderIds(orderIds: List<Long>): List<OrderItem>
+
 }

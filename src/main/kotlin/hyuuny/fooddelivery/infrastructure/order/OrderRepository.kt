@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.order
 
+import AdminOrderSearchCondition
 import ApiOrderSearchCondition
 import hyuuny.fooddelivery.domain.order.Order
 import org.springframework.data.domain.PageImpl
@@ -14,6 +15,8 @@ interface OrderRepository {
     suspend fun findByIdAndUserId(id: Long, userId: Long): Order?
 
     suspend fun updateStatus(order: Order)
+
+    suspend fun findAllOrders(searchCondition: AdminOrderSearchCondition, pageable: Pageable): PageImpl<Order>
 
     suspend fun findAllOrders(searchCondition: ApiOrderSearchCondition, pageable: Pageable): PageImpl<Order>
 

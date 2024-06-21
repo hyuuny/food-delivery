@@ -31,4 +31,7 @@ class OrderItem(
         )
     }
 
+    fun toMenuNameBySize(itemSize: Int): String = if (itemSize > 1) "$menuName 외 ${itemSize - 1}개"
+    else "$menuName ${quantity}개"
+
 }

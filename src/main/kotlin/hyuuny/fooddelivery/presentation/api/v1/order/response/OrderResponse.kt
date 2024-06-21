@@ -6,6 +6,7 @@ import hyuuny.fooddelivery.common.constant.PaymentMethod
 import hyuuny.fooddelivery.domain.order.Order
 import hyuuny.fooddelivery.domain.order.OrderItem
 import hyuuny.fooddelivery.domain.order.OrderItemOption
+import hyuuny.fooddelivery.domain.store.Store
 import java.time.LocalDateTime
 
 data class OrderResponse(
@@ -13,6 +14,7 @@ data class OrderResponse(
     val orderNumber: String,
     val userId: Long,
     val storeId: Long,
+    val categoryId: Long,
     val paymentId: String,
     val paymentMethod: PaymentMethod,
     val status: OrderStatus,
@@ -35,6 +37,7 @@ data class OrderResponse(
                 orderNumber = entity.orderNumber,
                 userId = entity.userId,
                 storeId = entity.storeId,
+                categoryId = entity.categoryId,
                 paymentId = entity.paymentId,
                 paymentMethod = entity.paymentMethod,
                 status = entity.status,
@@ -93,6 +96,42 @@ data class OrderItemOptionResponse(
                 optionId = entity.optionId,
                 optionName = entity.optionName,
                 price = entity.optionPrice,
+            )
+        }
+    }
+}
+
+data class OrderResponses(
+    val id: Long,
+    val orderNumber: String,
+    val userId: Long,
+    val storeId: Long,
+    val categoryId: Long,
+    val orderStatus: OrderStatus,
+    val deliveryType: DeliveryType,
+    val storeName: String,
+    val storeIconImageUrl: String?,
+    val menuName: String,
+    val totalPrice: Long,
+    val deliveryFee: Long,
+    val createdAt: LocalDateTime,
+) {
+    companion object {
+        fun from(entity: Order, store: Store, menuName: String): OrderResponses {
+            return OrderResponses(
+                id = entity.id!!,
+                orderNumber = entity.orderNumber,
+                userId = entity.userId,
+                storeId = entity.storeId,
+                categoryId = entity.categoryId,
+                orderStatus = entity.status,
+                deliveryType = entity.deliveryType,
+                storeName = store.name,
+                storeIconImageUrl = store.iconImageUrl,
+                menuName = menuName,
+                totalPrice = entity.totalPrice,
+                deliveryFee = entity.deliveryFee,
+                createdAt = entity.createdAt,
             )
         }
     }

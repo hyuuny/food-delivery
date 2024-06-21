@@ -7,6 +7,7 @@ data class CreateOrderCommand(
     val orderNumber: String,
     val userId: Long,
     val storeId: Long,
+    val categoryId: Long,
     val paymentId: String,
     val paymentMethod: PaymentMethod,
     val deliveryType: DeliveryType,

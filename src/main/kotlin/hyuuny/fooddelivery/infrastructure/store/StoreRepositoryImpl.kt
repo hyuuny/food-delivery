@@ -97,6 +97,8 @@ class StoreRepositoryImpl(
         }
     }
 
+    override suspend fun findAllByIdIn(ids: List<Long>): List<Store> = dao.findAllByIdIn(ids)
+
     private fun buildCriteria(searchCondition: ApiStoreSearchCondition): Criteria {
         var criteria = Criteria.empty()
 

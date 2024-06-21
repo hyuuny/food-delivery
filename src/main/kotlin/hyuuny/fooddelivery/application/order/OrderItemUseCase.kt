@@ -13,4 +13,6 @@ class OrderItemUseCase(
 
     suspend fun getAllByOrderId(orderId: Long): List<OrderItem> = repository.findAllByOrderId(orderId)
 
+    suspend fun getAllByOrderIdIn(orderIds: List<Long>): List<OrderItem> = repository.findAllByOrderIds(orderIds)
+
 }

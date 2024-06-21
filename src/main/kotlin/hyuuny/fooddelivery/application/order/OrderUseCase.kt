@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.application.order
 
+import ApiOrderSearchCondition
 import CreateOrderCommand
 import CreateOrderItemCommand
 import CreateOrderItemOptionCommand
@@ -17,6 +18,8 @@ import hyuuny.fooddelivery.domain.user.User
 import hyuuny.fooddelivery.infrastructure.order.OrderItemOptionRepository
 import hyuuny.fooddelivery.infrastructure.order.OrderItemRepository
 import hyuuny.fooddelivery.infrastructure.order.OrderRepository
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -31,6 +34,11 @@ class OrderUseCase(
 ) {
 
     companion object : Log
+
+    suspend fun getOrdersByApiCondition(searchCondition: ApiOrderSearchCondition, pageable: Pageable): PageImpl<Order> {
+        val page = repository.findAllOrders(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
 
     @Transactional
     suspend fun createOrder(
@@ -49,6 +57,7 @@ class OrderUseCase(
                 orderNumber = generateOrderNumber(now),
                 userId = user.id!!,
                 storeId = request.storeId,
+                categoryId = request.categoryId,
                 paymentId = generatePaymentId(),
                 paymentMethod = request.paymentMethod,
                 status = OrderStatus.CREATED,

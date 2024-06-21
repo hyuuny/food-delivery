@@ -1,9 +1,11 @@
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.OrderStatus
 import hyuuny.fooddelivery.common.constant.PaymentMethod
+import java.time.LocalDate
 
 data class CreateOrderRequest(
     val storeId: Long,
+    val categoryId: Long,
     val paymentMethod: PaymentMethod,
     val deliveryType: DeliveryType,
     val zipCode: String,
@@ -23,7 +25,7 @@ data class CreateOrderItemRequest(
     val optionIds: List<Long>,
 )
 
-data class ApiOrderSearchCondition(
+data class AdminOrderSearchCondition(
     val id: Long?,
     val orderNumber: String?,
     val userId: Long?,
@@ -33,4 +35,15 @@ data class ApiOrderSearchCondition(
     val status: OrderStatus?,
     val deliveryType: DeliveryType,
     val phoneNumber: String?,
+)
+
+data class ApiOrderSearchCondition(
+    val userId: Long,
+    val categoryIds: List<Long>?,
+    val deliveryType: DeliveryType?,
+    val orderStatus: OrderStatus?,
+    val storeName: String?,
+    val menuName: String?,
+    val fromDate: LocalDate?,
+    val toDate: LocalDate?,
 )

@@ -22,4 +22,6 @@ interface StoreRepository {
 
     suspend fun findAllStores(searchCondition: ApiStoreSearchCondition, pageable: Pageable): PageImpl<Store>
 
+    suspend fun findAllByIdIn(ids: List<Long>): List<Store>
+
 }
