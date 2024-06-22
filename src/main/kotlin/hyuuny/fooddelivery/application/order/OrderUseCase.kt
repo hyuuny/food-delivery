@@ -5,6 +5,7 @@ import CreateOrderCommand
 import CreateOrderItemCommand
 import CreateOrderItemOptionCommand
 import CreateOrderRequest
+import UpdateOrderStatusCommand
 import generateOrderNumber
 import generatePaymentId
 import hyuuny.fooddelivery.common.constant.OrderStatus
@@ -114,6 +115,42 @@ class OrderUseCase(
     suspend fun getOrder(id: Long, getUser: suspend () -> User): Order {
         val user = getUser()
         return findOrderByIdAndUserIdOrThrow(id, user.id!!)
+    }
+
+    @Transactional
+    suspend fun cancelOrder(id: Long, getUser: suspend () -> User) {
+        val user = getUser()
+        val order = repository.findByIdAndUserId(id, user.id!!) ?: throw NoSuchElementException("${id}번 주문을 찾을 수 없습니다.")
+        if (!order.isCancelable()) throw IllegalStateException("주문 취소가 불가능합니다.")
+
+        val now = LocalDateTime.now()
+        order.handle(
+            UpdateOrderStatusCommand(
+                status = OrderStatus.CANCELLED_BY_USER,
+                updatedAt = now,
+            )
+        )
+
+        log.info("Cancel Order Number: ${order.orderNumber}")
+        repository.updateStatus(order)
+    }
+
+    @Transactional
+    suspend fun refundOrder(id: Long, getUser: suspend () -> User) {
+        val user = getUser()
+        val order = repository.findByIdAndUserId(id, user.id!!) ?: throw NoSuchElementException("${id}번 주문을 찾을 수 없습니다.")
+        if (!order.isRefundable()) throw IllegalStateException("주문 환불이 불가능합니다.")
+
+        val now = LocalDateTime.now()
+        order.handle(
+            UpdateOrderStatusCommand(
+                status = OrderStatus.REFUNDED,
+                updatedAt = now,
+            )
+        )
+
+        log.info("Refund Order Number: ${order.orderNumber}")
+        repository.updateStatus(order)
     }
 
     private suspend fun findOrderByIdAndUserIdOrThrow(id: Long, userId: Long) =

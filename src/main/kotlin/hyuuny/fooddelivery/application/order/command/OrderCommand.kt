@@ -40,3 +40,8 @@ data class CreateOrderItemOptionCommand(
     val optionPrice: Long,
     val createdAt: LocalDateTime,
 )
+
+data class UpdateOrderStatusCommand(
+    val status: OrderStatus,
+    val updatedAt: LocalDateTime,
+)

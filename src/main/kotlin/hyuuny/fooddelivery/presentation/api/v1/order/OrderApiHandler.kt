@@ -92,5 +92,21 @@ class OrderApiHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun cancelOrder(request: ServerRequest): ServerResponse {
+        val userId = request.pathVariable("userId").toLong()
+        val id = request.pathVariable("id").toLong()
+
+        useCase.cancelOrder(id) { userUseCase.getUser(userId) }
+        return ok().bodyValueAndAwait(mapOf("message" to "${id}번 주문이 정상적으로 취소되었습니다."))
+    }
+
+    suspend fun refundOrder(request: ServerRequest): ServerResponse {
+        val userId = request.pathVariable("userId").toLong()
+        val id = request.pathVariable("id").toLong()
+
+        useCase.refundOrder(id) { userUseCase.getUser(userId) }
+        return ok().bodyValueAndAwait(mapOf("message" to "${id}번 주문이 정상적으로 환불되었습니다."))
+    }
+
 
 }

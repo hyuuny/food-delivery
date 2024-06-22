@@ -1,8 +1,11 @@
 package hyuuny.fooddelivery.domain.order
 
 import CreateOrderCommand
+import UpdateOrderStatusCommand
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.OrderStatus
+import hyuuny.fooddelivery.common.constant.OrderStatus.Companion.CANCELABLE_ORDER_STATUS
+import hyuuny.fooddelivery.common.constant.OrderStatus.Companion.REFUNDABLE_ORDER_STATUS
 import hyuuny.fooddelivery.common.constant.PaymentMethod
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
@@ -28,13 +31,15 @@ class Order(
     val totalPrice: Long,
     val deliveryFee: Long = 0,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
+    updatedAt: LocalDateTime,
 ) {
 
     @Id
     var id = id
         protected set
     var status = status
+        private set
+    var updatedAt = updatedAt
         private set
 
     companion object {
@@ -59,5 +64,14 @@ class Order(
             updatedAt = command.updatedAt,
         )
     }
+
+    fun handle(command: UpdateOrderStatusCommand) {
+        this.status = command.status
+        this.updatedAt = command.updatedAt
+    }
+
+    fun isCancelable(): Boolean = CANCELABLE_ORDER_STATUS.contains(status)
+
+    fun isRefundable(): Boolean = REFUNDABLE_ORDER_STATUS.contains(status)
 
 }
