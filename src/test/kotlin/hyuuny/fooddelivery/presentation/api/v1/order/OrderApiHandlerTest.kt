@@ -516,6 +516,42 @@ class OrderApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.totalElements").isEqualTo(5)
     }
 
+    @DisplayName("회원은 주문을 취소할 수 있다.")
+    @Test
+    fun cancelOrder() {
+        val userId = 1L
+        val id = 1L
+
+        coEvery { useCase.cancelOrder(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/api/v1/users/$userId/orders/$id/cancel")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.message").isEqualTo("${id}번 주문이 정상적으로 취소되었습니다.")
+    }
+
+    @DisplayName("회원은 주문을 환불할 수 있다.")
+    @Test
+    fun refundOrder() {
+        val userId = 1L
+        val id = 1L
+
+        coEvery { useCase.refundOrder(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/api/v1/users/$userId/orders/$id/refund")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.message").isEqualTo("${id}번 주문이 정상적으로 환불되었습니다.")
+    }
+
     private fun generateOrder(id: Long, userId: Long, request: CreateOrderRequest, now: LocalDateTime): Order {
         val orderNumber = generateOrderNumber(now)
         val paymentId = generatePaymentId()
