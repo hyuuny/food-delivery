@@ -7,8 +7,12 @@ import hyuuny.fooddelivery.infrastructure.store.StoreDao
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.r2dbc.core.applyAndAwait
+import org.springframework.data.r2dbc.core.update
 import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query
+import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
 import selectAndCount
 
@@ -27,7 +31,15 @@ class OrderRepositoryImpl(
     override suspend fun findByIdAndUserId(id: Long, userId: Long): Order? = dao.findByIdAndUserId(id, userId)
 
     override suspend fun updateStatus(order: Order) {
-        TODO("Not yet implemented")
+        template.update<Order>()
+            .matching(
+                Query.query(
+                    where("id").`is`(order.id!!)
+                )
+            ).applyAndAwait(
+                Update.update("status", order.status)
+                    .set("updatedAt", order.updatedAt)
+            )
     }
 
     override suspend fun findAllOrders(
