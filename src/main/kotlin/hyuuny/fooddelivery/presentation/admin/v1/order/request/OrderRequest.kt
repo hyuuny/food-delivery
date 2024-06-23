@@ -3,6 +3,10 @@ import hyuuny.fooddelivery.common.constant.OrderStatus
 import hyuuny.fooddelivery.common.constant.PaymentMethod
 import java.time.LocalDate
 
+data class ChangeOrderStatusRequest(
+    val orderStatus: OrderStatus,
+)
+
 data class AdminOrderSearchCondition(
     val id: Long?,
     val orderNumber: String?,

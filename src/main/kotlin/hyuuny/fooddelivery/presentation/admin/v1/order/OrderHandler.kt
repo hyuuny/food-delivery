@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.order
 
 import AdminOrderSearchCondition
+import ChangeOrderStatusRequest
 import hyuuny.fooddelivery.application.order.OrderUseCase
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.OrderStatus
@@ -12,11 +13,8 @@ import hyuuny.fooddelivery.common.utils.parseSort
 import hyuuny.fooddelivery.presentation.admin.v1.order.response.OrderResponses
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.bodyValueAndAwait
-import org.springframework.web.reactive.function.server.queryParamOrNull
 
 @Component
 class OrderHandler(
@@ -79,6 +77,14 @@ class OrderHandler(
         val order = useCase.getOrder(id)
         val response = responseMapper.mapToOrderResponse(order)
         return ok().bodyValueAndAwait(response)
+    }
+
+    suspend fun changeOrderStatus(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<ChangeOrderStatusRequest>()
+
+        useCase.changeOrderStatus(id, body)
+        return ok().bodyValueAndAwait(mapOf("message" to "${id}번 주문이 '${body.orderStatus.value}' 상태로 변경되었습니다."))
     }
 
 }

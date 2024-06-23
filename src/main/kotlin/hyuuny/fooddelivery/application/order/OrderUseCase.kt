@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.application.order
 
 import AdminOrderSearchCondition
 import ApiOrderSearchCondition
+import ChangeOrderStatusRequest
 import CreateOrderCommand
 import CreateOrderItemCommand
 import CreateOrderItemOptionCommand
@@ -161,6 +162,21 @@ class OrderUseCase(
         )
 
         log.info("Refund Order Number: ${order.orderNumber}")
+        repository.updateStatus(order)
+    }
+
+    @Transactional
+    suspend fun changeOrderStatus(id: Long, request: ChangeOrderStatusRequest) {
+        val order = findOrderByIdOrThrow(id)
+
+        val now = LocalDateTime.now()
+        order.handle(
+            UpdateOrderStatusCommand(
+                status = request.orderStatus,
+                updatedAt = now,
+            )
+        )
+        log.info("Change Order Status Number: ${order.orderNumber}. Change Status: ${order.status}")
         repository.updateStatus(order)
     }
 

@@ -125,6 +125,7 @@ class AdminRoutes {
             "/admin/v1/orders".nest {
                 GET("", handler::getOrders)
                 GET("/{id}", handler::getOrder)
+                PATCH("/{id}/change-order-status", handler::changeOrderStatus)
             }
         }
     }
