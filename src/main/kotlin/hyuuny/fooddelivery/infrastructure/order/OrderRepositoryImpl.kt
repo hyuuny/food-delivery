@@ -4,6 +4,7 @@ import AdminOrderSearchCondition
 import ApiOrderSearchCondition
 import hyuuny.fooddelivery.domain.order.Order
 import hyuuny.fooddelivery.infrastructure.store.StoreDao
+import hyuuny.fooddelivery.infrastructure.user.UserDao
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
@@ -21,6 +22,7 @@ class OrderRepositoryImpl(
     private val dao: OrderDao,
     private val storeDao: StoreDao,
     private val orderItemDao: OrderItemDao,
+    private val userDao: UserDao,
     private val template: R2dbcEntityTemplate,
 ) : OrderRepository {
 
@@ -46,7 +48,11 @@ class OrderRepositoryImpl(
         searchCondition: AdminOrderSearchCondition,
         pageable: Pageable
     ): PageImpl<Order> {
-        TODO("Not yet implemented")
+        val criteria = buildCriteria(searchCondition)
+        val query = Query.query(criteria).with(pageable)
+        return template.selectAndCount<Order>(query, criteria).let { (data, total) ->
+            PageImpl(data, pageable, total)
+        }
     }
 
     override suspend fun findAllOrders(searchCondition: ApiOrderSearchCondition, pageable: Pageable): PageImpl<Order> {
@@ -55,6 +61,66 @@ class OrderRepositoryImpl(
         return template.selectAndCount<Order>(query, criteria).let { (data, total) ->
             PageImpl(data, pageable, total)
         }
+    }
+
+    private suspend fun buildCriteria(searchCondition: AdminOrderSearchCondition): Criteria {
+        var criteria = Criteria.empty()
+
+        searchCondition.id?.let {
+            criteria = criteria.and("id").`is`(it)
+        }
+
+        searchCondition.userId?.let {
+            criteria = criteria.and("userId").`is`(it)
+        }
+
+        searchCondition.userName?.let {
+            val userIds = userDao.findAllByName(it).mapNotNull { it.id }
+            criteria = criteria.and("userId").`in`(userIds)
+        }
+
+        searchCondition.storeId?.let {
+            criteria = criteria.and("storeId").`is`(it)
+        }
+
+        searchCondition.storeName?.let {
+            val storeIds = storeDao.findAllByNameLike(it).mapNotNull { it.id }
+            criteria = criteria.and("storeId").`in`(storeIds)
+        }
+
+        searchCondition.categoryIds?.let {
+            criteria = criteria.and("categoryId").`in`(it)
+        }
+
+        searchCondition.paymentId?.let {
+            criteria = criteria.and("paymentId").`is`(it)
+        }
+
+        searchCondition.paymentMethod?.let {
+            criteria = criteria.and("paymentMethod").`is`(it)
+        }
+
+        searchCondition.orderStatus?.let {
+            criteria = criteria.and("status").`is`(it)
+        }
+
+        searchCondition.deliveryType?.let {
+            criteria = criteria.and("deliveryType").`is`(it)
+        }
+
+        searchCondition.phoneNumber?.let {
+            criteria = criteria.and("phoneNumber").`is`(it)
+        }
+
+        searchCondition.fromDate?.let {
+            criteria = criteria.and("createdAt").greaterThanOrEquals(it)
+        }
+
+        searchCondition.toDate?.let {
+            criteria = criteria.and("createdAt").lessThanOrEquals(it)
+        }
+
+        return criteria
     }
 
     private suspend fun buildCriteria(searchCondition: ApiOrderSearchCondition): Criteria {

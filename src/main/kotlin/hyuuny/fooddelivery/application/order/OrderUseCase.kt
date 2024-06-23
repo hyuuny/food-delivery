@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.application.order
 
+import AdminOrderSearchCondition
 import ApiOrderSearchCondition
 import CreateOrderCommand
 import CreateOrderItemCommand
@@ -35,6 +36,14 @@ class OrderUseCase(
 ) {
 
     companion object : Log
+
+    suspend fun getOrderByAdminCondition(
+        searchCondition: AdminOrderSearchCondition,
+        pageable: Pageable
+    ): PageImpl<Order> {
+        val page = repository.findAllOrders(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
 
     suspend fun getOrdersByApiCondition(searchCondition: ApiOrderSearchCondition, pageable: Pageable): PageImpl<Order> {
         val page = repository.findAllOrders(searchCondition, pageable)
@@ -117,6 +126,8 @@ class OrderUseCase(
         return findOrderByIdAndUserIdOrThrow(id, user.id!!)
     }
 
+    suspend fun getOrder(id: Long): Order = findOrderByIdOrThrow(id)
+
     @Transactional
     suspend fun cancelOrder(id: Long, getUser: suspend () -> User) {
         val user = getUser()
@@ -155,5 +166,8 @@ class OrderUseCase(
 
     private suspend fun findOrderByIdAndUserIdOrThrow(id: Long, userId: Long) =
         repository.findByIdAndUserId(id, userId) ?: throw NoSuchElementException("${id}번 주문을 찾을 수 없습니다.")
+
+    private suspend fun findOrderByIdOrThrow(id: Long) =
+        repository.findById(id) ?: throw NoSuchElementException("${id}번 주문을 찾을 수 없습니다.")
 
 }

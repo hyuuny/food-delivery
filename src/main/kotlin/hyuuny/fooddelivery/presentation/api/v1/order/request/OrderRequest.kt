@@ -25,18 +25,6 @@ data class CreateOrderItemRequest(
     val optionIds: List<Long>,
 )
 
-data class AdminOrderSearchCondition(
-    val id: Long?,
-    val orderNumber: String?,
-    val userId: Long?,
-    val storeId: Long?,
-    val paymentId: String?,
-    val paymentMethod: PaymentMethod?,
-    val status: OrderStatus?,
-    val deliveryType: DeliveryType,
-    val phoneNumber: String?,
-)
-
 data class ApiOrderSearchCondition(
     val userId: Long,
     val categoryIds: List<Long>?,

@@ -7,4 +7,6 @@ interface UserDao : CoroutineCrudRepository<User, Long> {
 
     suspend fun existsByEmail(email: String): Boolean
 
+    suspend fun findAllByName(name: String): List<User>
+
 }

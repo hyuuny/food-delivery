@@ -9,4 +9,6 @@ interface StoreDao : CoroutineCrudRepository<Store, Long> {
 
     suspend fun findAllByIdIn(ids: List<Long>): List<Store>
 
+    suspend fun findAllByNameLike(name: String): List<Store>
+
 }
