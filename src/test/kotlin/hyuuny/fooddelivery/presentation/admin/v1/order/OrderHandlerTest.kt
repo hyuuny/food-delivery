@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.presentation.admin.v1.order
 
+import ChangeOrderStatusRequest
 import com.ninjasquad.springmockk.MockkBean
 import generateOrderNumber
 import generatePaymentId
@@ -365,6 +366,27 @@ class OrderHandlerTest : BaseIntegrationTest() {
             .isEqualTo(expectedResponse.orderItems[0].options[1].optionName)
             .jsonPath("$.orderItems[0].options[1].price").isEqualTo(expectedResponse.orderItems[0].options[1].price)
             .jsonPath("$.totalPrice").isEqualTo(expectedTotalPrice)
+    }
+
+    @DisplayName("관리자는 회원의 주문 상태를 변경할 수 있다.")
+    @Test
+    fun changeOrderStatus() {
+        val id = 1L
+        val request = ChangeOrderStatusRequest(OrderStatus.OUT_FOR_DELIVERY)
+
+        coEvery { useCase.changeOrderStatus(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/admin/v1/orders/$id/change-order-status")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.message").isEqualTo(
+                "${id}번 주문이 '${OrderStatus.OUT_FOR_DELIVERY.value}' 상태로 변경되었습니다."
+            )
     }
 
 }
