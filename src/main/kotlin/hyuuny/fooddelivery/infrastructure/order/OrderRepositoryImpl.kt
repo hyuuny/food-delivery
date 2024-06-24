@@ -70,6 +70,10 @@ class OrderRepositoryImpl(
             criteria = criteria.and("id").`is`(it)
         }
 
+        searchCondition.orderNumber?.let {
+            criteria = criteria.and("orderNumber").`is`(it)
+        }
+
         searchCondition.userId?.let {
             criteria = criteria.and("userId").`is`(it)
         }
