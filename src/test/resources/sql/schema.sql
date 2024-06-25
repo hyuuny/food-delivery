@@ -212,3 +212,26 @@ CREATE TABLE IF NOT EXISTS order_item_options
 );
 CREATE INDEX IF NOT EXISTS idx_order_item_options_order_item_id ON order_item_options (order_item_id);
 
+CREATE TABLE IF NOT EXISTS reviews
+(
+    id         SERIAL PRIMARY KEY,
+    user_id    BIGINT    NOT NULL,
+    store_id   BIGINT    NOT NULL,
+    order_id   BIGINT    NOT NULL,
+    score      INT       NOT NULL,
+    content    TEXT      NOT NULL,
+    created_at TIMESTAMP NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON reviews (user_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_store_id ON reviews (store_id);
+
+CREATE TABLE IF NOT EXISTS review_photos
+(
+    id         SERIAL PRIMARY KEY,
+    review_id  BIGINT    NOT NULL,
+    photo_url  TEXT      NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (review_id) REFERENCES reviews (id)
+);
+CREATE INDEX IF NOT EXISTS idx_review_photos_review_id ON review_photos (review_id);
+
