@@ -48,6 +48,10 @@ class ReviewUseCase(
         val user = getUser()
         val store = getStore(request.storeId)
         val order = getOrder(request.orderId)
+
+        if (order.storeId != request.storeId) throw IllegalArgumentException("매장과 주문한 매장이 서로 다릅니다.")
+        if (repository.existsByUserIdAndOrderId(user.id!!, order.id!!)) throw IllegalArgumentException("이미 등록된 리뷰입니다.")
+
         val review = Review.handle(
             CreateReviewCommand(
                 userId = user.id!!,

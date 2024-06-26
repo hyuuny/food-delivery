@@ -122,6 +122,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
         coEvery { userUseCase.getUser(any()) } returns user
         coEvery { storeUseCase.getStore(any()) } returns store
         coEvery { orderUseCase.getOrder(any()) } returns order
+        coEvery { repository.existsByUserIdAndOrderId(any(), any()) } returns false
         coEvery { reviewPhotoRepository.insertAll(any()) } returns reviewPhotos
         coEvery { repository.insert(any()) } returns review
 
@@ -207,6 +208,43 @@ class CreateOrderUseCaseTest : BehaviorSpec({
                     )
                 }
                 ex.message shouldBe "0번 주문을 찾을 수 없습니다."
+            }
+        }
+
+        `when`("리뷰의 매장아이디와 주문한 매장의 아이디가 서로 다르면") {
+            coEvery { userUseCase.getUser(any()) } returns user
+            coEvery { storeUseCase.getStore(any()) } returns store
+            coEvery { orderUseCase.getOrder(any()) } returns order
+
+            then("매장과 주문한 매장이 서로 다르다는 메세지가 반환된다.") {
+                val ex = shouldThrow<IllegalArgumentException> {
+                    useCase.createReview(
+                        request = request.copy(storeId = 1029),
+                        getUser = { userUseCase.getUser(userId) },
+                        getStore = storeUseCase::getStore,
+                        getOrder = orderUseCase::getOrder,
+                    )
+                }
+                ex.message shouldBe "매장과 주문한 매장이 서로 다릅니다."
+            }
+        }
+
+        `when`("주문에 이미 작성한 리뷰를 중복 작성하면") {
+            coEvery { userUseCase.getUser(any()) } returns user
+            coEvery { storeUseCase.getStore(any()) } returns store
+            coEvery { orderUseCase.getOrder(any()) } returns order
+            coEvery { repository.existsByUserIdAndOrderId(any(), any()) } returns true
+
+            then("이미 등록된 리뷰라는 메세지가 반환된다.") {
+                val ex = shouldThrow<IllegalArgumentException> {
+                    useCase.createReview(
+                        request = request,
+                        getUser = { userUseCase.getUser(userId) },
+                        getStore = storeUseCase::getStore,
+                        getOrder = orderUseCase::getOrder,
+                    )
+                }
+                ex.message shouldBe "이미 등록된 리뷰입니다."
             }
         }
     }

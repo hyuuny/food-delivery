@@ -7,4 +7,6 @@ interface ReviewDao : CoroutineCrudRepository<Review, Long> {
 
     suspend fun findAllByUserIdIn(userIds: List<Long>): List<Review>
 
+    suspend fun existsByUserIdAndOrderId(userId: Long, orderId: Long): Boolean
+
 }

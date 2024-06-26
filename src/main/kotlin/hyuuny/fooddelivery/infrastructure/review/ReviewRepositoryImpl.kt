@@ -42,6 +42,9 @@ class ReviewRepositoryImpl(
         return dao.findAllByUserIdIn(userIds)
     }
 
+    override suspend fun existsByUserIdAndOrderId(userId: Long, orderId: Long): Boolean =
+        dao.existsByUserIdAndOrderId(userId, orderId)
+
     private fun buildCriteria(searchCondition: ApiReviewSearchCondition): Criteria {
         var criteria = Criteria.empty()
 
