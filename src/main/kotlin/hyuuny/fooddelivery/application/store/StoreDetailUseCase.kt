@@ -14,6 +14,6 @@ class StoreDetailUseCase(
     suspend fun getStoreDetailByStoreId(storeId: Long): StoreDetail = findStoreDetailByStoreIdOrThrow(storeId)
 
     private suspend fun findStoreDetailByStoreIdOrThrow(storeId: Long) = repository.findByStoreId(storeId)
-        ?: throw NoSuchElementException("${0}번 매장 정보를 찾을 수 없습니다.")
+        ?: throw NoSuchElementException("${storeId}번 매장 정보를 찾을 수 없습니다.")
 
 }

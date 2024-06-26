@@ -77,4 +77,7 @@ class ReviewUseCase(
         return savedReview
     }
 
+    suspend fun getAverageScoreByStoreIds(storeIds: List<Long>): Map<Long, Double> =
+        repository.findAverageScoreByStoreId(storeIds)
+
 }

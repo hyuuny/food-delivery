@@ -71,6 +71,7 @@ class StoreApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.taxId").isEqualTo(store.taxId)
             .jsonPath("$.deliveryFee").isEqualTo(store.deliveryFee)
             .jsonPath("$.minimumOrderAmount").isEqualTo(store.minimumOrderAmount)
+            .jsonPath("$.averageScore").isEqualTo(0.0)
             .jsonPath("$.iconImageUrl").isEqualTo(store.iconImageUrl!!)
             .jsonPath("$.description").isEqualTo(store.description)
             .jsonPath("$.foodOrigin").isEqualTo(store.foodOrigin)

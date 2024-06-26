@@ -10,7 +10,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.springframework.stereotype.Component
 
-@Component
+@Component(value = "adminStoreResponseMapper")
 class StoreResponseMapper(
     private val storeDetailUseCase: StoreDetailUseCase,
     private val storeImageUseCase: StoreImageUseCase,

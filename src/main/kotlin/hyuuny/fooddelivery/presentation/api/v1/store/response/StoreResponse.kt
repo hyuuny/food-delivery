@@ -17,6 +17,7 @@ class StoreResponse(
     val taxId: String,
     val deliveryFee: Long,
     val minimumOrderAmount: Long,
+    val averageScore: Double,
     val iconImageUrl: String?,
     val description: String,
     val foodOrigin: String,
@@ -28,6 +29,7 @@ class StoreResponse(
     companion object {
         fun from(
             entity: Store,
+            averageScore: Double,
             storeDetail: StoreDetailResponse,
             storeImages: List<StoreImageResponse>?,
             menuGroups: List<MenuGroupResponse>?,
@@ -41,6 +43,7 @@ class StoreResponse(
                 taxId = entity.taxId,
                 deliveryFee = entity.deliveryFee,
                 minimumOrderAmount = entity.minimumOrderAmount,
+                averageScore = averageScore,
                 iconImageUrl = entity.iconImageUrl,
                 description = entity.description,
                 foodOrigin = entity.foodOrigin,
@@ -146,11 +149,12 @@ data class StoreResponses(
     val name: String,
     val deliveryFee: Long,
     val minimumOrderAmount: Long,
+    val averageScore: Double,
     val menuGroups: List<MenuGroupResponses>,
     val createdAt: LocalDateTime,
 ) {
     companion object {
-        fun from(entity: Store, menuGroups: List<MenuGroupResponses>): StoreResponses {
+        fun from(entity: Store, averageScore: Double, menuGroups: List<MenuGroupResponses>): StoreResponses {
             return StoreResponses(
                 id = entity.id!!,
                 categoryId = entity.categoryId,
@@ -158,6 +162,7 @@ data class StoreResponses(
                 name = entity.name,
                 deliveryFee = entity.deliveryFee,
                 minimumOrderAmount = entity.minimumOrderAmount,
+                averageScore = averageScore,
                 menuGroups = menuGroups,
                 createdAt = entity.createdAt,
             )

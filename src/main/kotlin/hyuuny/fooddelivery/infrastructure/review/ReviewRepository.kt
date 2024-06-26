@@ -19,4 +19,6 @@ interface ReviewRepository {
 
     suspend fun existsByUserIdAndOrderId(userId: Long, orderId: Long): Boolean
 
+    suspend fun findAverageScoreByStoreId(storeIds: List<Long>): Map<Long, Double>
+
 }
