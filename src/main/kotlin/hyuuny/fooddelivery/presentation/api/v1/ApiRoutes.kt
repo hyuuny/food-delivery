@@ -4,6 +4,7 @@ import hyuuny.fooddelivery.presentation.api.v1.cart.CartApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.category.CategoryApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.menu.MenuApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.order.OrderApiHandler
+import hyuuny.fooddelivery.presentation.api.v1.review.ReviewApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.store.StoreApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.user.UserApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.useraddress.UserAddressApiHandler
@@ -99,6 +100,15 @@ class ApiRoutes {
                 GET("", handler::getOrders)
                 PATCH("/{id}/cancel", handler::cancelOrder)
                 PATCH("/{id}/refund", handler::refundOrder)
+            }
+        }
+    }
+
+    @Bean
+    fun reviewApi(handler: ReviewApiHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/api/v1/users/{userId}/reviews".nest {
+                POST("", handler::createReview)
             }
         }
     }

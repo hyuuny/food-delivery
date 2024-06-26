@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.review
 
+import CreateReviewCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -18,5 +19,16 @@ class Review(
     @Id
     var id: Long? = id
         protected set
+
+    companion object {
+        fun handle(command: CreateReviewCommand): Review = Review(
+            userId = command.userId,
+            storeId = command.storeId,
+            orderId = command.orderId,
+            score = command.score,
+            content = command.content,
+            createdAt = command.createdAt,
+        )
+    }
 
 }
