@@ -25,7 +25,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.LocalDateTime
 
-class CreateOrderUseCaseTest : BehaviorSpec({
+class CreateReviewUseCaseTest : BehaviorSpec({
 
     val repository = mockk<ReviewRepository>()
     val reviewPhotoRepository = mockk<ReviewPhotoRepository>()
