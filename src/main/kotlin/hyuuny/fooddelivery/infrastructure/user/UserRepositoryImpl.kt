@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.infrastructure.user
 
 import AdminUserSearchCondition
 import hyuuny.fooddelivery.domain.user.User
+import kotlinx.coroutines.flow.toList
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -32,6 +33,8 @@ class UserRepositoryImpl(
     }
 
     override suspend fun findById(id: Long): User? = dao.findById(id)
+
+    override suspend fun findAllByIdIn(userIds: List<Long>): List<User> = dao.findAllById(userIds).toList()
 
     override suspend fun updateName(user: User) {
         template.update<User>()

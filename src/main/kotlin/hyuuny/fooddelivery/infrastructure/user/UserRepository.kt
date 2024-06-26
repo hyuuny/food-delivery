@@ -13,6 +13,8 @@ interface UserRepository {
 
     suspend fun findById(id: Long): User?
 
+    suspend fun findAllByIdIn(userIds: List<Long>): List<User>
+
     suspend fun updateName(user: User)
 
     suspend fun updateNickname(user: User)

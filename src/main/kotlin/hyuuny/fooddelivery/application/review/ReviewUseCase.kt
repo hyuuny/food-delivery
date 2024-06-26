@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.application.review
 
+import ApiReviewSearchCondition
 import CreateReviewCommand
 import CreateReviewPhotoCommand
 import CreateReviewRequest
@@ -10,6 +11,8 @@ import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.domain.user.User
 import hyuuny.fooddelivery.infrastructure.review.ReviewPhotoRepository
 import hyuuny.fooddelivery.infrastructure.review.ReviewRepository
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -20,6 +23,17 @@ class ReviewUseCase(
     private val repository: ReviewRepository,
     private val reviewPhotoRepository: ReviewPhotoRepository,
 ) {
+
+    suspend fun getReviewByApiCondition(
+        searchCondition: ApiReviewSearchCondition,
+        pageable: Pageable
+    ): PageImpl<Review> {
+        val page = repository.findAllReviews(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
+
+    suspend fun getAllByUserIds(userIds: List<Long>): List<Review> =
+        repository.findAllByUserIdIn(userIds)
 
     @Transactional
     suspend fun createReview(

@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.infrastructure.review
 
 import ApiReviewSearchCondition
 import hyuuny.fooddelivery.domain.review.Review
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 
 interface ReviewRepository {
@@ -10,8 +11,10 @@ interface ReviewRepository {
 
     suspend fun findById(id: Long): Review?
 
-    suspend fun findAllReviews(searchCondition: ApiReviewSearchCondition, pageable: Pageable): List<Review>
+    suspend fun findAllReviews(searchCondition: ApiReviewSearchCondition, pageable: Pageable): PageImpl<Review>
 
     suspend fun delete(id: Long)
+
+    suspend fun findAllByUserIdIn(userIds: List<Long>): List<Review>
 
 }

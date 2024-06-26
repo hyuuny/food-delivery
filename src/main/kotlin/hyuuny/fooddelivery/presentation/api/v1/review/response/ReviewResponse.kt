@@ -52,3 +52,59 @@ data class ReviewPhotoResponse(
         )
     }
 }
+
+data class ReviewResponses(
+    val id: Long,
+    val userId: Long,
+    val storeId: Long,
+    val orderId: Long,
+    val storeName: String,
+    val userNickname: String,
+    val userImageUrl: String? = null,
+    val score: Int,
+    val averageScore: Double,
+    val reviewCount: Int,
+    val content: String,
+    val photos: List<ReviewPhotoResponses>,
+    val createdAt: LocalDateTime,
+) {
+    companion object {
+        fun from(
+            entity: Review,
+            user: User,
+            store: Store,
+            averageScore: Double = 0.0,
+            reviewCount: Int,
+            photos: List<ReviewPhoto>
+        ): ReviewResponses =
+            ReviewResponses(
+                id = entity.id!!,
+                userId = entity.userId,
+                storeId = entity.storeId,
+                orderId = entity.orderId,
+                storeName = store.name,
+                userNickname = user.nickname,
+                userImageUrl = user.imageUrl,
+                score = entity.score,
+                averageScore = averageScore,
+                reviewCount = reviewCount,
+                content = entity.content,
+                photos = photos.map { ReviewPhotoResponses.from(it) },
+                createdAt = entity.createdAt,
+            )
+    }
+}
+
+data class ReviewPhotoResponses(
+    val id: Long,
+    val reviewId: Long,
+    val photoUrl: String,
+) {
+    companion object {
+        fun from(entity: ReviewPhoto): ReviewPhotoResponses = ReviewPhotoResponses(
+            id = entity.id!!,
+            reviewId = entity.reviewId,
+            photoUrl = entity.photoUrl
+        )
+    }
+}

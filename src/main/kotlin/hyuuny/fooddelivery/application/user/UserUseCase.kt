@@ -137,6 +137,8 @@ class UserUseCase(
 
     suspend fun existsById(id: Long): Boolean = repository.existsById(id)
 
+    suspend fun getAllByIds(ids: List<Long>): List<User> = repository.findAllByIdIn(ids)
+
     private suspend fun findUserByIdOrThrow(id: Long): User =
         repository.findById(id) ?: throw NoSuchElementException("${id}번 회원을 찾을 수 없습니다.")
 

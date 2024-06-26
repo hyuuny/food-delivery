@@ -110,6 +110,10 @@ class ApiRoutes {
             "/api/v1/users/{userId}/reviews".nest {
                 POST("", handler::createReview)
             }
+
+            "/api/v1/reviews".nest {
+                GET("", handler::getReviews)
+            }
         }
     }
 
