@@ -6,6 +6,7 @@ import hyuuny.fooddelivery.presentation.admin.v1.menugroup.MenuGroupHandler
 import hyuuny.fooddelivery.presentation.admin.v1.option.OptionHandler
 import hyuuny.fooddelivery.presentation.admin.v1.optiongroup.OptionGroupHandler
 import hyuuny.fooddelivery.presentation.admin.v1.order.OrderHandler
+import hyuuny.fooddelivery.presentation.admin.v1.review.ReviewHandler
 import hyuuny.fooddelivery.presentation.admin.v1.store.StoreHandler
 import hyuuny.fooddelivery.presentation.admin.v1.user.UserHandler
 import org.springframework.context.annotation.Bean
@@ -126,6 +127,15 @@ class AdminRoutes {
                 GET("", handler::getOrders)
                 GET("/{id}", handler::getOrder)
                 PATCH("/{id}/change-order-status", handler::changeOrderStatus)
+            }
+        }
+    }
+
+    @Bean
+    fun reviewAdminApi(handler: ReviewHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/admin/v1/reviews".nest {
+                GET("", handler::getReviews)
             }
         }
     }

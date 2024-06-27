@@ -55,4 +55,15 @@ class ReviewApiHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun deleteReview(request: ServerRequest): ServerResponse {
+        val userId = request.pathVariable("userId").toLong()
+        val id = request.pathVariable("id").toLong()
+
+        useCase.deleteReview(
+            id = id,
+            getUser = { userUseCase.getUser(userId) }
+        )
+        return ok().buildAndAwait()
+    }
+
 }

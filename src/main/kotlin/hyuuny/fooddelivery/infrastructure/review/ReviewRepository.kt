@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.infrastructure.review
 
+import AdminReviewSearchCondition
 import ApiReviewSearchCondition
 import hyuuny.fooddelivery.domain.review.Review
 import org.springframework.data.domain.PageImpl
@@ -10,6 +11,8 @@ interface ReviewRepository {
     suspend fun insert(review: Review): Review
 
     suspend fun findById(id: Long): Review?
+
+    suspend fun findAllReviews(searchCondition: AdminReviewSearchCondition, pageable: Pageable): PageImpl<Review>
 
     suspend fun findAllReviews(searchCondition: ApiReviewSearchCondition, pageable: Pageable): PageImpl<Review>
 

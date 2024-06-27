@@ -109,6 +109,7 @@ class ApiRoutes {
         return coRouter {
             "/api/v1/users/{userId}/reviews".nest {
                 POST("", handler::createReview)
+                DELETE("/{id}", handler::deleteReview)
             }
 
             "/api/v1/reviews".nest {

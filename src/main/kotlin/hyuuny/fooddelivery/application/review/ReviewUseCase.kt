@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.application.review
 
+import AdminReviewSearchCondition
 import ApiReviewSearchCondition
 import CreateReviewCommand
 import CreateReviewPhotoCommand
@@ -23,6 +24,14 @@ class ReviewUseCase(
     private val repository: ReviewRepository,
     private val reviewPhotoRepository: ReviewPhotoRepository,
 ) {
+
+    suspend fun getReviewByAdminCondition(
+        searchCondition: AdminReviewSearchCondition,
+        pageable: Pageable
+    ): PageImpl<Review> {
+        val page = repository.findAllReviews(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
 
     suspend fun getReviewByApiCondition(
         searchCondition: ApiReviewSearchCondition,
@@ -77,7 +86,22 @@ class ReviewUseCase(
         return savedReview
     }
 
+    @Transactional
+    suspend fun deleteReview(
+        id: Long,
+        getUser: suspend () -> User,
+    ) {
+        val user = getUser()
+        val review = findReviewByIdOrThrow(id)
+        if (review.userId != user.id) throw IllegalArgumentException("리뷰 삭제 권한이 없습니다.")
+        repository.delete(id)
+        reviewPhotoRepository.deleteAllByReviewId(id)
+    }
+
     suspend fun getAverageScoreByStoreIds(storeIds: List<Long>): Map<Long, Double> =
         repository.findAverageScoreByStoreId(storeIds)
+
+    private suspend fun findReviewByIdOrThrow(id: Long) =
+        repository.findById(id) ?: throw NoSuchElementException("${id}번 리뷰를 찾을 수 없습니다.")
 
 }

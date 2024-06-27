@@ -9,4 +9,6 @@ interface UserDao : CoroutineCrudRepository<User, Long> {
 
     suspend fun findAllByName(name: String): List<User>
 
+    suspend fun findAllByNickname(nickname: String): List<User>
+
 }
