@@ -3,11 +3,13 @@ package hyuuny.fooddelivery.presentation.api.v1.review
 import CreateReviewPhotoRequest
 import CreateReviewRequest
 import com.ninjasquad.springmockk.MockkBean
+import hyuuny.fooddelivery.application.order.OrderItemUseCase
 import hyuuny.fooddelivery.application.review.ReviewPhotoUseCase
 import hyuuny.fooddelivery.application.review.ReviewUseCase
 import hyuuny.fooddelivery.application.store.StoreUseCase
 import hyuuny.fooddelivery.application.user.UserUseCase
 import hyuuny.fooddelivery.common.constant.DeliveryType
+import hyuuny.fooddelivery.domain.order.OrderItem
 import hyuuny.fooddelivery.domain.review.Review
 import hyuuny.fooddelivery.domain.review.ReviewPhoto
 import hyuuny.fooddelivery.domain.store.Store
@@ -36,6 +38,9 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
 
     @MockkBean
     private lateinit var storeUseCase: StoreUseCase
+
+    @MockkBean
+    private lateinit var orderItemUseCase: OrderItemUseCase
 
     @DisplayName("회원은 주문에 리뷰를 작성할 수 있다.")
     @Test
@@ -179,6 +184,17 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
                 createdAt = now
             )
         }
+        val orderItems = listOf(
+            OrderItem(1L, reviews[0].orderId, 1L, "피자", 15000, 1, now),
+            OrderItem(2L, reviews[0].orderId, 2L, "불고기 버거", 5000, 1, now),
+            OrderItem(3L, reviews[1].orderId, 3L, "참치김밥", 5000, 1, now),
+            OrderItem(4L, reviews[1].orderId, 4L, "야채김밥", 4000, 1, now),
+            OrderItem(5L, reviews[2].orderId, 5L, "일반돈까스", 6500, 1, now),
+            OrderItem(6L, reviews[2].orderId, 6L, "대왕돈까스", 7500, 1, now),
+            OrderItem(7L, reviews[2].orderId, 7L, "매운돈까스", 7000, 1, now),
+            OrderItem(8L, reviews[3].orderId, 8L, "후라이드치킨", 16000, 1, now),
+            OrderItem(9L, reviews[3].orderId, 9L, "코카콜라 2L", 2000, 1, now),
+        )
 
         val sortedReviews = reviews.sortedByDescending { it.id }
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.DEFAULT_DIRECTION, "id"))
@@ -188,6 +204,7 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
         coEvery { userUseCase.getAllByIds(any()) } returns users
         coEvery { storeUseCase.getAllByIds(any()) } returns listOf(store)
         coEvery { useCase.getAllByUserIds(any()) } returns sortedReviews
+        coEvery { orderItemUseCase.getAllByOrderIdIn(any()) } returns orderItems
 
         webTestClient.get().uri("/api/v1/reviews?storeId=${storeId}&sort=id:desc")
             .accept(MediaType.APPLICATION_JSON)
@@ -208,6 +225,8 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[0].averageScore").isEqualTo(randomScores[3] / 1)
             .jsonPath("$.content[0].reviewCount").isEqualTo(1)
             .jsonPath("$.content[0].content").isEqualTo(reviews[3].content)
+            .jsonPath("$.content[0].items[0].menuName").isEqualTo(orderItems[7].menuName)
+            .jsonPath("$.content[0].items[1].menuName").isEqualTo(orderItems[8].menuName)
             .jsonPath("$.content[0].photos[0].reviewId").isEqualTo(reviewPhotos[3].reviewId)
             .jsonPath("$.content[0].photos[0].photoUrl").isEqualTo(reviewPhotos[3].photoUrl)
 
@@ -222,6 +241,9 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].averageScore").isEqualTo(randomScores[2] / 1)
             .jsonPath("$.content[1].reviewCount").isEqualTo(1)
             .jsonPath("$.content[1].content").isEqualTo(reviews[2].content)
+            .jsonPath("$.content[1].items[0].menuName").isEqualTo(orderItems[4].menuName)
+            .jsonPath("$.content[1].items[1].menuName").isEqualTo(orderItems[5].menuName)
+            .jsonPath("$.content[1].items[2].menuName").isEqualTo(orderItems[6].menuName)
             .jsonPath("$.content[1].photos[0].reviewId").isEqualTo(reviewPhotos[2].reviewId)
             .jsonPath("$.content[1].photos[0].photoUrl").isEqualTo(reviewPhotos[2].photoUrl)
 
@@ -236,6 +258,8 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[2].averageScore").isEqualTo(randomScores[1] / 1)
             .jsonPath("$.content[2].reviewCount").isEqualTo(1)
             .jsonPath("$.content[2].content").isEqualTo(reviews[1].content)
+            .jsonPath("$.content[2].items[0].menuName").isEqualTo(orderItems[2].menuName)
+            .jsonPath("$.content[2].items[1].menuName").isEqualTo(orderItems[3].menuName)
             .jsonPath("$.content[2].photos[0].reviewId").isEqualTo(reviewPhotos[1].reviewId)
             .jsonPath("$.content[2].photos[0].photoUrl").isEqualTo(reviewPhotos[1].photoUrl)
 
@@ -250,6 +274,8 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[3].averageScore").isEqualTo(randomScores[0] / 1)
             .jsonPath("$.content[3].reviewCount").isEqualTo(1)
             .jsonPath("$.content[3].content").isEqualTo(reviews[0].content)
+            .jsonPath("$.content[3].items[0].menuName").isEqualTo(orderItems[0].menuName)
+            .jsonPath("$.content[3].items[1].menuName").isEqualTo(orderItems[1].menuName)
             .jsonPath("$.content[3].photos[0].reviewId").isEqualTo(reviewPhotos[0].reviewId)
             .jsonPath("$.content[3].photos[0].photoUrl").isEqualTo(reviewPhotos[0].photoUrl)
 
@@ -318,6 +344,17 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
                 createdAt = now
             )
         }
+        val orderItems = listOf(
+            OrderItem(1L, reviews[0].orderId, 1L, "피자", 15000, 1, now),
+            OrderItem(2L, reviews[0].orderId, 2L, "불고기 버거", 5000, 1, now),
+            OrderItem(3L, reviews[1].orderId, 3L, "참치김밥", 5000, 1, now),
+            OrderItem(4L, reviews[1].orderId, 4L, "야채김밥", 4000, 1, now),
+            OrderItem(5L, reviews[2].orderId, 5L, "일반돈까스", 6500, 1, now),
+            OrderItem(6L, reviews[2].orderId, 6L, "대왕돈까스", 7500, 1, now),
+            OrderItem(7L, reviews[2].orderId, 7L, "매운돈까스", 7000, 1, now),
+            OrderItem(8L, reviews[3].orderId, 8L, "후라이드치킨", 16000, 1, now),
+            OrderItem(9L, reviews[3].orderId, 9L, "코카콜라 2L", 2000, 1, now),
+        )
 
         val sortedReviews = reviews.sortedByDescending { it.id }
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.DEFAULT_DIRECTION, "id"))
@@ -327,6 +364,7 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
         coEvery { userUseCase.getAllByIds(any()) } returns listOf(user)
         coEvery { storeUseCase.getAllByIds(any()) } returns stores
         coEvery { useCase.getAllByUserIds(any()) } returns sortedReviews
+        coEvery { orderItemUseCase.getAllByOrderIdIn(any()) } returns orderItems
 
         val expectedAverageScore = randomScores.sumOf { it } / reviews.size
         webTestClient.get().uri("/api/v1/reviews?userId=${userId}&sort=id:desc")
@@ -348,6 +386,8 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[0].averageScore").isEqualTo(expectedAverageScore)
             .jsonPath("$.content[0].reviewCount").isEqualTo(4)
             .jsonPath("$.content[0].content").isEqualTo(reviews[3].content)
+            .jsonPath("$.content[0].items[0].menuName").isEqualTo(orderItems[7].menuName)
+            .jsonPath("$.content[0].items[1].menuName").isEqualTo(orderItems[8].menuName)
             .jsonPath("$.content[0].photos[0].reviewId").isEqualTo(reviewPhotos[3].reviewId)
             .jsonPath("$.content[0].photos[0].photoUrl").isEqualTo(reviewPhotos[3].photoUrl)
 
@@ -362,6 +402,9 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].averageScore").isEqualTo(expectedAverageScore)
             .jsonPath("$.content[1].reviewCount").isEqualTo(4)
             .jsonPath("$.content[1].content").isEqualTo(reviews[2].content)
+            .jsonPath("$.content[1].items[0].menuName").isEqualTo(orderItems[4].menuName)
+            .jsonPath("$.content[1].items[1].menuName").isEqualTo(orderItems[5].menuName)
+            .jsonPath("$.content[1].items[2].menuName").isEqualTo(orderItems[6].menuName)
             .jsonPath("$.content[1].photos[0].reviewId").isEqualTo(reviewPhotos[2].reviewId)
             .jsonPath("$.content[1].photos[0].photoUrl").isEqualTo(reviewPhotos[2].photoUrl)
 
@@ -376,6 +419,8 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[2].averageScore").isEqualTo(expectedAverageScore)
             .jsonPath("$.content[2].reviewCount").isEqualTo(4)
             .jsonPath("$.content[2].content").isEqualTo(reviews[1].content)
+            .jsonPath("$.content[2].items[0].menuName").isEqualTo(orderItems[2].menuName)
+            .jsonPath("$.content[2].items[1].menuName").isEqualTo(orderItems[3].menuName)
             .jsonPath("$.content[2].photos[0].reviewId").isEqualTo(reviewPhotos[1].reviewId)
             .jsonPath("$.content[2].photos[0].photoUrl").isEqualTo(reviewPhotos[1].photoUrl)
 
@@ -390,6 +435,8 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[3].averageScore").isEqualTo(expectedAverageScore)
             .jsonPath("$.content[3].reviewCount").isEqualTo(4)
             .jsonPath("$.content[3].content").isEqualTo(reviews[0].content)
+            .jsonPath("$.content[3].items[0].menuName").isEqualTo(orderItems[0].menuName)
+            .jsonPath("$.content[3].items[1].menuName").isEqualTo(orderItems[1].menuName)
             .jsonPath("$.content[3].photos[0].reviewId").isEqualTo(reviewPhotos[0].reviewId)
             .jsonPath("$.content[3].photos[0].photoUrl").isEqualTo(reviewPhotos[0].photoUrl)
 

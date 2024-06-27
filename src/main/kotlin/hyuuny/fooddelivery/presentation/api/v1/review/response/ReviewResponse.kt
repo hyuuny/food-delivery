@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.presentation.api.v1.review.response
 
+import hyuuny.fooddelivery.domain.order.OrderItem
 import hyuuny.fooddelivery.domain.review.Review
 import hyuuny.fooddelivery.domain.review.ReviewPhoto
 import hyuuny.fooddelivery.domain.store.Store
@@ -65,6 +66,7 @@ data class ReviewResponses(
     val averageScore: Double,
     val reviewCount: Int,
     val content: String,
+    val items: List<ReviewItemResponse>,
     val photos: List<ReviewPhotoResponses>,
     val createdAt: LocalDateTime,
 ) {
@@ -75,6 +77,7 @@ data class ReviewResponses(
             store: Store,
             averageScore: Double = 0.0,
             reviewCount: Int,
+            items: List<OrderItem>,
             photos: List<ReviewPhoto>
         ): ReviewResponses =
             ReviewResponses(
@@ -89,8 +92,22 @@ data class ReviewResponses(
                 averageScore = averageScore,
                 reviewCount = reviewCount,
                 content = entity.content,
+                items = items.map { ReviewItemResponse.from(it) },
                 photos = photos.map { ReviewPhotoResponses.from(it) },
                 createdAt = entity.createdAt,
+            )
+    }
+}
+
+data class ReviewItemResponse(
+    val orderId: Long,
+    val menuName: String,
+) {
+    companion object {
+        fun from(entity: OrderItem): ReviewItemResponse =
+            ReviewItemResponse(
+                orderId = entity.orderId,
+                menuName = entity.menuName,
             )
     }
 }
