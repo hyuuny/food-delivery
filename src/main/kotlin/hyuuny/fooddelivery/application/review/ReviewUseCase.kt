@@ -44,6 +44,8 @@ class ReviewUseCase(
     suspend fun getAllByUserIds(userIds: List<Long>): List<Review> =
         repository.findAllByUserIdIn(userIds)
 
+    suspend fun getReview(id: Long): Review = findReviewByIdOrThrow(id)
+
     @Transactional
     suspend fun createReview(
         request: CreateReviewRequest,

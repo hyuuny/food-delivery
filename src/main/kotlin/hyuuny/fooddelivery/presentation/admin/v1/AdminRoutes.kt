@@ -136,6 +136,7 @@ class AdminRoutes {
         return coRouter {
             "/admin/v1/reviews".nest {
                 GET("", handler::getReviews)
+                GET("/{id}", handler::getReview)
             }
         }
     }

@@ -54,4 +54,12 @@ class ReviewHandler(
         return ok().bodyValueAndAwait(responses)
     }
 
+    suspend fun getReview(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+
+        val review = useCase.getReview(id)
+        val response = responseMapper.mapToReviewResponse(review)
+        return ok().bodyValueAndAwait(response)
+    }
+
 }
