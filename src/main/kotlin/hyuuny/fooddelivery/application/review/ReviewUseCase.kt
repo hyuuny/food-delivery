@@ -100,6 +100,13 @@ class ReviewUseCase(
         reviewPhotoRepository.deleteAllByReviewId(id)
     }
 
+    @Transactional
+    suspend fun deleteReview(id: Long) {
+        val review = findReviewByIdOrThrow(id)
+        repository.delete(review.id!!)
+        reviewPhotoRepository.deleteAllByReviewId(id)
+    }
+
     suspend fun getAverageScoreByStoreIds(storeIds: List<Long>): Map<Long, Double> =
         repository.findAverageScoreByStoreId(storeIds)
 

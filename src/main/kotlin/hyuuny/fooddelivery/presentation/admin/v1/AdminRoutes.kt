@@ -137,6 +137,7 @@ class AdminRoutes {
             "/admin/v1/reviews".nest {
                 GET("", handler::getReviews)
                 GET("/{id}", handler::getReview)
+                DELETE("/{id}", handler::deleteReview)
             }
         }
     }

@@ -62,4 +62,11 @@ class ReviewHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun deleteReview(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+
+        useCase.deleteReview(id)
+        return ok().bodyValueAndAwait(mapOf("message" to "${id}번 리뷰가 정상적으로 삭제되었습니다."))
+    }
+
 }
