@@ -240,7 +240,22 @@ class ReviewHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.photos[0].photoUrl").isEqualTo(expectedResponse.photos[0].photoUrl)
             .jsonPath("$.photos[1].photoUrl").isEqualTo(expectedResponse.photos[1].photoUrl)
             .jsonPath("$.createdAt").exists()
+    }
 
+    @DisplayName("관리자는 회원의 리뷰를 삭제할 수 있다.")
+    @Test
+    fun deleteReview() {
+        val reviewId = 1L
+
+        coEvery { useCase.deleteReview(any()) } returns Unit
+
+        webTestClient.delete().uri("/admin/v1/reviews/$reviewId")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.message").isEqualTo("${reviewId}번 리뷰가 정상적으로 삭제되었습니다.")
     }
 
 }
