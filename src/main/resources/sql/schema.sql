@@ -234,3 +234,14 @@ CREATE TABLE IF NOT EXISTS review_photos
     FOREIGN KEY (review_id) REFERENCES reviews (id)
 );
 CREATE INDEX IF NOT EXISTS idx_review_photos_review_id ON review_photos (review_id);
+
+CREATE TABLE IF NOT EXISTS review_comments
+(
+    id         SERIAL PRIMARY KEY,
+    user_id    BIGINT    NOT NULL,
+    review_id  BIGINT    NOT NULL,
+    content    TEXT      NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_review_comments_review_id ON review_comments (review_id);
