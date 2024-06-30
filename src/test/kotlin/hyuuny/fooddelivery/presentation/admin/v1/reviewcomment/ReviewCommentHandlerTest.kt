@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.presentation.admin.v1.reviewcomment
 
+import ChangeContentRequest
 import CreateReviewCommentRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.review.ReviewUseCase
@@ -8,7 +9,9 @@ import hyuuny.fooddelivery.application.user.UserUseCase
 import hyuuny.fooddelivery.domain.review.Review
 import hyuuny.fooddelivery.domain.reviewcomment.ReviewComment
 import hyuuny.fooddelivery.domain.user.User
+import hyuuny.fooddelivery.infrastructure.reviewcomment.ReviewCommentRepository
 import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
+import hyuuny.fooddelivery.presentation.admin.v1.reviewcomment.response.ReviewCommentResponse
 import io.mockk.coEvery
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -28,6 +31,9 @@ class ReviewCommentHandlerTest : BaseIntegrationTest() {
 
     @MockkBean
     private lateinit var reviewUseCase: ReviewUseCase
+
+    @MockkBean
+    private lateinit var repository: ReviewCommentRepository
 
     @DisplayName("회원이 작성한 리뷰에 댓글을 달 수 있다.")
     @Test
@@ -137,6 +143,54 @@ class ReviewCommentHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.size").isEqualTo(15)
             .jsonPath("$.last").isEqualTo(true)
             .jsonPath("$.totalElements").isEqualTo(4)
+    }
+
+    @DisplayName("리뷰 댓글을 상세조회 할 수 있다.")
+    @Test
+    fun getReviewComment() {
+        val id = 1L
+
+        val now = LocalDateTime.now()
+        val reviewComment = ReviewComment(
+            id = id,
+            reviewId = 1L,
+            userId = 1L,
+            content = "감사합니다. 다음에 또 방문해주세요.\uD83D\uDE00\uD83D\uDE03",
+            createdAt = now,
+            updatedAt = now,
+        )
+        coEvery { useCase.getReviewComment(any()) } returns reviewComment
+
+        val expectedResponse = ReviewCommentResponse.from(reviewComment)
+        webTestClient.get().uri("/admin/v1/review-comments/$id")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.id").isEqualTo(expectedResponse.id)
+            .jsonPath("$.userId").isEqualTo(expectedResponse.userId)
+            .jsonPath("$.reviewId").isEqualTo(expectedResponse.reviewId)
+            .jsonPath("$.ownerName").isEqualTo(expectedResponse.ownerName)
+            .jsonPath("$.ownerImageUrl").isEqualTo(expectedResponse.ownerImageUrl)
+            .jsonPath("$.content").isEqualTo(expectedResponse.content)
+    }
+
+    @DisplayName("리뷰 댓글의 내용을 수정할 수 있다.")
+    @Test
+    fun changeContent() {
+        val reviewId = 1L
+        val request = ChangeContentRequest(content = "행복한 하루되세요")
+        coEvery { useCase.changeContent(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/admin/v1/review-comments/$reviewId/change-content")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
     }
 
     private fun generateReviewComment(request: CreateReviewCommentRequest, now: LocalDateTime): ReviewComment {
