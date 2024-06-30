@@ -149,6 +149,8 @@ class AdminRoutes {
             "/admin/v1/review-comments".nest {
                 POST("", handler::createReviewComment)
                 GET("", handler::getReviewComments)
+                GET("/{id}", handler::getReviewComment)
+                PATCH("/{id}/change-content", handler::changeContent)
             }
         }
     }

@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.reviewcomment
 
 import AdminReviewCommentSearchCondition
+import ChangeContentRequest
 import CreateReviewCommentRequest
 import hyuuny.fooddelivery.application.review.ReviewUseCase
 import hyuuny.fooddelivery.application.reviewcomment.ReviewCommentUseCase
@@ -57,6 +58,22 @@ class ReviewCommentHandler(
         )
         val response = ReviewCommentResponse.from(reviewComment)
         return ok().bodyValueAndAwait(response)
+    }
+
+    suspend fun getReviewComment(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+
+        val comment = useCase.getReviewComment(id)
+        val response = ReviewCommentResponse.from(comment)
+        return ok().bodyValueAndAwait(response)
+    }
+
+    suspend fun changeContent(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<ChangeContentRequest>()
+
+        useCase.changeContent(id, body)
+        return ok().buildAndAwait()
     }
 
 }

@@ -1,3 +1,5 @@
+package hyuuny.fooddelivery.application.reviewcomment.command
+
 import java.time.LocalDateTime
 
 data class CreateReviewCommentCommand(
@@ -5,5 +7,10 @@ data class CreateReviewCommentCommand(
     val reviewId: Long,
     val content: String,
     val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+)
+
+data class ChangeReviewCommentContentCommand(
+    val content: String,
     val updatedAt: LocalDateTime,
 )

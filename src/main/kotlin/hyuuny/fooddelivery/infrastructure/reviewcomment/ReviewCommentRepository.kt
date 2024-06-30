@@ -16,7 +16,7 @@ interface ReviewCommentRepository {
         pageable: Pageable
     ): PageImpl<ReviewComment>
 
-    suspend fun update(reviewComment: ReviewComment)
+    suspend fun updateContent(reviewComment: ReviewComment)
 
     suspend fun delete(id: Long)
 

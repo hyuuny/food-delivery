@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.domain.reviewcomment
 
-import CreateReviewCommentCommand
+import hyuuny.fooddelivery.application.reviewcomment.command.ChangeReviewCommentContentCommand
+import hyuuny.fooddelivery.application.reviewcomment.command.CreateReviewCommentCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -31,6 +32,11 @@ class ReviewComment(
             createdAt = command.createdAt,
             updatedAt = command.createdAt,
         )
+    }
+
+    fun handle(command: ChangeReviewCommentContentCommand) {
+        this.content = command.content
+        this.updatedAt = command.updatedAt
     }
 
     fun getOwnerName(): String = "사장님"

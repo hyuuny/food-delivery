@@ -6,6 +6,10 @@ data class CreateReviewCommentRequest(
     val content: String,
 )
 
+data class ChangeContentRequest(
+    val content: String
+)
+
 data class AdminReviewCommentSearchCondition(
     val id: Long?,
     val userId: Long?,

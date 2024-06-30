@@ -5,8 +5,11 @@ import hyuuny.fooddelivery.domain.reviewcomment.ReviewComment
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.r2dbc.core.applyAndAwait
+import org.springframework.data.r2dbc.core.update
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query
+import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
 import selectAndCount
 
@@ -18,9 +21,7 @@ class ReviewCommentRepositoryImpl(
 
     override suspend fun insert(reviewComment: ReviewComment): ReviewComment = dao.save(reviewComment)
 
-    override suspend fun findById(id: Long): ReviewComment? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun findById(id: Long): ReviewComment? = dao.findById(id)
 
     override suspend fun findAllReviewComments(
         searchCondition: AdminReviewCommentSearchCondition,
@@ -33,8 +34,16 @@ class ReviewCommentRepositoryImpl(
         }
     }
 
-    override suspend fun update(reviewComment: ReviewComment) {
-        TODO("Not yet implemented")
+    override suspend fun updateContent(reviewComment: ReviewComment) {
+        template.update<ReviewComment>()
+            .matching(
+                Query.query(
+                    Criteria.where("id").`is`(reviewComment.id!!)
+                ),
+            ).applyAndAwait(
+                Update.update("content", reviewComment.content)
+                    .set("updatedAt", reviewComment.updatedAt)
+            )
     }
 
     override suspend fun delete(id: Long) {
