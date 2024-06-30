@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.reviewcomment
 
+import CreateReviewCommentCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -21,5 +22,20 @@ class ReviewComment(
         private set
     var updatedAt = updatedAt
         private set
+
+    companion object {
+        fun handle(command: CreateReviewCommentCommand): ReviewComment = ReviewComment(
+            userId = command.userId,
+            reviewId = command.reviewId,
+            content = command.content,
+            createdAt = command.createdAt,
+            updatedAt = command.createdAt,
+        )
+    }
+
+    fun getOwnerName(): String = "사장님"
+
+    fun getOwnerImageUrl(): String =
+        "https://my-s3-bucket.s3.ap-northeast-2.amazonaws.com/images/owner-default.jpeg"
 
 }

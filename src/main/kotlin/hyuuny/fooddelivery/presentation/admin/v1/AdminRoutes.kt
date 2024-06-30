@@ -7,6 +7,7 @@ import hyuuny.fooddelivery.presentation.admin.v1.option.OptionHandler
 import hyuuny.fooddelivery.presentation.admin.v1.optiongroup.OptionGroupHandler
 import hyuuny.fooddelivery.presentation.admin.v1.order.OrderHandler
 import hyuuny.fooddelivery.presentation.admin.v1.review.ReviewHandler
+import hyuuny.fooddelivery.presentation.admin.v1.reviewcomment.ReviewCommentHandler
 import hyuuny.fooddelivery.presentation.admin.v1.store.StoreHandler
 import hyuuny.fooddelivery.presentation.admin.v1.user.UserHandler
 import org.springframework.context.annotation.Bean
@@ -141,5 +142,16 @@ class AdminRoutes {
             }
         }
     }
+
+    @Bean
+    fun reviewCommentApi(handler: ReviewCommentHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/admin/v1/review-comments".nest {
+                POST("", handler::createReviewComment)
+                GET("", handler::getReviewComments)
+            }
+        }
+    }
+
 
 }
