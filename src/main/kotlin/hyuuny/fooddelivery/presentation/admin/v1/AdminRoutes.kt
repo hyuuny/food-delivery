@@ -151,6 +151,7 @@ class AdminRoutes {
                 GET("", handler::getReviewComments)
                 GET("/{id}", handler::getReviewComment)
                 PATCH("/{id}/change-content", handler::changeContent)
+                DELETE("/{id}", handler::deleteReviewComment)
             }
         }
     }

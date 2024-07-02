@@ -46,9 +46,7 @@ class ReviewCommentRepositoryImpl(
             )
     }
 
-    override suspend fun delete(id: Long) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun delete(id: Long) = dao.deleteById(id)
 
     private fun buildCriteria(searchCondition: AdminReviewCommentSearchCondition): Criteria {
         var criteria = Criteria.empty()

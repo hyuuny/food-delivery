@@ -66,6 +66,12 @@ class ReviewCommentUseCase(
         repository.updateContent(reviewComment)
     }
 
+    @Transactional
+    suspend fun deleteReviewComment(id: Long) {
+        val reviewComment = findReviewCommentByIdOrThrow(id)
+        repository.delete(reviewComment.id!!)
+    }
+
     private suspend fun findReviewCommentByIdOrThrow(id: Long) =
         repository.findById(id) ?: throw NoSuchElementException("${id}번 리뷰 댓글을 찾을 수 없습니다.")
 

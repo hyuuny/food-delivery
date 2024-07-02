@@ -76,4 +76,10 @@ class ReviewCommentHandler(
         return ok().buildAndAwait()
     }
 
+    suspend fun deleteReviewComment(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+
+        useCase.deleteReviewComment(id)
+        return ok().bodyValueAndAwait(mapOf("message" to "${id}번 리뷰 댓글이 정상적으로 삭제되었습니다."))
+    }
 }
