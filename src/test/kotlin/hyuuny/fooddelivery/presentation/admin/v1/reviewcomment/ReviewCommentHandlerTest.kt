@@ -193,6 +193,21 @@ class ReviewCommentHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
+    @DisplayName("리뷰 댓글을 삭제할 수 있다.")
+    @Test
+    fun deleteReviewComment() {
+        val id = 1L
+        coEvery { useCase.deleteReviewComment(any()) } returns Unit
+
+        webTestClient.delete().uri("/admin/v1/review-comments/$id")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.message").isEqualTo("${id}번 리뷰 댓글이 정상적으로 삭제되었습니다.")
+    }
+
     private fun generateReviewComment(request: CreateReviewCommentRequest, now: LocalDateTime): ReviewComment {
         return ReviewComment(
             id = 1L,
