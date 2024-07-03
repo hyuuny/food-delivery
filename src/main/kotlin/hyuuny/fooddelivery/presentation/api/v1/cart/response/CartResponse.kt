@@ -9,16 +9,20 @@ import hyuuny.fooddelivery.domain.option.Option
 data class CartResponse(
     val id: Long,
     val userId: Long,
+    val storeId: Long?,
     val items: List<CartItemResponse>,
     val totalPrice: Long,
+    val deliveryFee: Long,
 ) {
     companion object {
         fun from(entity: Cart, cartItemResponses: List<CartItemResponse>, totalPrice: Long): CartResponse {
             return CartResponse(
                 id = entity.id!!,
                 userId = entity.userId,
+                storeId = entity.storeId,
                 items = cartItemResponses,
-                totalPrice = totalPrice
+                totalPrice = totalPrice,
+                deliveryFee = entity.deliveryFee,
             )
         }
     }

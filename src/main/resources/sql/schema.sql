@@ -100,11 +100,14 @@ CREATE TABLE IF NOT EXISTS categories
 
 CREATE TABLE IF NOT EXISTS carts
 (
-    id         SERIAL PRIMARY KEY,
-    user_id    BIGINT    NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    id           SERIAL PRIMARY KEY,
+    user_id      BIGINT    NOT NULL,
+    store_id     BIGINT,
+    delivery_fee BIGINT DEFAULT 0,
+    created_at   TIMESTAMP NOT NULL,
+    updated_at   TIMESTAMP NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_user_id ON carts (user_id);
 
 CREATE TABLE IF NOT EXISTS cart_items
 (

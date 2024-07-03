@@ -10,6 +10,8 @@ import java.time.LocalDateTime
 class Cart(
     id: Long? = null,
     val userId: Long,
+    storeId: Long? = null,
+    deliveryFee: Long = 0,
     val createdAt: LocalDateTime,
     updatedAt: LocalDateTime,
 ) {
@@ -17,6 +19,10 @@ class Cart(
     @Id
     var id = id
         protected set
+    var storeId = storeId
+        private set
+    var deliveryFee = deliveryFee
+        private set
     var updatedAt = updatedAt
         private set
 
