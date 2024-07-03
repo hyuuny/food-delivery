@@ -20,4 +20,6 @@ interface ReviewCommentRepository {
 
     suspend fun delete(id: Long)
 
+    suspend fun findAllByReviewIdIn(reviewIds: List<Long>): List<ReviewComment>
+
 }

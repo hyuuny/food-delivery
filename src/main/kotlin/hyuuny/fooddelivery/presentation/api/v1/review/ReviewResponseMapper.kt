@@ -3,6 +3,7 @@ package hyuuny.fooddelivery.presentation.api.v1.review
 import hyuuny.fooddelivery.application.order.OrderItemUseCase
 import hyuuny.fooddelivery.application.review.ReviewPhotoUseCase
 import hyuuny.fooddelivery.application.review.ReviewUseCase
+import hyuuny.fooddelivery.application.reviewcomment.ReviewCommentUseCase
 import hyuuny.fooddelivery.application.store.StoreUseCase
 import hyuuny.fooddelivery.application.user.UserUseCase
 import hyuuny.fooddelivery.domain.review.Review
@@ -19,6 +20,7 @@ class ReviewResponseMapper(
     private val userUseCase: UserUseCase,
     private val storeUseCase: StoreUseCase,
     private val orderItemUseCase: OrderItemUseCase,
+    private val reviewCommentUseCase: ReviewCommentUseCase,
 ) {
 
     suspend fun mapToReviewResponse(review: Review) = coroutineScope {
@@ -44,18 +46,21 @@ class ReviewResponseMapper(
         val storeDeferred = async { storeUseCase.getAllByIds(storeIds) }
         val userReviewsDeferred = async { useCase.getAllByUserIds(userIds) }
         val orderItemsDeferred = async { orderItemUseCase.getAllByOrderIdIn(orderIds) }
+        val reviewCommentsDeferred = async { reviewCommentUseCase.getAllByReviewIds(reviewIds) }
 
         val reviewPhotos = reviewPhotosDeferred.await().sortedBy { it.id }
         val user = userDeferred.await()
         val store = storeDeferred.await()
         val userReviews = userReviewsDeferred.await()
         val orderItems = orderItemsDeferred.await()
+        val reviewComments = reviewCommentsDeferred.await()
 
         val reviewPhotoGroup = reviewPhotos.groupBy { it.reviewId }
         val userMap = user.associateBy { it.id }
         val storeMap = store.associateBy { it.id }
         val userReviewGroup = userReviews.groupBy { it.userId }
         val reviewItemGroup = orderItems.groupBy { it.orderId }
+        val commentMap = reviewComments.associateBy { it.reviewId }
 
         reviews.mapNotNull {
             val user = userMap[it.userId] ?: return@mapNotNull null
@@ -63,12 +68,13 @@ class ReviewResponseMapper(
             val reviewPhotos = reviewPhotoGroup[it.id] ?: return@mapNotNull null
             val userReviews = userReviewGroup[it.userId] ?: return@mapNotNull null
             val items = reviewItemGroup[it.orderId] ?: return@mapNotNull null
+            val reviewComment = commentMap[it.id]
 
             val totalScore = userReviews.sumOf { it.score }.toDouble()
             val reviewCount = userReviews.count()
             val averageScore = if (reviewCount > 0) totalScore / reviewCount else 0.0
 
-            ReviewResponses.from(it, user, store, averageScore, reviewCount, items, reviewPhotos)
+            ReviewResponses.from(it, user, store, averageScore, reviewCount, items, reviewPhotos, reviewComment)
         }
     }
 

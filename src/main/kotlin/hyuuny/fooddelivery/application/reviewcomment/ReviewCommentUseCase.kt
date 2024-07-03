@@ -72,6 +72,9 @@ class ReviewCommentUseCase(
         repository.delete(reviewComment.id!!)
     }
 
+    suspend fun getAllByReviewIds(reviewIds: List<Long>): List<ReviewComment> =
+        repository.findAllByReviewIdIn(reviewIds)
+
     private suspend fun findReviewCommentByIdOrThrow(id: Long) =
         repository.findById(id) ?: throw NoSuchElementException("${id}번 리뷰 댓글을 찾을 수 없습니다.")
 

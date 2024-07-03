@@ -3,6 +3,7 @@ package hyuuny.fooddelivery.presentation.api.v1.review.response
 import hyuuny.fooddelivery.domain.order.OrderItem
 import hyuuny.fooddelivery.domain.review.Review
 import hyuuny.fooddelivery.domain.review.ReviewPhoto
+import hyuuny.fooddelivery.domain.reviewcomment.ReviewComment
 import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.domain.user.User
 import java.time.LocalDateTime
@@ -68,6 +69,7 @@ data class ReviewResponses(
     val content: String,
     val items: List<ReviewItemResponse>,
     val photos: List<ReviewPhotoResponses>,
+    val comment: ReviewCommentResponse?,
     val createdAt: LocalDateTime,
 ) {
     companion object {
@@ -78,7 +80,8 @@ data class ReviewResponses(
             averageScore: Double = 0.0,
             reviewCount: Int,
             items: List<OrderItem>,
-            photos: List<ReviewPhoto>
+            photos: List<ReviewPhoto>,
+            comment: ReviewComment?,
         ): ReviewResponses =
             ReviewResponses(
                 id = entity.id!!,
@@ -94,6 +97,7 @@ data class ReviewResponses(
                 content = entity.content,
                 items = items.map { ReviewItemResponse.from(it) },
                 photos = photos.map { ReviewPhotoResponses.from(it) },
+                comment = comment?.let { ReviewCommentResponse.from(it) },
                 createdAt = entity.createdAt,
             )
     }
@@ -123,5 +127,24 @@ data class ReviewPhotoResponses(
             reviewId = entity.reviewId,
             photoUrl = entity.photoUrl
         )
+    }
+}
+
+data class ReviewCommentResponse(
+    val id: Long,
+    val reviewId: Long,
+    val userId: Long,
+    val content: String,
+    val createdAt: LocalDateTime,
+) {
+    companion object {
+        fun from(entity: ReviewComment): ReviewCommentResponse =
+            ReviewCommentResponse(
+                id = entity.id!!,
+                reviewId = entity.reviewId,
+                userId = entity.userId,
+                content = entity.content,
+                createdAt = entity.createdAt,
+            )
     }
 }

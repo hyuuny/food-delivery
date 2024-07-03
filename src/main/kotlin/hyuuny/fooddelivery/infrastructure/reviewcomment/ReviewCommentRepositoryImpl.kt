@@ -48,6 +48,9 @@ class ReviewCommentRepositoryImpl(
 
     override suspend fun delete(id: Long) = dao.deleteById(id)
 
+    override suspend fun findAllByReviewIdIn(reviewIds: List<Long>): List<ReviewComment> =
+        dao.findAllByReviewIdIn(reviewIds)
+
     private fun buildCriteria(searchCondition: AdminReviewCommentSearchCondition): Criteria {
         var criteria = Criteria.empty()
 

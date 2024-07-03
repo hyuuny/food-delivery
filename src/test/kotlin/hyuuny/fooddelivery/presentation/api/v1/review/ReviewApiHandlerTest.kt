@@ -6,12 +6,14 @@ import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.order.OrderItemUseCase
 import hyuuny.fooddelivery.application.review.ReviewPhotoUseCase
 import hyuuny.fooddelivery.application.review.ReviewUseCase
+import hyuuny.fooddelivery.application.reviewcomment.ReviewCommentUseCase
 import hyuuny.fooddelivery.application.store.StoreUseCase
 import hyuuny.fooddelivery.application.user.UserUseCase
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.domain.order.OrderItem
 import hyuuny.fooddelivery.domain.review.Review
 import hyuuny.fooddelivery.domain.review.ReviewPhoto
+import hyuuny.fooddelivery.domain.reviewcomment.ReviewComment
 import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.domain.user.User
 import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
@@ -41,6 +43,9 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
 
     @MockkBean
     private lateinit var orderItemUseCase: OrderItemUseCase
+
+    @MockkBean
+    private lateinit var reviewCommentUseCase: ReviewCommentUseCase
 
     @DisplayName("회원은 주문에 리뷰를 작성할 수 있다.")
     @Test
@@ -130,6 +135,7 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
         val userIds = listOf(84L, 91L, 13L, 49L)
         val storeId = 52L
         val orderIds = listOf(1938L, 2831L, 2901L, 3899L)
+        val ownerId = 77L
 
         val now = LocalDateTime.now()
         val users = userIds.map {
@@ -195,6 +201,16 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             OrderItem(8L, reviews[3].orderId, 8L, "후라이드치킨", 16000, 1, now),
             OrderItem(9L, reviews[3].orderId, 9L, "코카콜라 2L", 2000, 1, now),
         )
+        val reviewComments = (1L..ids.size - 1).mapIndexed { idx, it ->
+            ReviewComment(
+                id = idx.toLong() + 1,
+                userId = ownerId,
+                reviewId = it,
+                content = "벌써 ${it}번쨰 방문이시네요.\n항상 감사합니다. 다음에 또 방문해주세요.\uD83D\uDE00\uD83D\uDE03",
+                createdAt = now,
+                updatedAt = now,
+            )
+        }
 
         val sortedReviews = reviews.sortedByDescending { it.id }
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.DEFAULT_DIRECTION, "id"))
@@ -205,6 +221,7 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
         coEvery { storeUseCase.getAllByIds(any()) } returns listOf(store)
         coEvery { useCase.getAllByUserIds(any()) } returns sortedReviews
         coEvery { orderItemUseCase.getAllByOrderIdIn(any()) } returns orderItems
+        coEvery { reviewCommentUseCase.getAllByReviewIds(any()) } returns reviewComments
 
         webTestClient.get().uri("/api/v1/reviews?storeId=${storeId}&sort=id:desc")
             .accept(MediaType.APPLICATION_JSON)
@@ -246,6 +263,10 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].items[2].menuName").isEqualTo(orderItems[6].menuName)
             .jsonPath("$.content[1].photos[0].reviewId").isEqualTo(reviewPhotos[2].reviewId)
             .jsonPath("$.content[1].photos[0].photoUrl").isEqualTo(reviewPhotos[2].photoUrl)
+            .jsonPath("$.content[1].comment.id").isEqualTo(reviewComments[2].id!!)
+            .jsonPath("$.content[1].comment.reviewId").isEqualTo(reviewComments[2].reviewId)
+            .jsonPath("$.content[1].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[1].comment.content").isEqualTo(reviewComments[2].content)
 
             .jsonPath("$.content[2].id").isEqualTo(reviews[1].id!!)
             .jsonPath("$.content[2].userId").isEqualTo(reviews[1].userId)
@@ -262,6 +283,10 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[2].items[1].menuName").isEqualTo(orderItems[3].menuName)
             .jsonPath("$.content[2].photos[0].reviewId").isEqualTo(reviewPhotos[1].reviewId)
             .jsonPath("$.content[2].photos[0].photoUrl").isEqualTo(reviewPhotos[1].photoUrl)
+            .jsonPath("$.content[2].comment.id").isEqualTo(reviewComments[1].id!!)
+            .jsonPath("$.content[2].comment.reviewId").isEqualTo(reviewComments[1].reviewId)
+            .jsonPath("$.content[2].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[2].comment.content").isEqualTo(reviewComments[1].content)
 
             .jsonPath("$.content[3].id").isEqualTo(reviews[0].id!!)
             .jsonPath("$.content[3].userId").isEqualTo(reviews[0].userId)
@@ -278,6 +303,10 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[3].items[1].menuName").isEqualTo(orderItems[1].menuName)
             .jsonPath("$.content[3].photos[0].reviewId").isEqualTo(reviewPhotos[0].reviewId)
             .jsonPath("$.content[3].photos[0].photoUrl").isEqualTo(reviewPhotos[0].photoUrl)
+            .jsonPath("$.content[3].comment.id").isEqualTo(reviewComments[0].id!!)
+            .jsonPath("$.content[3].comment.reviewId").isEqualTo(reviewComments[0].reviewId)
+            .jsonPath("$.content[3].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[3].comment.content").isEqualTo(reviewComments[0].content)
 
             .jsonPath("$.pageNumber").isEqualTo(1)
             .jsonPath("$.size").isEqualTo(15)
@@ -292,6 +321,7 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
         val userId = 84L
         val storeIds = listOf(52L, 592L, 690L, 782L)
         val orderIds = listOf(1938L, 2831L, 2901L, 3899L)
+        val ownerId = 77L
 
         val now = LocalDateTime.now()
         val user = User(
@@ -355,6 +385,16 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             OrderItem(8L, reviews[3].orderId, 8L, "후라이드치킨", 16000, 1, now),
             OrderItem(9L, reviews[3].orderId, 9L, "코카콜라 2L", 2000, 1, now),
         )
+        val reviewComments = ids.mapIndexed { idx, it ->
+            ReviewComment(
+                id = idx.toLong() + 1,
+                userId = ownerId,
+                reviewId = it,
+                content = "벌써 ${it}번쨰 방문이시네요.\n항상 감사합니다. 다음에 또 방문해주세요.\uD83D\uDE00\uD83D\uDE03",
+                createdAt = now,
+                updatedAt = now,
+            )
+        }
 
         val sortedReviews = reviews.sortedByDescending { it.id }
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.DEFAULT_DIRECTION, "id"))
@@ -365,6 +405,7 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
         coEvery { storeUseCase.getAllByIds(any()) } returns stores
         coEvery { useCase.getAllByUserIds(any()) } returns sortedReviews
         coEvery { orderItemUseCase.getAllByOrderIdIn(any()) } returns orderItems
+        coEvery { reviewCommentUseCase.getAllByReviewIds(any()) } returns reviewComments
 
         val expectedAverageScore = randomScores.sumOf { it } / reviews.size
         webTestClient.get().uri("/api/v1/reviews?userId=${userId}&sort=id:desc")
@@ -390,6 +431,10 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[0].items[1].menuName").isEqualTo(orderItems[8].menuName)
             .jsonPath("$.content[0].photos[0].reviewId").isEqualTo(reviewPhotos[3].reviewId)
             .jsonPath("$.content[0].photos[0].photoUrl").isEqualTo(reviewPhotos[3].photoUrl)
+            .jsonPath("$.content[0].comment.id").isEqualTo(reviewComments[3].id!!)
+            .jsonPath("$.content[0].comment.reviewId").isEqualTo(reviewComments[3].reviewId)
+            .jsonPath("$.content[0].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[0].comment.content").isEqualTo(reviewComments[3].content)
 
             .jsonPath("$.content[1].id").isEqualTo(reviews[2].id!!)
             .jsonPath("$.content[1].userId").isEqualTo(reviews[2].userId)
@@ -407,6 +452,11 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].items[2].menuName").isEqualTo(orderItems[6].menuName)
             .jsonPath("$.content[1].photos[0].reviewId").isEqualTo(reviewPhotos[2].reviewId)
             .jsonPath("$.content[1].photos[0].photoUrl").isEqualTo(reviewPhotos[2].photoUrl)
+            .jsonPath("$.content[1].comment.id").isEqualTo(reviewComments[2].id!!)
+            .jsonPath("$.content[1].comment.reviewId").isEqualTo(reviewComments[2].reviewId)
+            .jsonPath("$.content[1].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[1].comment.content").isEqualTo(reviewComments[2].content)
+
 
             .jsonPath("$.content[2].id").isEqualTo(reviews[1].id!!)
             .jsonPath("$.content[2].userId").isEqualTo(reviews[1].userId)
@@ -423,6 +473,10 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[2].items[1].menuName").isEqualTo(orderItems[3].menuName)
             .jsonPath("$.content[2].photos[0].reviewId").isEqualTo(reviewPhotos[1].reviewId)
             .jsonPath("$.content[2].photos[0].photoUrl").isEqualTo(reviewPhotos[1].photoUrl)
+            .jsonPath("$.content[2].comment.id").isEqualTo(reviewComments[1].id!!)
+            .jsonPath("$.content[2].comment.reviewId").isEqualTo(reviewComments[1].reviewId)
+            .jsonPath("$.content[2].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[2].comment.content").isEqualTo(reviewComments[1].content)
 
             .jsonPath("$.content[3].id").isEqualTo(reviews[0].id!!)
             .jsonPath("$.content[3].userId").isEqualTo(reviews[0].userId)
@@ -439,6 +493,10 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[3].items[1].menuName").isEqualTo(orderItems[1].menuName)
             .jsonPath("$.content[3].photos[0].reviewId").isEqualTo(reviewPhotos[0].reviewId)
             .jsonPath("$.content[3].photos[0].photoUrl").isEqualTo(reviewPhotos[0].photoUrl)
+            .jsonPath("$.content[3].comment.id").isEqualTo(reviewComments[0].id!!)
+            .jsonPath("$.content[3].comment.reviewId").isEqualTo(reviewComments[0].reviewId)
+            .jsonPath("$.content[3].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[3].comment.content").isEqualTo(reviewComments[0].content)
 
             .jsonPath("$.pageNumber").isEqualTo(1)
             .jsonPath("$.size").isEqualTo(15)
