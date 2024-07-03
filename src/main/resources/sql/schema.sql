@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS menus
     created_at    TIMESTAMP             NOT NULL,
     updated_at    TIMESTAMP             NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_menus_menu_group_id ON menus (menu_group_id);
 
 CREATE TABLE IF NOT EXISTS option_groups
 (
@@ -22,6 +23,7 @@ CREATE TABLE IF NOT EXISTS option_groups
     created_at TIMESTAMP             NOT NULL,
     updated_at TIMESTAMP             NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_option_groups_menu_id ON option_groups (menu_id);
 
 CREATE TABLE IF NOT EXISTS options
 (
@@ -32,6 +34,7 @@ CREATE TABLE IF NOT EXISTS options
     created_at      TIMESTAMP        NOT NULL,
     updated_at      TIMESTAMP        NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_options_option_group_id ON options (option_group_id);
 
 CREATE TABLE IF NOT EXISTS menu_groups
 (
@@ -43,6 +46,7 @@ CREATE TABLE IF NOT EXISTS menu_groups
     created_at  TIMESTAMP    NOT NULL,
     updated_at  TIMESTAMP    NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_menu_groups_store_id ON menu_groups (store_id);
 
 CREATE TABLE IF NOT EXISTS stores
 (
@@ -61,6 +65,7 @@ CREATE TABLE IF NOT EXISTS stores
     created_at           TIMESTAMP    NOT NULL,
     updated_at           TIMESTAMP    NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_stores_category_id ON stores (category_id);
 
 CREATE TABLE IF NOT EXISTS store_details
 (
@@ -75,6 +80,7 @@ CREATE TABLE IF NOT EXISTS store_details
 
     FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE
 );
+CREATE INDEX IF NOT EXISTS idx_store_details_store_id ON store_details (store_id);
 
 CREATE TABLE IF NOT EXISTS store_images
 (
@@ -85,6 +91,7 @@ CREATE TABLE IF NOT EXISTS store_images
 
     FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE
 );
+CREATE INDEX IF NOT EXISTS idx_store_images_store_id ON store_images (store_id);
 
 CREATE TABLE IF NOT EXISTS categories
 (
@@ -117,7 +124,8 @@ CREATE TABLE IF NOT EXISTS cart_items
     quantity   INT       NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (cart_id) REFERENCES carts (id)
+
+    FOREIGN KEY (cart_id) REFERENCES carts (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS cart_item_options
@@ -126,7 +134,8 @@ CREATE TABLE IF NOT EXISTS cart_item_options
     cart_item_id BIGINT    NOT NULL,
     option_id    BIGINT    NOT NULL,
     created_at   TIMESTAMP NOT NULL,
-    FOREIGN KEY (cart_item_id) REFERENCES cart_items (id)
+
+    FOREIGN KEY (cart_item_id) REFERENCES cart_items (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS users
@@ -140,7 +149,6 @@ CREATE TABLE IF NOT EXISTS users
     created_at   TIMESTAMP    NOT NULL,
     updated_at   TIMESTAMP    NOT NULL
 );
-
 CREATE INDEX IF NOT EXISTS idx_users_name ON users (name);
 CREATE INDEX IF NOT EXISTS idx_users_phoneNumber ON users (phone_number);
 
@@ -157,10 +165,11 @@ CREATE TABLE IF NOT EXISTS user_addresses
     route_guidance    VARCHAR(255),
     selected          BOOLEAN      NOT NULL,
     created_at        TIMESTAMP    NOT NULL,
-    updated_at        TIMESTAMP    NOT NULL
-);
+    updated_at        TIMESTAMP    NOT NULL,
 
-CREATE INDEX IF NOT EXISTS idx_users_id ON user_addresses (user_id);
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_user_addresses_user_id ON user_addresses (user_id);
 
 CREATE TABLE IF NOT EXISTS orders
 (
@@ -184,7 +193,6 @@ CREATE TABLE IF NOT EXISTS orders
     created_at       TIMESTAMP    NOT NULL,
     updated_at       TIMESTAMP    NOT NULL
 );
-
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders (user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_store_id ON orders (store_id);
 CREATE INDEX IF NOT EXISTS idx_orders_payment_id ON orders (payment_id);
@@ -199,6 +207,7 @@ CREATE TABLE IF NOT EXISTS order_items
     menu_price BIGINT       NOT NULL,
     quantity   INT          NOT NULL,
     created_at TIMESTAMP    NOT NULL,
+
     FOREIGN KEY (order_id) REFERENCES orders (id)
 );
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items (order_id);
@@ -211,6 +220,7 @@ CREATE TABLE IF NOT EXISTS order_item_options
     option_name   VARCHAR(255) NOT NULL,
     option_price  BIGINT       NOT NULL,
     created_at    TIMESTAMP    NOT NULL,
+
     FOREIGN KEY (order_item_id) REFERENCES order_items (id)
 );
 CREATE INDEX IF NOT EXISTS idx_order_item_options_order_item_id ON order_item_options (order_item_id);
@@ -234,6 +244,7 @@ CREATE TABLE IF NOT EXISTS review_photos
     review_id  BIGINT    NOT NULL,
     photo_url  TEXT      NOT NULL,
     created_at TIMESTAMP NOT NULL,
+
     FOREIGN KEY (review_id) REFERENCES reviews (id)
 );
 CREATE INDEX IF NOT EXISTS idx_review_photos_review_id ON review_photos (review_id);
