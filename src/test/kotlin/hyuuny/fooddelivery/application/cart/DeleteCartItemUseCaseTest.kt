@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.application.cart
 
 import UpdateCartItemQuantityRequest
+import hyuuny.fooddelivery.domain.cart.Cart
 import hyuuny.fooddelivery.domain.cart.CartItem
 import hyuuny.fooddelivery.infrastructure.cart.CartItemOptionRepository
 import hyuuny.fooddelivery.infrastructure.cart.CartItemRepository
@@ -24,12 +25,14 @@ class DeleteCartItemUseCaseTest : BehaviorSpec({
         val cartItemId = 1L
 
         val now = LocalDateTime.now()
+        val cart = Cart(id = cartId, userId = 1, storeId = 40, createdAt = now, updatedAt = now)
         val cartItem = CartItem(id = 1, cartId = cartId, menuId = 1, quantity = 1, createdAt = now, updatedAt = now)
 
-        coEvery { repository.existsById(any()) } returns true
+        coEvery { repository.findById(any()) } returns cart
         coEvery { itemRepository.findByIdAndCartId(any(), any()) } returns cartItem
         coEvery { itemOptionRepository.deleteAllByCartItemId(any()) } returns Unit
         coEvery { itemRepository.delete(any()) } returns Unit
+        coEvery { repository.updateStoreIdAndDeliveryFee(any()) } returns Unit
 
         `when`("존재하는 품목을 삭제하면") {
             useCase.deleteCartItem(cartId, cartItemId)
@@ -51,7 +54,7 @@ class DeleteCartItemUseCaseTest : BehaviorSpec({
         }
 
         `when`("존재하지 않는 장바구니 아이디이면") {
-            coEvery { repository.existsById(any()) } returns false
+            coEvery { repository.findById(any()) } returns null
 
             then("장바구니를 찾을 수 없다는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
@@ -62,7 +65,7 @@ class DeleteCartItemUseCaseTest : BehaviorSpec({
         }
 
         `when`("존재하지 않는 장바구니 품목 아이디이면") {
-            coEvery { repository.existsById(any()) } returns true
+            coEvery { repository.findById(any()) } returns cart
             coEvery { itemRepository.findByIdAndCartId(any(), any()) } returns null
 
             then("장바구니 품목을 찾을 수 없다는 메세지가 반환된다.") {

@@ -4,6 +4,7 @@ import AddItemToCartRequest
 import UpdateCartItemOptionsRequest
 import UpdateCartItemQuantityRequest
 import hyuuny.fooddelivery.application.cart.CartUseCase
+import hyuuny.fooddelivery.application.store.StoreUseCase
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -14,6 +15,7 @@ import org.springframework.web.reactive.function.server.bodyValueAndAwait
 @Component
 class CartApiHandler(
     private val useCase: CartUseCase,
+    private val storeUseCase: StoreUseCase,
     private val responseMapper: CartResponseMapper,
 ) {
 
@@ -21,7 +23,11 @@ class CartApiHandler(
         val userId = request.pathVariable("userId").toLong()
         val body = request.awaitBody<AddItemToCartRequest>()
 
-        val cart = useCase.addItemToCart(userId, body)
+        val cart = useCase.addItemToCart(
+            userId = userId,
+            getStore = { storeUseCase.getStore(body.storeId) },
+            request = body
+        )
         val response = responseMapper.mapToCartResponse(cart)
         return ok().bodyValueAndAwait(response)
     }
@@ -67,6 +73,14 @@ class CartApiHandler(
         val cart = useCase.getOrInsertCart(userId)
         val response = responseMapper.mapToCartResponse(cart)
         return ok().bodyValueAndAwait(response)
+    }
+
+    suspend fun existsCartByUserIdAndStoreId(request: ServerRequest): ServerResponse {
+        val userId = request.pathVariable("userId").toLong()
+        val storeId = request.pathVariable("storeId").toLong()
+
+        val response = useCase.existsCartByUserIdAndStoreId(userId, storeId)
+        return ok().bodyValueAndAwait(mapOf("exists" to response))
     }
 
 }

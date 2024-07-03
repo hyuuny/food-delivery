@@ -10,12 +10,15 @@ import hyuuny.fooddelivery.application.cart.CartItemUseCase
 import hyuuny.fooddelivery.application.cart.CartUseCase
 import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.application.option.OptionUseCase
+import hyuuny.fooddelivery.application.store.StoreUseCase
+import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.MenuStatus
 import hyuuny.fooddelivery.domain.cart.Cart
 import hyuuny.fooddelivery.domain.cart.CartItem
 import hyuuny.fooddelivery.domain.cart.CartItemOption
 import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.domain.option.Option
+import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
 import hyuuny.fooddelivery.presentation.api.v1.cart.response.CartItemOptionResponse
 import hyuuny.fooddelivery.presentation.api.v1.cart.response.CartItemResponse
@@ -23,6 +26,8 @@ import hyuuny.fooddelivery.presentation.api.v1.cart.response.CartResponse
 import io.mockk.coEvery
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.http.MediaType
 import java.time.LocalDateTime
 
@@ -41,6 +46,9 @@ class CartApiHandlerTest : BaseIntegrationTest() {
     private lateinit var menuUseCase: MenuUseCase
 
     @MockkBean
+    private lateinit var storeUseCase: StoreUseCase
+
+    @MockkBean
     private lateinit var optionUseCase: OptionUseCase
 
     @DisplayName("사용자는 장바구니에 메뉴를 추가할 수 있다.")
@@ -52,21 +60,25 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val cartItemOptionId = 1L
         val menuId = 1L
         val optionId = 1L
+        val storeId = 37L
 
         val request = AddItemToCartRequest(
+            storeId = storeId,
             item = AddItemAndOptionRequest(
                 menuId = menuId,
                 quantity = 1,
                 optionIds = listOf(1L, 2L)
             )
         )
-        val cart = generateCart(cartId, userId)
+        val cart = generateCart(cartId, userId, storeId)
         val cartItem = generateCartItem(cartItemId, cartId, menuId)
         val menu = generateMenu(menuId)
         val itemOptions = generateCartItemOptions(cartItemOptionId, cartItemId, optionId)
         val options = generateOptions(optionId)
+        val store = generateStore(storeId)
 
-        coEvery { useCase.addItemToCart(userId, any()) } returns cart
+        coEvery { storeUseCase.getStore(any()) } returns store
+        coEvery { useCase.addItemToCart(any(), any(), any()) } returns cart
         coEvery { cartItemUseCase.getAllByCartId(cartId) } returns listOf(cartItem)
         coEvery { menuUseCase.getAllByIds(listOf(cartItem.menuId)) } returns listOf(menu)
         coEvery { cartItemOptionUseCase.getAllByCartItemIds(listOf(cartItem.id!!)) } returns itemOptions
@@ -77,6 +89,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val expectedResponse = CartResponse(
             id = cartId,
             userId = userId,
+            storeId = storeId,
             items = listOf(
                 CartItemResponse(
                     id = cartItemId,
@@ -98,7 +111,8 @@ class CartApiHandlerTest : BaseIntegrationTest() {
                     itemWithOptionsPrice = menu.price + options.sumOf { it.price } * cartItem.quantity
                 )
             ),
-            totalPrice = expectedTotalPrice
+            totalPrice = expectedTotalPrice,
+            deliveryFee = 0
         )
 
         webTestClient.post().uri("/api/v1/users/$userId/carts")
@@ -124,6 +138,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.items[0].options[1].optionName").isEqualTo(expectedResponse.items[0].options[1].optionName)
             .jsonPath("$.items[0].itemWithOptionsPrice").isEqualTo(expectedItemWithOptionPrice)
             .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
+            .jsonPath("$.deliveryFee").isEqualTo(expectedResponse.deliveryFee)
     }
 
     @DisplayName("사용자는 장바구니에 담긴 메뉴를 조회할 수 있다.")
@@ -135,8 +150,9 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val cartItemOptionId = 1L
         val menuId = 1L
         val optionId = 1L
+        val storeId = 37L
 
-        val cart = generateCart(cartId, userId)
+        val cart = generateCart(cartId, userId, storeId)
         val cartItem = generateCartItem(cartItemId, cartId, menuId)
         val menu = generateMenu(menuId)
         val itemOptions = generateCartItemOptions(cartItemOptionId, cartItemId, optionId)
@@ -173,8 +189,10 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val expectedResponse = CartResponse(
             id = cartId,
             userId = cart.userId,
+            storeId = storeId,
             items = cartItemResponses,
-            totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice }
+            totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice },
+            deliveryFee = 0
         )
 
         webTestClient.get().uri("/api/v1/users/$userId/carts")
@@ -185,6 +203,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(expectedResponse.id)
             .jsonPath("$.userId").isEqualTo(expectedResponse.userId)
+            .jsonPath("$.storeId").isEqualTo(expectedResponse.storeId!!)
             .jsonPath("$.items").isArray
             .jsonPath("$.items[0].id").isEqualTo(expectedResponse.items[0].id)
             .jsonPath("$.items[0].menuId").isEqualTo(expectedResponse.items[0].menuId)
@@ -199,6 +218,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.items[0].options[1].optionName").isEqualTo(expectedResponse.items[0].options[1].optionName)
             .jsonPath("$.items[0].itemWithOptionsPrice").isEqualTo(expectedItemWithOptionPrice)
             .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
+            .jsonPath("$.deliveryFee").isEqualTo(expectedResponse.deliveryFee)
     }
 
     @DisplayName("장바구니가 없던 사용자가 장바구니를 조회하면 텅빈 장바구니가 보여진다.")
@@ -206,8 +226,9 @@ class CartApiHandlerTest : BaseIntegrationTest() {
     fun getCart_null_insert() {
         val userId = 1L
         val cartId = 1L
+        val storeId = 37L
 
-        val cart = generateCart(cartId, userId)
+        val cart = generateCart(cartId, userId, storeId)
 
         coEvery { useCase.getOrInsertCart(any()) } returns cart
         coEvery { cartItemUseCase.getAllByCartId(cartId) } returns emptyList()
@@ -218,8 +239,10 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val expectedResponse = CartResponse(
             id = cartId,
             userId = cart.userId,
+            storeId = cart.storeId,
             items = emptyList(),
-            totalPrice = 0
+            totalPrice = 0,
+            deliveryFee = 0
         )
 
         webTestClient.get().uri("/api/v1/users/$userId/carts")
@@ -230,8 +253,10 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(expectedResponse.id)
             .jsonPath("$.userId").isEqualTo(expectedResponse.userId)
+            .jsonPath("$.storeId").isEqualTo(expectedResponse.storeId!!)
             .jsonPath("$.items").isEmpty
             .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
+            .jsonPath("$.deliveryFee").isEqualTo(expectedResponse.deliveryFee)
     }
 
     @DisplayName("장바구니 품목의 수량을 변경할 수 있다.")
@@ -243,10 +268,11 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val cartItemOptionId = 1L
         val menuId = 1L
         val optionId = 1L
+        val storeId = 37L
 
         val updatedQuantity = 5
         val request = UpdateCartItemQuantityRequest(quantity = updatedQuantity)
-        val cart = generateCart(cartId, userId)
+        val cart = generateCart(cartId, userId, storeId)
         val cartItem = generateCartItem(cartItemId, cartId, menuId, updatedQuantity)
         val menu = generateMenu(menuId)
         val itemOptions = generateCartItemOptions(cartItemOptionId, cartItemId, optionId)
@@ -284,8 +310,10 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val expectedResponse = CartResponse(
             id = cartId,
             userId = cart.userId,
+            storeId = cart.storeId,
             items = cartItemResponses,
-            totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice }
+            totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice },
+            deliveryFee = 0
         )
 
         webTestClient.put().uri("/api/v1/users/$userId/carts/$cartId/cart-items/$cartItemId")
@@ -298,6 +326,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(expectedResponse.id)
             .jsonPath("$.userId").isEqualTo(expectedResponse.userId)
+            .jsonPath("$.storeId").isEqualTo(expectedResponse.storeId!!)
             .jsonPath("$.items").isArray
             .jsonPath("$.items[0].id").isEqualTo(expectedResponse.items[0].id)
             .jsonPath("$.items[0].menuId").isEqualTo(expectedResponse.items[0].menuId)
@@ -312,6 +341,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.items[0].options[1].optionName").isEqualTo(expectedResponse.items[0].options[1].optionName)
             .jsonPath("$.items[0].itemWithOptionsPrice").isEqualTo(expectedItemWithOptionPrice)
             .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
+            .jsonPath("$.deliveryFee").isEqualTo(expectedResponse.deliveryFee)
     }
 
     @DisplayName("장바구니에 담긴 품목의 옵션을 변경할 수 있다.")
@@ -323,8 +353,9 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val cartItemOptionId = 1L
         val menuId = 1L
         val newOptionId = 13L
+        val storeId = 37L
 
-        val cart = generateCart(cartId, userId)
+        val cart = generateCart(cartId, userId, storeId)
         val cartItem = generateCartItem(cartItemId, cartId, menuId)
         val menu = generateMenu(menuId)
 
@@ -373,8 +404,10 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val expectedResponse = CartResponse(
             id = cartId,
             userId = cart.userId,
+            storeId = cart.storeId,
             items = cartItemResponses,
-            totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice }
+            totalPrice = cartItemResponses.sumOf { it.itemWithOptionsPrice },
+            deliveryFee = 0,
         )
 
         webTestClient.put().uri("/api/v1/users/$userId/carts/$cartId/cart-items/$cartItemId/options")
@@ -387,6 +420,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(expectedResponse.id)
             .jsonPath("$.userId").isEqualTo(expectedResponse.userId)
+            .jsonPath("$.storeId").isEqualTo(expectedResponse.storeId!!)
             .jsonPath("$.items").isArray
             .jsonPath("$.items[0].id").isEqualTo(expectedResponse.items[0].id)
             .jsonPath("$.items[0].menuId").isEqualTo(expectedResponse.items[0].menuId)
@@ -403,6 +437,7 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.items[0].options[2].optionName").isEqualTo(expectedResponse.items[0].options[2].optionName)
             .jsonPath("$.items[0].itemWithOptionsPrice").isEqualTo(expectedItemWithOptionPrice)
             .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
+            .jsonPath("$.deliveryFee").isEqualTo(expectedResponse.deliveryFee)
     }
 
     @DisplayName("장바구니에 담긴 품목을 삭제할 수 있다.")
@@ -411,8 +446,9 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val userId = 1L
         val cartId = 1L
         val cartItemId = 1L
+        val storeId = 37L
 
-        val cart = generateCart(cartId, userId)
+        val cart = generateCart(cartId, userId, storeId)
 
         coEvery { useCase.deleteCartItem(any(), any()) } returns Unit
         coEvery { useCase.getOrInsertCart(any()) } returns cart
@@ -424,8 +460,10 @@ class CartApiHandlerTest : BaseIntegrationTest() {
         val expectedResponse = CartResponse(
             id = cartId,
             userId = cart.userId,
+            storeId = cart.storeId,
             items = emptyList(),
-            totalPrice = 0
+            totalPrice = 0,
+            deliveryFee = 0
         )
 
         webTestClient.delete().uri("/api/v1/users/$userId/carts/$cartId/cart-items/$cartItemId")
@@ -436,13 +474,33 @@ class CartApiHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(expectedResponse.id)
             .jsonPath("$.userId").isEqualTo(expectedResponse.userId)
+            .jsonPath("$.storeId").isEqualTo(expectedResponse.storeId!!)
             .jsonPath("$.items.length()").isEqualTo(0)
             .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
+            .jsonPath("$.deliveryFee").isEqualTo(expectedResponse.deliveryFee)
     }
 
-    private fun generateCart(id: Long, userId: Long): Cart {
+    @DisplayName("사용자는 특정 매장의 장바구니가 있는지 확인할 수 있다.")
+    @CsvSource("ture", "false")
+    @ParameterizedTest
+    fun existsCartByUserIdAndStoreId(exists: Boolean) {
+        val userId = 1L
+        val storeId = 37L
+
+        coEvery { useCase.existsCartByUserIdAndStoreId(any(), any()) } returns exists
+
+        webTestClient.get().uri("/api/v1/users/$userId/carts/stores/$storeId/exists")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.exists").isEqualTo(exists)
+    }
+
+    private fun generateCart(id: Long, userId: Long, storeId: Long?): Cart {
         val now = LocalDateTime.now()
-        return Cart(id = id, userId = userId, createdAt = now, updatedAt = now)
+        return Cart(id = id, userId = userId, storeId = storeId, createdAt = now, updatedAt = now)
     }
 
     private fun generateCartItem(id: Long, cartId: Long, menuId: Long, quantity: Int = 1): CartItem {
@@ -500,6 +558,26 @@ class CartApiHandlerTest : BaseIntegrationTest() {
                 createdAt = now,
                 updatedAt = now
             )
+        )
+    }
+
+    private fun generateStore(id: Long): Store {
+        val now = LocalDateTime.now()
+        return Store(
+            id = id,
+            categoryId = 1L,
+            deliveryType = DeliveryType.OUTSOURCING,
+            name = "BBQ",
+            ownerName = "김성현",
+            taxId = "123-12-12345",
+            deliveryFee = 1000,
+            minimumOrderAmount = 18000,
+            iconImageUrl = "icon-image-url-5.jpg",
+            description = "저희 업소는 100% 국내산 닭고기를 사용하며, BBQ 올리브 오일만을 사용합니다.",
+            foodOrigin = "황금올리브치킨(후라이드/속안심/핫윙/블랙페퍼/레드착착/크런치 버터), 핫황금올리브치킨크리스피, 파더`s치킨(로스트 갈릭/와사비)",
+            phoneNumber = "02-1234-1234",
+            createdAt = now,
+            updatedAt = now
         )
     }
 }

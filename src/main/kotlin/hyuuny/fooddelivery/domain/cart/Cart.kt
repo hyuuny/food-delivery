@@ -27,6 +27,9 @@ class Cart(
         private set
 
     companion object {
+
+        private const val DEFAULT_DELIVERY_FEE = 0L
+
         fun handle(command: CreateCartCommand): Cart = Cart(
             userId = command.userId,
             createdAt = command.createdAt,
@@ -36,6 +39,12 @@ class Cart(
 
     fun handle(command: UpdateCartUpdatedAtCommand) {
         this.updatedAt = command.updatedAt
+    }
+
+    fun clear() {
+        this.storeId = null
+        this.deliveryFee = DEFAULT_DELIVERY_FEE
+        this.updatedAt = LocalDateTime.now()
     }
 
 }

@@ -2,6 +2,8 @@ import java.time.LocalDateTime
 
 data class CreateCartCommand(
     val userId: Long,
+    val storeId: Long?,
+    val deliveryFee: Long,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )

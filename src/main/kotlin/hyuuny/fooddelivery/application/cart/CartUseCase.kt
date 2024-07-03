@@ -12,6 +12,7 @@ import UpdateCartUpdatedAtCommand
 import hyuuny.fooddelivery.domain.cart.Cart
 import hyuuny.fooddelivery.domain.cart.CartItem
 import hyuuny.fooddelivery.domain.cart.CartItemOption
+import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.infrastructure.cart.CartItemOptionRepository
 import hyuuny.fooddelivery.infrastructure.cart.CartItemRepository
 import hyuuny.fooddelivery.infrastructure.cart.CartRepository
@@ -28,12 +29,19 @@ class CartUseCase(
 ) {
 
     @Transactional
-    suspend fun addItemToCart(userId: Long, request: AddItemToCartRequest): Cart {
+    suspend fun addItemToCart(
+        userId: Long,
+        getStore: suspend () -> Store,
+        request: AddItemToCartRequest
+    ): Cart {
         if (request.item.optionIds.isEmpty()) throw IllegalArgumentException("품목 옵션은 필수값입니다.")
 
         val now = LocalDateTime.now()
-        val existingCart = repository.findByUserId(userId)
-        val cart = existingCart ?: insertCart(userId, now)
+        val store = getStore()
+        val findCart = findCartByUserId(userId)
+        val cart = findCart?.also {
+            if (it.storeId != store.id) throw IllegalArgumentException("장바구니에는 같은 매장의 메뉴만 담을 수 있습니다.")
+        } ?: insertCart(userId, store, now)
 
         val cartItem = cartItemRepository.insert(
             CartItem.handle(
@@ -57,13 +65,12 @@ class CartUseCase(
             )
         }.also { cartItemOptionRepository.insertAll(it) }
 
-        if (existingCart != null) updateCartUpdatedAt(cart, now)
+        if (findCart != null) updateCartUpdatedAt(cart, now)
         return cart
     }
 
     @Transactional
-    suspend fun getOrInsertCart(userId: Long): Cart = repository.findByUserId(userId)
-        ?: insertCart(userId, LocalDateTime.now())
+    suspend fun getOrInsertCart(userId: Long): Cart = findCartByUserId(userId) ?: insertCart(userId)
 
     @Transactional
     suspend fun updateCartItemQuantity(id: Long, cartItemId: Long, request: UpdateCartItemQuantityRequest) {
@@ -108,20 +115,30 @@ class CartUseCase(
 
     @Transactional
     suspend fun deleteCartItem(id: Long, cartItemId: Long) {
-        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
-
+        val cart = findCartByIdOrThrow(id)
         val cartItem = findCartItemByCartItemIdAndCartIdOrThrow(cartItemId, id)
         cartItemOptionRepository.deleteAllByCartItemId(cartItem.id!!)
         cartItemRepository.delete(cartItem.id!!)
+        updateCartStoreIdAndDeliveryFee(cart)
     }
 
     @Transactional
     suspend fun clearCart(id: Long) {
-        if (!repository.existsById(id)) throw NoSuchElementException("${id}번 장바구니를 찾을 수 없습니다.")
-
+        val cart = findCartByIdOrThrow(id)
         val cartItems = cartItemRepository.findAllByCartId(id)
         cartItemOptionRepository.deleteAllByCartItemIdIn(cartItems.mapNotNull { it.id })
         cartItemRepository.deleteAllByCartId(id)
+        updateCartStoreIdAndDeliveryFee(cart)
+    }
+
+    suspend fun existsCartByUserIdAndStoreId(userId: Long, storeId: Long): Boolean =
+        findCartByUserId(userId)?.let {
+            it.storeId == storeId
+        } ?: false
+
+    private suspend fun updateCartStoreIdAndDeliveryFee(cart: Cart) {
+        cart.clear()
+        repository.updateStoreIdAndDeliveryFee(cart)
     }
 
     private suspend fun updateCartItemUpdatedAt(cartItem: CartItem, updatedAt: LocalDateTime) {
@@ -141,10 +158,19 @@ class CartUseCase(
         cartItemRepository.findByIdAndCartId(cartItemId, cartId)
             ?: throw NoSuchElementException("${cartId}번 장바구니의 ${cartItemId}번 품목을 찾을 수 없습니다.")
 
-    private suspend fun insertCart(userId: Long, now: LocalDateTime) = repository.insert(
-        Cart.handle(
-            CreateCartCommand(userId = userId, createdAt = now, updatedAt = now)
+    private suspend fun insertCart(userId: Long, store: Store? = null, now: LocalDateTime = LocalDateTime.now()) =
+        repository.insert(
+            Cart.handle(
+                CreateCartCommand(
+                    userId = userId,
+                    storeId = store?.id,
+                    deliveryFee = store?.deliveryFee ?: 0,
+                    createdAt = now,
+                    updatedAt = now
+                )
+            )
         )
-    )
+
+    private suspend fun findCartByUserId(userId: Long) = repository.findByUserId(userId)
 
 }

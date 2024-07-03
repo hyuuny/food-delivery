@@ -1,4 +1,5 @@
 data class AddItemToCartRequest(
+    val storeId: Long,
     val item: AddItemAndOptionRequest,
 )
 

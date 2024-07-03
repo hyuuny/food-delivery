@@ -54,6 +54,7 @@ class ApiRoutes {
                 PUT("/{cartId}/cart-items/{cartItemId}", handler::updateCartItemQuantity)
                 PUT("/{cartId}/cart-items/{cartItemId}/options", handler::updateCartItemOptions)
                 DELETE("/{cartId}/cart-items/{cartItemId}", handler::deleteCartItem)
+                GET("/stores/{storeId}/exists", handler::existsCartByUserIdAndStoreId)
             }
         }
     }

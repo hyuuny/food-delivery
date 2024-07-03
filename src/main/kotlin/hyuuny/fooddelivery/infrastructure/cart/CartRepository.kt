@@ -12,6 +12,8 @@ interface CartRepository {
 
     suspend fun update(cart: Cart)
 
+    suspend fun updateStoreIdAndDeliveryFee(cart: Cart)
+
     suspend fun existsById(id: Long): Boolean
 
 }

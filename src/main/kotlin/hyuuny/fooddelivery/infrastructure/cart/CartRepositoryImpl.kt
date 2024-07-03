@@ -32,6 +32,19 @@ class CartRepositoryImpl(
             )
     }
 
+    override suspend fun updateStoreIdAndDeliveryFee(cart: Cart) {
+        template.update<Cart>()
+            .matching(
+                Query.query(
+                    where("id").`is`(cart.id!!)
+                ),
+            ).applyAndAwait(
+                Update.update("store_id", cart.storeId)
+                    .set("delivery_fee", cart.deliveryFee)
+                    .set("updated_at", cart.updatedAt)
+            )
+    }
+
     override suspend fun existsById(id: Long): Boolean = dao.existsById(id)
 
 }
