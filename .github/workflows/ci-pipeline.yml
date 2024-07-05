@@ -23,20 +23,29 @@ jobs:
           ./gradlew assemble --no-daemon --build-cache
           ./gradlew --stop
 
-      - name: ⭐Set IMAGE_TAG
+      - name: ⭐ Set IMAGE_TAG
         id: set_image_tag
-        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$IMAGE_TAG"
+
+      - name: 📋 Verify IMAGE_TAG
+        run: echo "IMAGE_TAG is ${{ env.IMAGE_TAG }}"
 
       - name: 🐳 Build Docker image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          IMAGE_TAG: ${{ steps.set_image_tag.outputs.IMAGE_TAG }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
 
         run: |
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
           docker build -t food-delivery .
+          IMAGE_TAG=${{ env.IMAGE_TAG }}
+          echo "Tagging image with hyuuny/food-delivery:${IMAGE_TAG}"
           docker tag food-delivery:latest hyuuny/food-delivery:${IMAGE_TAG}
+          echo "Pushing image to Docker Hub"
           docker push hyuuny/food-delivery:${IMAGE_TAG}
 
       - name: 🧪 Run Tests
