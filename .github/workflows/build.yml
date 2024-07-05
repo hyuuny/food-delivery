@@ -16,6 +16,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
+          distribution: 'temurin'
 
       - name: Build with Gradle
         run: |
@@ -29,7 +30,7 @@ jobs:
         run: |
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
           docker build -t food-delivery .
-          docker tag my-docker-image:latest hyuuny/food-delivery:latest
+          docker tag food-delivery:latest hyuuny/food-delivery:latest
           docker push hyuuny/food-delivery:latest
 
       - name: Run Tests
