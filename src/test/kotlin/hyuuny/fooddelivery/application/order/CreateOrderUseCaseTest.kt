@@ -254,6 +254,29 @@ class CreateOrderUseCaseTest : BehaviorSpec({
                 ex.message shouldBe "장바구니에 담긴 메뉴와 일치하지 않습니다."
             }
         }
+
+        `when`("장바구니의 배달비와 주문 시 배달비가 다르면") {
+            val invalidRequest = request.copy(deliveryFee = 3000)
+            coEvery {
+                orderCartValidator.validate(
+                    any(),
+                    any()
+                )
+            } throws IllegalStateException("배달비가 일치하지 않습니다.")
+
+            then("주문 생성이 실패한다") {
+                val ex = shouldThrow<IllegalStateException> {
+                    useCase.createOrder(
+                        cartId = cartId,
+                        request = invalidRequest,
+                        getUser = { userUseCase.getUser(userId) },
+                        getMenus = { menuUseCase.getAllByIds(invalidRequest.orderItems.map { it.menuId }) },
+                        getOptions = { optionUseCase.getAllByIds(invalidRequest.orderItems.flatMap { it.optionIds }) }
+                    )
+                }
+                ex.message shouldBe "배달비가 일치하지 않습니다."
+            }
+        }
     }
 
 })

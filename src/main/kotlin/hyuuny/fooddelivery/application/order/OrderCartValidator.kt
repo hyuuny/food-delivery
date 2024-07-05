@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.application.order
 
 import CreateOrderRequest
+import hyuuny.fooddelivery.domain.cart.Cart
 import hyuuny.fooddelivery.domain.cart.CartItem
 import hyuuny.fooddelivery.domain.cart.CartItemOption
 import hyuuny.fooddelivery.infrastructure.cart.CartItemOptionRepository
@@ -26,7 +27,7 @@ class OrderCartValidator(
             val cartDeferred = async { cartRepository.findById(cartId) }
             val cartItemsDeferred = async { cartItemRepository.findAllByCartId(cartId) }
 
-            cartDeferred.await() ?: throw NoSuchElementException("${cartId}번 장바구니를 찾을 수 없습니다.")
+            val cart = cartDeferred.await() ?: throw NoSuchElementException("${cartId}번 장바구니를 찾을 수 없습니다.")
             val cartItems = cartItemsDeferred.await()
             val cartItemOptions = cartItemOptionRepository.findAllByCartItemIdIn(cartItems.mapNotNull { it.id })
 
@@ -35,6 +36,7 @@ class OrderCartValidator(
 
             verifyMenuIdsInCart(cartItems, request)
             verifyOptionIdsInCart(cartItemOptions, request)
+            verifyDeliveryFee(cart, request)
 
             val menuTotalPrice = menuDeferred.await().sumOf { it.price }
             val options = optionDeferred.await()
@@ -59,6 +61,10 @@ class OrderCartValidator(
         val orderItemOptionIdSet = request.orderItems.flatMap { it.optionIds }.toSet()
 
         if (cartItemOptionIdSet != orderItemOptionIdSet) throw IllegalStateException("메뉴의 옵션이 일치하지 않습니다.")
+    }
+
+    private fun verifyDeliveryFee(cart: Cart, request: CreateOrderRequest) {
+        if (cart.deliveryFee != request.deliveryFee) throw IllegalStateException("배달비가 일치하지 않습니다.")
     }
 
 }
