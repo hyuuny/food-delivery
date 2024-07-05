@@ -11,14 +11,16 @@ data class OptionResponse(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
-    constructor(entity: Option) : this(
-        id = entity.id!!,
-        optionGroupId = entity.optionGroupId,
-        name = entity.name,
-        price = entity.price,
-        createdAt = entity.createdAt,
-        updatedAt = entity.updatedAt
-    )
+    companion object {
+        fun from(entity: Option): OptionResponse = OptionResponse(
+            id = entity.id!!,
+            optionGroupId = entity.optionGroupId,
+            name = entity.name,
+            price = entity.price,
+            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt
+        )
+    }
 }
 
 data class OptionResponses(
@@ -27,12 +29,14 @@ data class OptionResponses(
     val name: String,
     val price: Long,
     val createdAt: LocalDateTime,
-){
-    constructor(entity: Option) : this(
-        id = entity.id!!,
-        optionGroupId = entity.optionGroupId,
-        name = entity.name,
-        price = entity.price,
-        createdAt = entity.createdAt,
-    )
+) {
+    companion object {
+        fun from(entity: Option): OptionResponses = OptionResponses(
+            id = entity.id!!,
+            optionGroupId = entity.optionGroupId,
+            name = entity.name,
+            price = entity.price,
+            createdAt = entity.createdAt,
+        )
+    }
 }

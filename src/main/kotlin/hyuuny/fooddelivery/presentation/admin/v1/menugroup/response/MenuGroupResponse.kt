@@ -10,15 +10,17 @@ data class MenuGroupResponse(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
-    constructor(entity: MenuGroup) : this(
-        id = entity.id!!,
-        storeId = entity.storeId,
-        name = entity.name,
-        priority = entity.priority,
-        description = entity.description,
-        createdAt = entity.createdAt,
-        updatedAt = entity.updatedAt
-    )
+    companion object {
+        fun from(entity: MenuGroup): MenuGroupResponse = MenuGroupResponse(
+            id = entity.id!!,
+            storeId = entity.storeId,
+            name = entity.name,
+            priority = entity.priority,
+            description = entity.description,
+            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt
+        )
+    }
 }
 
 data class MenuGroupResponses(
@@ -29,12 +31,14 @@ data class MenuGroupResponses(
     val description: String?,
     val createdAt: LocalDateTime,
 ) {
-    constructor(entity: MenuGroup) : this(
-        id = entity.id!!,
-        storeId = entity.storeId,
-        name = entity.name,
-        priority = entity.priority,
-        description = entity.description,
-        createdAt = entity.createdAt,
-    )
+    companion object {
+        fun from(entity: MenuGroup): MenuGroupResponses = MenuGroupResponses(
+            id = entity.id!!,
+            storeId = entity.storeId,
+            name = entity.name,
+            priority = entity.priority,
+            description = entity.description,
+            createdAt = entity.createdAt,
+        )
+    }
 }

@@ -15,6 +15,8 @@ interface MenuRepository {
 
     suspend fun updateMenuStatus(menu: Menu)
 
+    suspend fun updateMenuGroupId(menu: Menu)
+
     suspend fun delete(id: Long)
 
     suspend fun existsById(id: Long): Boolean

@@ -2,6 +2,9 @@ package hyuuny.fooddelivery.application.optiongroup
 
 import ReorderOptionGroupRequest
 import ReorderOptionGroupRequests
+import hyuuny.fooddelivery.application.menu.MenuUseCase
+import hyuuny.fooddelivery.common.constant.MenuStatus
+import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.domain.optiongroup.OptionGroup
 import hyuuny.fooddelivery.infrastructure.optiongroup.OptionGroupRepository
 import io.kotest.assertions.throwables.shouldThrow
@@ -16,10 +19,24 @@ internal class ReOrderOptionGroupUseCaseTest : BehaviorSpec({
 
     val repository = mockk<OptionGroupRepository>()
     val useCase = OptionGroupUseCase(repository)
+    val menuUseCase = mockk<MenuUseCase>()
 
     given("옵션그룹 순서를 수정 할 때") {
         val menuId = 1L
         val now = LocalDateTime.now()
+        val menu = Menu(
+            id = menuId,
+            menuGroupId = 1L,
+            name = "싸이버거",
+            price = 6000,
+            status = MenuStatus.ON_SALE,
+            popularity = true,
+            imageUrl = "cyburger-image-url",
+            description = "[베스트]닭다리살",
+            createdAt = now,
+            updatedAt = now
+        )
+
         val firstOptionGroup = OptionGroup(
             id = 1L,
             menuId = menuId,
@@ -50,17 +67,19 @@ internal class ReOrderOptionGroupUseCaseTest : BehaviorSpec({
         val optionGroups = listOf(firstOptionGroup, secondOptionGroup, thirdOptionGroup)
 
         val requests = ReorderOptionGroupRequests(
+            menuId = menuId,
             reOrderedOptionGroups = listOf(
                 ReorderOptionGroupRequest(3, 1),
                 ReorderOptionGroupRequest(1, 2),
                 ReorderOptionGroupRequest(2, 3),
             )
         )
+        coEvery { menuUseCase.getMenu(any()) } returns menu
         coEvery { repository.findAllByMenuId(any()) } returns optionGroups
         coEvery { repository.bulkUpdatePriority(any()) } returns Unit
 
         `when`("기존 옵션그룹과 개수가 일치하면") {
-            useCase.reOrderOptionGroups(menuId, requests)
+            useCase.reOrderOptionGroups(requests) { menu }
 
             then("그룹의 순서를 수정 할 수 있다.") {
                 coVerify { repository.bulkUpdatePriority(any()) }
@@ -69,6 +88,7 @@ internal class ReOrderOptionGroupUseCaseTest : BehaviorSpec({
 
         `when`("기존 옵션그룹과 개수가 일치하지 않으면") {
             val incorrectRequests = ReorderOptionGroupRequests(
+                menuId = menuId,
                 reOrderedOptionGroups = listOf(
                     ReorderOptionGroupRequest(3, 1),
                     ReorderOptionGroupRequest(1, 2)
@@ -78,7 +98,7 @@ internal class ReOrderOptionGroupUseCaseTest : BehaviorSpec({
 
             then("그룹의 순서를 수정할 수 없다.") {
                 val ex = shouldThrow<IllegalStateException> {
-                    useCase.reOrderOptionGroups(menuId, incorrectRequests)
+                    useCase.reOrderOptionGroups(incorrectRequests) { menu }
                 }
                 ex.message shouldBe "옵션그룹의 개수가 일치하지 않습니다."
             }

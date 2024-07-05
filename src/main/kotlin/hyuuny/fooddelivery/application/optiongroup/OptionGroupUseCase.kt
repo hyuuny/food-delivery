@@ -7,6 +7,7 @@ import ReOrderOptionGroupCommand
 import ReorderOptionGroupRequests
 import UpdateOptionGroupCommand
 import UpdateOptionGroupRequest
+import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.domain.optiongroup.OptionGroup
 import hyuuny.fooddelivery.infrastructure.optiongroup.OptionGroupRepository
 import org.springframework.data.domain.PageImpl
@@ -30,13 +31,17 @@ class OptionGroupUseCase(
     }
 
     @Transactional
-    suspend fun createOptionGroup(request: CreateOptionGroupRequest): OptionGroup {
+    suspend fun createOptionGroup(
+        request: CreateOptionGroupRequest,
+        getMenu: suspend () -> Menu,
+    ): OptionGroup {
         if (request.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
 
         val now = LocalDateTime.now()
+        val menu = getMenu()
         val optionGroup = OptionGroup.handle(
             CreateOptionGroupCommand(
-                menuId = request.menuId,
+                menuId = menu.id!!,
                 name = request.name,
                 required = request.required,
                 priority = request.priority,
@@ -47,9 +52,7 @@ class OptionGroupUseCase(
         return repository.insert(optionGroup)
     }
 
-    suspend fun getOptionGroup(id: Long): OptionGroup {
-        return findOptionGroupByIdOrThrow(id)
-    }
+    suspend fun getOptionGroup(id: Long): OptionGroup = findOptionGroupByIdOrThrow(id)
 
     @Transactional
     suspend fun updateOptionGroup(id: Long, request: UpdateOptionGroupRequest) {
@@ -68,9 +71,13 @@ class OptionGroupUseCase(
     }
 
     @Transactional
-    suspend fun reOrderOptionGroups(menuId: Long, request: ReorderOptionGroupRequests) {
+    suspend fun reOrderOptionGroups(
+        request: ReorderOptionGroupRequests,
+        getMenu: suspend () -> Menu,
+    ) {
         val now = LocalDateTime.now()
-        val optionGroups = repository.findAllByMenuId(menuId)
+        val menu = getMenu()
+        val optionGroups = repository.findAllByMenuId(menu.id!!)
 
         if (optionGroups.size != request.reOrderedOptionGroups.size) throw IllegalStateException("옵션그룹의 개수가 일치하지 않습니다.")
 

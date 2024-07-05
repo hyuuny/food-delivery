@@ -39,6 +39,18 @@ class OptionRepositoryImpl(
             )
     }
 
+    override suspend fun updateOptionGroupId(option: Option) {
+        template.update<Option>()
+            .matching(
+                Query.query(
+                    where("id").`is`(option.id!!),
+                ),
+            ).applyAndAwait(
+                Update.update("optionGroupId", option.optionGroupId)
+                    .set("updatedAt", option.updatedAt)
+            )
+    }
+
     override suspend fun delete(id: Long) = dao.deleteById(id)
 
     override suspend fun findAllOptions(

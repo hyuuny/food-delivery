@@ -7,19 +7,19 @@ import MenuGroupResponses
 import ReorderMenuGroupRequests
 import UpdateMenuGroupRequest
 import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
+import hyuuny.fooddelivery.application.store.StoreUseCase
 import hyuuny.fooddelivery.common.response.SimplePage
 import hyuuny.fooddelivery.common.utils.extractCursorAndCount
 import hyuuny.fooddelivery.common.utils.parseSort
 import org.springframework.data.domain.PageRequest
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.server.ResponseStatusException
 
 @Component
 class MenuGroupHandler(
-    private val useCase: MenuGroupUseCase
+    private val useCase: MenuGroupUseCase,
+    private val storeUseCase: StoreUseCase,
 ) {
 
     suspend fun getMenuGroups(request: ServerRequest): ServerResponse {
@@ -34,25 +34,23 @@ class MenuGroupHandler(
 
         val pageRequest = PageRequest.of(cursor, count, sort)
         val page = useCase.getMenuGroupsByAdminCondition(searchCondition, pageRequest)
-        val responses = SimplePage(page.content.map { MenuGroupResponses(it) }, page)
+        val responses = SimplePage(page.content.map { MenuGroupResponses.from(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }
 
     suspend fun createMenuGroup(request: ServerRequest): ServerResponse {
-        val storeId = request.pathVariable("storeId").toLong()
         val body = request.awaitBody<CreateMenuGroupRequest>()
 
-        if (storeId != body.storeId) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "매장 아이디가 일치하지 않습니다.")
+        val menuGroup = useCase.createMenuGroup(body) { storeUseCase.getStore(body.storeId) }
+        val response = MenuGroupResponse.from(menuGroup)
+        return ok().bodyValueAndAwait(response)
+    }
 
-        val menuGroup = useCase.createMenuGroup(
-            CreateMenuGroupRequest(
-                storeId = storeId,
-                name = body.name,
-                priority = body.priority,
-                description = body.description
-            )
-        )
-        val response = MenuGroupResponse(menuGroup)
+    suspend fun getMenuGroup(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+
+        val menuGroup = useCase.getMenuGroup(id)
+        val response = MenuGroupResponse.from(menuGroup)
         return ok().bodyValueAndAwait(response)
     }
 
@@ -65,22 +63,15 @@ class MenuGroupHandler(
     }
 
     suspend fun reOrderMenuGroup(request: ServerRequest): ServerResponse {
-        val storeId = request.pathVariable("storeId").toLong()
         val body = request.awaitBody<ReorderMenuGroupRequests>()
 
-        useCase.reOrderMenuGroups(storeId, body)
+        useCase.reOrderMenuGroups(body) { storeUseCase.getStore(body.storeId) }
         return ok().buildAndAwait()
-    }
-
-    suspend fun getMenuGroup(request: ServerRequest): ServerResponse {
-        val id = request.pathVariable("id").toLong()
-        val menuGroup = useCase.getMenuGroup(id)
-        val response = MenuGroupResponse(menuGroup)
-        return ok().bodyValueAndAwait(response)
     }
 
     suspend fun deleteMenuGroup(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
+
         useCase.deleteMenuGroup(id)
         return ok().buildAndAwait()
     }

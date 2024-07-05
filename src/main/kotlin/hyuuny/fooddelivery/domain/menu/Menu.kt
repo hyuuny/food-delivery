@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.menu
 
+import ChangeMenuGroupCommand
 import ChangeMenuStatusCommand
 import CreateMenuCommand
 import UpdateMenuCommand
@@ -11,7 +12,7 @@ import java.time.LocalDateTime
 @Table("menus")
 class Menu(
     id: Long? = null,
-    val menuGroupId: Long,
+    menuGroupId: Long,
     name: String,
     price: Long,
     status: MenuStatus = MenuStatus.ON_SALE,
@@ -25,6 +26,8 @@ class Menu(
     @Id
     var id = id
         protected set
+    var menuGroupId = menuGroupId
+        private set
     var name = name
         private set
     var price = price
@@ -65,6 +68,11 @@ class Menu(
 
     fun handle(command: ChangeMenuStatusCommand) {
         status = command.status
+        updatedAt = command.updatedAt
+    }
+
+    fun handle(command: ChangeMenuGroupCommand) {
+        menuGroupId = command.menuGroupId
         updatedAt = command.updatedAt
     }
 

@@ -1,11 +1,13 @@
 package hyuuny.fooddelivery.application.option
 
 import AdminOptionSearchCondition
+import ChangeOptionGroupIdCommand
 import CreateOptionCommand
 import CreateOptionRequest
 import UpdateOptionCommand
 import UpdateOptionRequest
 import hyuuny.fooddelivery.domain.option.Option
+import hyuuny.fooddelivery.domain.optiongroup.OptionGroup
 import hyuuny.fooddelivery.infrastructure.option.OptionRepository
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -28,13 +30,17 @@ class OptionUseCase(
     }
 
     @Transactional
-    suspend fun createOption(request: CreateOptionRequest): Option {
+    suspend fun createOption(
+        request: CreateOptionRequest,
+        getOptionGroup: suspend () -> OptionGroup,
+    ): Option {
         if (request.name.isBlank()) throw IllegalArgumentException("옵션명은 공백일수 없습니다.")
 
         val now = LocalDateTime.now()
+        val optionGroup = getOptionGroup()
         val option = Option.handle(
             CreateOptionCommand(
-                optionGroupId = request.optionGroupId,
+                optionGroupId = optionGroup.id!!,
                 name = request.name,
                 price = request.price,
                 createdAt = now,
@@ -62,6 +68,23 @@ class OptionUseCase(
             )
         )
         repository.update(option)
+    }
+
+    @Transactional
+    suspend fun changeOptionGroup(
+        id: Long,
+        getOptionGroup: suspend () -> OptionGroup
+    ) {
+        val now = LocalDateTime.now()
+        val optionGroup = getOptionGroup()
+        val option = findOptionByIdOrThrow(id)
+        option.handle(
+            ChangeOptionGroupIdCommand(
+                optionGroupId = optionGroup.id!!,
+                updatedAt = now,
+            )
+        )
+        repository.updateOptionGroupId(option)
     }
 
     @Transactional

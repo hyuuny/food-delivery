@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.option
 
+import ChangeOptionGroupIdCommand
 import CreateOptionCommand
 import UpdateOptionCommand
 import org.springframework.data.annotation.Id
@@ -9,7 +10,7 @@ import java.time.LocalDateTime
 @Table("options")
 class Option(
     id: Long? = null,
-    val optionGroupId: Long,
+    optionGroupId: Long,
     name: String,
     price: Long = 0,
     val createdAt: LocalDateTime,
@@ -19,6 +20,8 @@ class Option(
     @Id
     var id = id
         protected set
+    var optionGroupId = optionGroupId
+        private set
     var name = name
         private set
     var price = price
@@ -40,6 +43,11 @@ class Option(
         name = command.name
         price = command.price
         updatedAt = command.updatedAt
+    }
+
+    fun handle(command: ChangeOptionGroupIdCommand) {
+        this.optionGroupId = command.optionGroupId
+        this.updatedAt = command.updatedAt
     }
 
 }

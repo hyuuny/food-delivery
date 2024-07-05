@@ -11,6 +11,7 @@ data class UpdateMenuGroupRequest(
 )
 
 data class ReorderMenuGroupRequests(
+    val storeId: Long,
     val reOrderedMenuGroups: List<ReorderMenuGroupRequest>,
 )
 

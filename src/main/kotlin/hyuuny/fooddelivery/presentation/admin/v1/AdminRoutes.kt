@@ -27,7 +27,8 @@ class AdminRoutes {
                 GET("", handler::getMenus)
                 GET("/{id}", handler::getMenu)
                 PUT("/{id}", handler::updateMeno)
-                PATCH("/change-status/{id}", handler::changeMenuStatus)
+                PATCH("/{id}/change-status", handler::changeMenuStatus)
+                PATCH("/{id}/change-menu-group", handler::changeMenuGroup)
                 DELETE("/{id}", handler::deleteMenu)
             }
         }
@@ -39,9 +40,6 @@ class AdminRoutes {
             "/admin/v1/option-groups".nest {
                 GET("", handler::getOptionGroups)
                 GET("/{id}", handler::getOptionGroup)
-            }
-
-            "/admin/v1/menus/{menuId}/option-groups".nest {
                 POST("", handler::createOptionGroup)
                 PUT("/{id}", handler::updateOptionGroup)
                 PATCH("/re-order", handler::reOrderOptionGroup)
@@ -56,11 +54,9 @@ class AdminRoutes {
             "/admin/v1/options".nest {
                 GET("", handler::getOptions)
                 GET("/{id}", handler::getOption)
-            }
-
-            "/admin/v1/option-groups/{optionGroupId}/options".nest {
                 POST("", handler::createOption)
                 PUT("/{id}", handler::updateOption)
+                PATCH("/{id}/change-option-group", handler::changeOptionGroup)
                 DELETE("/{id}", handler::deleteOption)
             }
         }
@@ -72,9 +68,6 @@ class AdminRoutes {
             "/admin/v1/menu-groups".nest {
                 GET("", handler::getMenuGroups)
                 GET("/{id}", handler::getMenuGroup)
-            }
-
-            "/admin/v1/stores/{storeId}/menu-groups".nest {
                 POST("", handler::createMenuGroup)
                 PUT("/{id}", handler::updateMenuGroup)
                 PATCH("/re-order", handler::reOrderMenuGroup)
@@ -155,6 +148,5 @@ class AdminRoutes {
             }
         }
     }
-
 
 }

@@ -12,11 +12,9 @@ import hyuuny.fooddelivery.common.utils.parseSort
 import hyuuny.fooddelivery.presentation.admin.v1.optiongroup.response.OptionGroupResponse
 import hyuuny.fooddelivery.presentation.admin.v1.optiongroup.response.OptionGroupResponses
 import org.springframework.data.domain.PageRequest
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.server.ResponseStatusException
 
 @Component
 class OptionGroupHandler(
@@ -35,54 +33,43 @@ class OptionGroupHandler(
 
         val pageRequest = PageRequest.of(cursor, count, sort)
         val page = useCase.getOptionGroupsByAdminCondition(searchCondition, pageRequest)
-        val responses = SimplePage(page.content.map { OptionGroupResponses(it) }, page)
+        val responses = SimplePage(page.content.map { OptionGroupResponses.from(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }
 
     suspend fun createOptionGroup(request: ServerRequest): ServerResponse {
-        val menuId = request.pathVariable("menuId").toLong()
         val body = request.awaitBody<CreateOptionGroupRequest>()
 
-        if (!menuUseCase.existById(menuId)) throw ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다.")
-
-        val optionGroup = useCase.createOptionGroup(body)
-        val response = OptionGroupResponse(optionGroup)
+        val optionGroup = useCase.createOptionGroup(body) { menuUseCase.getMenu(body.menuId) }
+        val response = OptionGroupResponse.from(optionGroup)
         return ok().bodyValueAndAwait(response)
     }
 
     suspend fun getOptionGroup(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
+
         val optionGroup = useCase.getOptionGroup(id)
-        val response = OptionGroupResponse(optionGroup)
+        val response = OptionGroupResponse.from(optionGroup)
         return ok().bodyValueAndAwait(response)
     }
 
     suspend fun updateOptionGroup(request: ServerRequest): ServerResponse {
-        val menuId = request.pathVariable("menuId").toLong()
         val id = request.pathVariable("id").toLong()
         val body = request.awaitBody<UpdateOptionGroupRequest>()
-
-        if (!menuUseCase.existById(menuId)) throw ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다.")
 
         useCase.updateOptionGroup(id, body)
         return ok().buildAndAwait()
     }
 
     suspend fun reOrderOptionGroup(request: ServerRequest): ServerResponse {
-        val menuId = request.pathVariable("menuId").toLong()
         val body = request.awaitBody<ReorderOptionGroupRequests>()
 
-        if (!menuUseCase.existById(menuId)) throw ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다.")
-
-        useCase.reOrderOptionGroups(menuId, body)
+        useCase.reOrderOptionGroups(body) { menuUseCase.getMenu(body.menuId) }
         return ok().buildAndAwait()
     }
 
     suspend fun deleteOptionGroup(request: ServerRequest): ServerResponse {
-        val menuId = request.pathVariable("menuId").toLong()
         val id = request.pathVariable("id").toLong()
-
-        if (!menuUseCase.existById(menuId)) throw ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다.")
 
         useCase.deleteOptionGroup(id)
         return ok().buildAndAwait()

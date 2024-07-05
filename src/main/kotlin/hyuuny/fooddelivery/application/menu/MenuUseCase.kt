@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.application.menu
 
 import AdminMenuSearchCondition
+import ChangeMenuGroupCommand
 import ChangeMenuStatusCommand
 import ChangeMenuStatusRequest
 import CreateMenuCommand
@@ -8,6 +9,7 @@ import CreateMenuRequest
 import UpdateMenuCommand
 import UpdateMenuRequest
 import hyuuny.fooddelivery.domain.menu.Menu
+import hyuuny.fooddelivery.domain.menugroup.MenuGroup
 import hyuuny.fooddelivery.infrastructure.menu.MenuRepository
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -30,13 +32,17 @@ class MenuUseCase(
     }
 
     @Transactional
-    suspend fun createMenu(request: CreateMenuRequest): Menu {
+    suspend fun createMenu(
+        request: CreateMenuRequest,
+        getMenuGroup: suspend () -> MenuGroup,
+    ): Menu {
         if (request.price <= 0) throw IllegalArgumentException("금액은 0이상이여야 합니다.")
 
         val now = LocalDateTime.now()
+        val menuGroup = getMenuGroup()
         val menu = Menu.handle(
             CreateMenuCommand(
-                menuGroupId = request.menuGroupId,
+                menuGroupId = menuGroup.id!!,
                 name = request.name,
                 price = request.price,
                 status = request.status,
@@ -50,9 +56,7 @@ class MenuUseCase(
         return repository.insert(menu)
     }
 
-    suspend fun getMenu(id: Long): Menu {
-        return findMenuByIdOrThrow(id)
-    }
+    suspend fun getMenu(id: Long): Menu = findMenuByIdOrThrow(id)
 
     @Transactional
     suspend fun updateMenu(id: Long, request: UpdateMenuRequest) {
@@ -87,12 +91,29 @@ class MenuUseCase(
     }
 
     @Transactional
+    suspend fun changeMenuGroup(
+        id: Long,
+        getMenuGroup: suspend () -> MenuGroup,
+    ) {
+        val now = LocalDateTime.now()
+        val menuGroup = getMenuGroup()
+        val menu = findMenuByIdOrThrow(id)
+        menu.handle(
+            ChangeMenuGroupCommand(
+                menuGroupId = menuGroup.id!!,
+                updatedAt = now,
+            )
+        )
+        repository.updateMenuGroupId(menu)
+    }
+
+    @Transactional
     suspend fun deleteMenu(id: Long) {
         if (!repository.existsById(id)) throw NoSuchElementException("${id}번 메뉴를 찾을 수 없습니다.")
         repository.delete(id)
     }
 
-    suspend fun existById(id: Long): Boolean = repository.existsById(id)
+    suspend fun existsById(id: Long): Boolean = repository.existsById(id)
 
     suspend fun getAllByMenuGroupIds(menuGroupIds: List<Long>): List<Menu> =
         repository.findAllByMenuGroupIdIn(menuGroupIds)

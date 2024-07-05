@@ -13,6 +13,8 @@ interface OptionRepository {
 
     suspend fun update(option: Option)
 
+    suspend fun updateOptionGroupId(option: Option)
+
     suspend fun delete(id: Long)
 
     suspend fun findAllOptions(searchCondition: AdminOptionSearchCondition, pageable: Pageable): Page<Option>

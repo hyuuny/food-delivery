@@ -15,18 +15,20 @@ data class MenuResponse(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
-    constructor(entity: Menu) : this(
-        id = entity.id!!,
-        menuGroupId = entity.menuGroupId,
-        name = entity.name,
-        price = entity.price,
-        status = entity.status,
-        popularity = entity.popularity,
-        imageUrl = entity.imageUrl,
-        description = entity.description,
-        createdAt = entity.createdAt,
-        updatedAt = entity.updatedAt,
-    )
+    companion object {
+        fun from(entity: Menu) = MenuResponse(
+            id = entity.id!!,
+            menuGroupId = entity.menuGroupId,
+            name = entity.name,
+            price = entity.price,
+            status = entity.status,
+            popularity = entity.popularity,
+            imageUrl = entity.imageUrl,
+            description = entity.description,
+            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt,
+        )
+    }
 }
 
 data class MenuResponses(
@@ -41,16 +43,18 @@ data class MenuResponses(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
-    constructor(entity: Menu) : this(
-        id = entity.id!!,
-        menuGroupId = entity.menuGroupId,
-        name = entity.name,
-        price = entity.price,
-        status = entity.status,
-        popularity = entity.popularity,
-        imageUrl = entity.imageUrl,
-        description = entity.description,
-        createdAt = entity.createdAt,
-        updatedAt = entity.updatedAt,
-    )
+    companion object {
+        fun from(entity: Menu) = MenuResponses(
+            id = entity.id!!,
+            menuGroupId = entity.menuGroupId,
+            name = entity.name,
+            price = entity.price,
+            status = entity.status,
+            popularity = entity.popularity,
+            imageUrl = entity.imageUrl,
+            description = entity.description,
+            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt,
+        )
+    }
 }

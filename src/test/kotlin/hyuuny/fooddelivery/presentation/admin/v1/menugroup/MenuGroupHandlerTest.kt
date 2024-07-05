@@ -33,9 +33,9 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             description = "자신있게 추천드려요!",
         )
         val menuGroup = generateMenuGroup(request)
-        coEvery { useCase.createMenuGroup(any()) } returns menuGroup
+        coEvery { useCase.createMenuGroup(any(), any()) } returns menuGroup
 
-        webTestClient.post().uri("/admin/v1/stores/${storeId}/menu-groups")
+        webTestClient.post().uri("/admin/v1/menu-groups")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -50,27 +50,6 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.description").isEqualTo(menuGroup.description!!)
             .jsonPath("$.createdAt").exists()
             .jsonPath("$.updatedAt").exists()
-    }
-
-    @DisplayName("매장 아이디가 일치하지 않으면, 메뉴 그룹을 등록할 수 없다.")
-    @Test
-    fun createMenuGroup_badRequest() {
-        val storeId = 1L
-        val request = CreateMenuGroupRequest(
-            storeId = storeId,
-            name = "추천메뉴",
-            priority = 1,
-            description = "자신있게 추천드려요!",
-        )
-        val menuGroup = generateMenuGroup(request)
-        coEvery { useCase.createMenuGroup(any()) } returns menuGroup
-
-        webTestClient.post().uri("/admin/v1/stores/${2}/menu-groups")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .bodyValue(request)
-            .exchange()
-            .expectStatus().isBadRequest
     }
 
     @DisplayName("메뉴그룹을 상세조회 할 수 있다.")
@@ -168,14 +147,15 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
     @DisplayName("메뉴그룹의 정보를 변경할 수 있다.")
     @Test
     fun updateMenuGroup() {
-        val storeId = 1L
+        val id = 1L
+
         val request = UpdateMenuGroupRequest(
             name = "추천메뉴",
             description = "자신있게 추천드려요!",
         )
         coEvery { useCase.updateMenuGroup(any(), any()) } returns Unit
 
-        webTestClient.put().uri("/admin/v1/stores/${storeId}/menu-groups/${1}")
+        webTestClient.put().uri("/admin/v1/menu-groups/$id")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -190,15 +170,16 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
     fun reOrderMenuGroup() {
         val storeId = 1L
         val requests = ReorderMenuGroupRequests(
+            storeId = storeId,
             reOrderedMenuGroups = listOf(
                 ReorderMenuGroupRequest(menuGroupId = 2, priority = 1),
                 ReorderMenuGroupRequest(menuGroupId = 3, priority = 2),
                 ReorderMenuGroupRequest(menuGroupId = 1, priority = 3),
             )
         )
-        coEvery { useCase.reOrderMenuGroups(storeId, requests) } returns Unit
+        coEvery { useCase.reOrderMenuGroups(any(), any()) } returns Unit
 
-        webTestClient.patch().uri("/admin/v1/stores/${storeId}/menu-groups/re-order")
+        webTestClient.patch().uri("/admin/v1/menu-groups/re-order")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(requests)
@@ -212,10 +193,9 @@ class MenuGroupHandlerTest : BaseIntegrationTest() {
     @Test
     fun deleteMenuGroup() {
         val id = 1L
-        val storeId = 2L
         coEvery { useCase.deleteMenuGroup(any()) } returns Unit
 
-        webTestClient.delete().uri("/admin/v1/stores/${storeId}/menu-groups/${id}")
+        webTestClient.delete().uri("/admin/v1/menu-groups/${id}")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk

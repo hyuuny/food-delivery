@@ -22,6 +22,10 @@ data class ChangeMenuStatusRequest(
     val status: MenuStatus,
 )
 
+data class ChangeMenuGroupRequest(
+    val menuGroupId: Long,
+)
+
 data class AdminMenuSearchCondition(
     val name: String? = null,
     val status: MenuStatus? = null,

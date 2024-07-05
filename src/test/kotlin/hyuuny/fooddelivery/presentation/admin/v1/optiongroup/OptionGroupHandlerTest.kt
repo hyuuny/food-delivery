@@ -5,9 +5,11 @@ import ReorderOptionGroupRequest
 import ReorderOptionGroupRequests
 import UpdateOptionGroupRequest
 import com.ninjasquad.springmockk.MockkBean
+import hyuuny.fooddelivery.application.menu.MenuUseCase
 import hyuuny.fooddelivery.application.optiongroup.OptionGroupUseCase
+import hyuuny.fooddelivery.common.constant.MenuStatus
+import hyuuny.fooddelivery.domain.menu.Menu
 import hyuuny.fooddelivery.domain.optiongroup.OptionGroup
-import hyuuny.fooddelivery.infrastructure.menu.MenuRepository
 import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
 import io.mockk.coEvery
 import org.junit.jupiter.api.DisplayName
@@ -15,9 +17,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
 class OptionGroupHandlerTest : BaseIntegrationTest() {
@@ -26,22 +26,37 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
     private lateinit var useCase: OptionGroupUseCase
 
     @MockkBean
-    private lateinit var menuRepository: MenuRepository
+    private lateinit var menuUseCase: MenuUseCase
 
     @DisplayName("메뉴의 옵션그룹을 등록할 수 있다.")
     @Test
     fun createOptionGroup() {
-        coEvery { menuRepository.existsById(any()) } returns true
+        val menuId = 130L
+
+        val now = LocalDateTime.now()
+        val menu = Menu(
+            id = menuId,
+            menuGroupId = 1L,
+            name = "싸이버거",
+            price = 6000,
+            status = MenuStatus.ON_SALE,
+            popularity = true,
+            imageUrl = "cyburger-image-url",
+            description = "[베스트]닭다리살",
+            createdAt = now,
+            updatedAt = now
+        )
         val request = CreateOptionGroupRequest(
-            menuId = 1L,
+            menuId = menuId,
             name = "치킨세트",
             required = true,
             priority = 1,
         )
-        val optionGroup = generateOptionGroup(request)
-        coEvery { useCase.createOptionGroup(request) } returns optionGroup
+        val optionGroup = generateOptionGroup(menuId, request)
+        coEvery { menuUseCase.getMenu(any()) } returns menu
+        coEvery { useCase.createOptionGroup(any(), any()) } returns optionGroup
 
-        webTestClient.post().uri("/admin/v1/menus/${request.menuId}/option-groups")
+        webTestClient.post().uri("/admin/v1/option-groups")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -58,35 +73,18 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.updatedAt").exists()
     }
 
-    @DisplayName("존재하지 메뉴의 옵션그룹은 등록할 수 없다.")
-    @Test
-    fun createOptionGroup_notFound() {
-        coEvery { menuRepository.existsById(any()) } throws ResponseStatusException(NOT_FOUND, "존재하지 않는 메뉴입니다.")
-        val request = CreateOptionGroupRequest(
-            menuId = 0L,
-            name = "치킨세트",
-            required = true,
-            priority = 1,
-        )
-
-        webTestClient.post().uri("/menus/${request.menuId}/option-groups")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .bodyValue(request)
-            .exchange()
-            .expectStatus().isNotFound
-    }
-
     @DisplayName("옵션그룹을 상세조회 할 수 있다.")
     @Test
     fun getOptionGroup() {
+        val menuId = 130L
+
         val request = CreateOptionGroupRequest(
-            menuId = 1L,
+            menuId = menuId,
             name = "치킨세트",
             required = true,
             priority = 1,
         )
-        val optionGroup = generateOptionGroup(request)
+        val optionGroup = generateOptionGroup(menuId, request)
         coEvery { useCase.getOptionGroup(any()) } returns optionGroup
 
         webTestClient.get().uri("/admin/v1/option-groups/${optionGroup.id}")
@@ -225,7 +223,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
     @DisplayName("옵션그룹의 정보를 변경할 수 있다.")
     @Test
     fun updateOptionGroup() {
-        coEvery { menuRepository.existsById(any()) } returns true
+        val id = 1L
         val request = UpdateOptionGroupRequest(
             menuId = 1L,
             name = "치킨세트",
@@ -233,7 +231,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.updateOptionGroup(any(), any()) } returns Unit
 
-        webTestClient.put().uri("/admin/v1/menus/${request.menuId}/option-groups/${1}")
+        webTestClient.put().uri("/admin/v1/option-groups/$id")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -241,34 +239,14 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
             .expectStatus().isOk
             .expectBody()
             .consumeWith(::println)
-    }
-
-    @DisplayName("존재하지 메뉴의 옵션그룹은 변경할 수 없다.")
-    @Test
-    fun updateOptionGroup_notFound() {
-        coEvery { menuRepository.existsById(any()) } throws ResponseStatusException(NOT_FOUND, "존재하지 않는 메뉴입니다.")
-        val request = UpdateOptionGroupRequest(
-            menuId = 0L,
-            name = "치킨세트",
-            required = true
-        )
-        coEvery { useCase.updateOptionGroup(any(), any()) } returns Unit
-
-        webTestClient.put().uri("/menus/${request.menuId}/option-groups${1}")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .bodyValue(request)
-            .exchange()
-            .expectStatus().isNotFound
     }
 
     @DisplayName("옵션그룹의 순서를 변경할 수 있다.")
     @Test
     fun reOrderOptionGroup() {
-        coEvery { menuRepository.existsById(any()) } returns true
-
         val menuId = 1L
         val requests = ReorderOptionGroupRequests(
+            menuId = menuId,
             reOrderedOptionGroups = listOf(
                 ReorderOptionGroupRequest(
                     optionGroupId = menuId,
@@ -286,7 +264,7 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.reOrderOptionGroups(any(), any()) } returns Unit
 
-        webTestClient.patch().uri("/admin/v1/menus/${menuId}/option-groups/re-order")
+        webTestClient.patch().uri("/admin/v1/option-groups/re-order")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(requests)
@@ -294,48 +272,15 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
             .expectStatus().isOk
             .expectBody()
             .consumeWith(::println)
-    }
-
-    @DisplayName("존재하지 않는 메뉴의 옵션그룹 순서를 변경할 수 없다.")
-    @Test
-    fun reOrderOptionGroup_notFound() {
-        coEvery { menuRepository.existsById(any()) } throws ResponseStatusException(NOT_FOUND, "존재하지 않는 메뉴입니다.")
-
-        val menuId = 0L
-        val requests = ReorderOptionGroupRequests(
-            reOrderedOptionGroups = listOf(
-                ReorderOptionGroupRequest(
-                    optionGroupId = menuId,
-                    priority = 3,
-                ),
-                ReorderOptionGroupRequest(
-                    optionGroupId = menuId,
-                    priority = 1,
-                ),
-                ReorderOptionGroupRequest(
-                    optionGroupId = menuId,
-                    priority = 2,
-                )
-            ),
-        )
-        coEvery { useCase.reOrderOptionGroups(any(), any()) } returns Unit
-
-        webTestClient.patch().uri("/admin/v1/menus/${menuId}/option-groups/re-order")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .bodyValue(requests)
-            .exchange()
-            .expectStatus().isNotFound
     }
 
     @DisplayName("옵션그룹을 삭제할 수 있다.")
     @Test
     fun deleteOptionGroup() {
-        val menuId = 1
-        coEvery { menuRepository.existsById(any()) } returns true
+        val id = 1L
         coEvery { useCase.deleteOptionGroup(any()) } returns Unit
 
-        webTestClient.delete().uri("/admin/v1/menus/${menuId}/option-groups/1")
+        webTestClient.delete().uri("/admin/v1/option-groups/$id")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk
@@ -343,24 +288,11 @@ class OptionGroupHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
-    @DisplayName("존재하지 않는 메뉴의 옵션그룹을 삭제할 수 없다.")
-    @Test
-    fun deleteOptionGroup_notFound() {
-        val menuId = 1
-        coEvery { menuRepository.existsById(any()) } throws ResponseStatusException(NOT_FOUND, "존재하지 않는 메뉴입니다.")
-        coEvery { useCase.deleteOptionGroup(any()) } returns Unit
-
-        webTestClient.delete().uri("/admin/v1/menus/${menuId}/option-groups/1")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus().isNotFound
-    }
-
-    private fun generateOptionGroup(request: CreateOptionGroupRequest): OptionGroup {
+    private fun generateOptionGroup(menuId: Long, request: CreateOptionGroupRequest): OptionGroup {
         val now = LocalDateTime.now()
         return OptionGroup(
             id = 1L,
-            menuId = request.menuId,
+            menuId = menuId,
             name = request.name,
             required = request.required,
             priority = request.priority,

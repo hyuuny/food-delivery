@@ -8,6 +8,7 @@ import ReorderMenuGroupRequests
 import UpdateMenuGroupCommand
 import UpdateMenuGroupRequest
 import hyuuny.fooddelivery.domain.menugroup.MenuGroup
+import hyuuny.fooddelivery.domain.store.Store
 import hyuuny.fooddelivery.infrastructure.menugroup.MenuGroupRepository
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -30,13 +31,17 @@ class MenuGroupUseCase(
     }
 
     @Transactional
-    suspend fun createMenuGroup(request: CreateMenuGroupRequest): MenuGroup {
+    suspend fun createMenuGroup(
+        request: CreateMenuGroupRequest,
+        getStore: suspend () -> Store,
+    ): MenuGroup {
         if (request.name.length < 2) throw IllegalArgumentException("이름은 2자 이상이어야 합니다.")
 
         val now = LocalDateTime.now()
+        val store = getStore()
         val menuGroup = MenuGroup.handle(
             CreateMenuGroupCommand(
-                storeId = request.storeId,
+                storeId = store.id!!,
                 name = request.name,
                 priority = request.priority,
                 description = request.description,
@@ -66,9 +71,13 @@ class MenuGroupUseCase(
     }
 
     @Transactional
-    suspend fun reOrderMenuGroups(storeId: Long, requests: ReorderMenuGroupRequests) {
+    suspend fun reOrderMenuGroups(
+        requests: ReorderMenuGroupRequests,
+        getStore: suspend () -> Store
+    ) {
         val now = LocalDateTime.now()
-        val menuGroups = repository.findAllByStoreId(storeId)
+        val store = getStore()
+        val menuGroups = repository.findAllByStoreId(store.id!!)
 
         if (menuGroups.size != requests.reOrderedMenuGroups.size) throw IllegalStateException("메뉴그룹의 개수가 일치하지 않습니다.")
 
@@ -95,9 +104,7 @@ class MenuGroupUseCase(
         repository.delete(id)
     }
 
-    private suspend fun findMenuGroupByIdOrThrow(id: Long): MenuGroup {
-        return repository.findById(id)
-            ?: throw NoSuchElementException("${id}번 메뉴그룹을 찾을 수 없습니다.")
-    }
+    private suspend fun findMenuGroupByIdOrThrow(id: Long): MenuGroup =
+        repository.findById(id) ?: throw NoSuchElementException("${id}번 메뉴그룹을 찾을 수 없습니다.")
 
 }

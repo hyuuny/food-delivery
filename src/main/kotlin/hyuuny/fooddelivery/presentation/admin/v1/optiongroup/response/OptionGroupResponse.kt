@@ -12,15 +12,17 @@ data class OptionGroupResponse(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
-    constructor(entity: OptionGroup) : this(
-        id = entity.id!!,
-        menuId = entity.menuId,
-        name = entity.name,
-        required = entity.required,
-        priority = entity.priority,
-        createdAt = entity.createdAt,
-        updatedAt = entity.updatedAt,
-    )
+    companion object{
+        fun from(entity: OptionGroup): OptionGroupResponse = OptionGroupResponse(
+            id = entity.id!!,
+            menuId = entity.menuId,
+            name = entity.name,
+            required = entity.required,
+            priority = entity.priority,
+            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt,
+        )
+    }
 }
 
 data class OptionGroupResponses(
@@ -31,12 +33,14 @@ data class OptionGroupResponses(
     val priority: Int,
     val createdAt: LocalDateTime,
 ) {
-    constructor(entity: OptionGroup) : this(
-        id = entity.id!!,
-        menuId = entity.menuId,
-        name = entity.name,
-        required = entity.required,
-        priority = entity.priority,
-        createdAt = entity.createdAt,
-    )
+    companion object {
+        fun from(entity: OptionGroup): OptionGroupResponses = OptionGroupResponses(
+            id = entity.id!!,
+            menuId = entity.menuId,
+            name = entity.name,
+            required = entity.required,
+            priority = entity.priority,
+            createdAt = entity.createdAt,
+        )
+    }
 }

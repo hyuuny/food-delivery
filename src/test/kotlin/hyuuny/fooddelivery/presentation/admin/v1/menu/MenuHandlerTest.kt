@@ -1,12 +1,15 @@
 package hyuuny.fooddelivery.presentation.admin.v1.menu
 
+import ChangeMenuGroupRequest
 import ChangeMenuStatusRequest
 import CreateMenuRequest
 import UpdateMenuRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.application.menu.MenuUseCase
+import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
 import hyuuny.fooddelivery.common.constant.MenuStatus
 import hyuuny.fooddelivery.domain.menu.Menu
+import hyuuny.fooddelivery.domain.menugroup.MenuGroup
 import hyuuny.fooddelivery.presentation.admin.v1.BaseIntegrationTest
 import io.mockk.coEvery
 import org.junit.jupiter.api.DisplayName
@@ -23,9 +26,25 @@ class MenuHandlerTest : BaseIntegrationTest() {
     @MockkBean
     private lateinit var useCase: MenuUseCase
 
+    @MockkBean
+    private lateinit var menuGroupUseCase: MenuGroupUseCase
+
     @DisplayName("메뉴를 등록할 수 있다.")
     @Test
     fun createMenu() {
+        val menuGroupId = 1L
+
+        val now = LocalDateTime.now()
+        val menuGroup = MenuGroup(
+            id = menuGroupId,
+            storeId = 1L,
+            name = "추천메뉴",
+            priority = 1,
+            description = "자신있게 추천드려요!",
+            createdAt = now,
+            updatedAt = now
+        )
+
         val request = CreateMenuRequest(
             menuGroupId = 1L,
             name = "싸이버거",
@@ -36,7 +55,8 @@ class MenuHandlerTest : BaseIntegrationTest() {
             description = "[베스트]닭다리살"
         )
         val menu = generateMenu(request)
-        coEvery { useCase.createMenu(request) } returns menu
+        coEvery { useCase.createMenu(any(), any()) } returns menu
+        coEvery { menuGroupUseCase.getMenuGroup(any()) } returns menuGroup
 
         webTestClient.post().uri("/admin/v1/menus")
             .contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +171,7 @@ class MenuHandlerTest : BaseIntegrationTest() {
         )
         coEvery { useCase.changeMenuStatus(any(), request) } returns Unit
 
-        webTestClient.patch().uri("/admin/v1/menus/change-status/${1}")
+        webTestClient.patch().uri("/admin/v1/menus/${1}/change-status")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -300,6 +320,23 @@ class MenuHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.size").isEqualTo(15)
             .jsonPath("$.last").isEqualTo(true)
             .jsonPath("$.totalElements").isEqualTo(2)
+    }
+
+    @DisplayName("메뉴의 메뉴그룹을 변경할 수 있다.")
+    @Test
+    fun changeMenuGroup() {
+        val id = 1L
+        val request = ChangeMenuGroupRequest(menuGroupId = 58L)
+        coEvery { useCase.changeMenuGroup(any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/admin/v1/menus/$id/change-menu-group")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
     }
 
     private fun generateMenu(request: CreateMenuRequest): Menu {

@@ -13,3 +13,8 @@ data class UpdateOptionCommand(
     val price: Long,
     val updatedAt: LocalDateTime,
 )
+
+data class ChangeOptionGroupIdCommand(
+    val optionGroupId: Long,
+    val updatedAt: LocalDateTime,
+)

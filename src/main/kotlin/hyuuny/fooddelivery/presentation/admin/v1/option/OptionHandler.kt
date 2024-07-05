@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.presentation.admin.v1.option
 
 import AdminOptionSearchCondition
+import ChangeOptionGroupIdRequest
 import CreateOptionRequest
 import UpdateOptionRequest
 import hyuuny.fooddelivery.application.option.OptionUseCase
@@ -11,11 +12,9 @@ import hyuuny.fooddelivery.common.utils.parseSort
 import hyuuny.fooddelivery.presentation.admin.v1.option.response.OptionResponse
 import hyuuny.fooddelivery.presentation.admin.v1.option.response.OptionResponses
 import org.springframework.data.domain.PageRequest
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.server.ResponseStatusException
 
 @Component
 class OptionHandler(
@@ -34,52 +33,44 @@ class OptionHandler(
 
         val pageRequest = PageRequest.of(cursor, count, sort)
         val page = useCase.getOptionsByAdminCondition(searchCondition, pageRequest)
-        val responses = SimplePage(page.content.map { OptionResponses(it) }, page)
+        val responses = SimplePage(page.content.map { OptionResponses.from(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }
 
     suspend fun createOption(request: ServerRequest): ServerResponse {
-        val optionGroupId = request.pathVariable("optionGroupId").toLong()
         val body = request.awaitBody<CreateOptionRequest>()
 
-        if (!optionGroupUseCase.existsById(optionGroupId)) throw ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "존재하지 않는 옵션그룹입니다."
-        )
-
-        val option = useCase.createOption(body)
-        return ok().bodyValueAndAwait(option)
+        val option = useCase.createOption(body) { optionGroupUseCase.getOptionGroup(body.optionGroupId) }
+        val response = OptionResponse.from(option)
+        return ok().bodyValueAndAwait(response)
     }
 
     suspend fun getOption(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
+
         val option = useCase.getOption(id)
-        val response = OptionResponse(option)
+        val response = OptionResponse.from(option)
         return ok().bodyValueAndAwait(response)
     }
 
     suspend fun updateOption(request: ServerRequest): ServerResponse {
-        val optionGroupId = request.pathVariable("optionGroupId").toLong()
         val id = request.pathVariable("id").toLong()
         val body = request.awaitBody<UpdateOptionRequest>()
-
-        if (!optionGroupUseCase.existsById(optionGroupId)) throw ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "존재하지 않는 옵션입니다."
-        )
 
         useCase.updateOption(id, body)
         return ok().buildAndAwait()
     }
 
-    suspend fun deleteOption(request: ServerRequest): ServerResponse {
-        val optionGroupId = request.pathVariable("optionGroupId").toLong()
+    suspend fun changeOptionGroup(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<ChangeOptionGroupIdRequest>()
 
-        if (!optionGroupUseCase.existsById(optionGroupId)) throw ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "존재하지 않는 옵션그룹입니다."
-        )
+        useCase.changeOptionGroup(id) { optionGroupUseCase.getOptionGroup(body.optionGroupId) }
+        return ok().buildAndAwait()
+    }
+
+    suspend fun deleteOption(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
 
         useCase.deleteOption(id)
         return ok().buildAndAwait()

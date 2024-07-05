@@ -1,12 +1,14 @@
 package hyuuny.fooddelivery.presentation.admin.v1.menu
 
 import AdminMenuSearchCondition
+import ChangeMenuGroupRequest
 import ChangeMenuStatusRequest
 import CreateMenuRequest
 import MenuResponse
 import MenuResponses
 import UpdateMenuRequest
 import hyuuny.fooddelivery.application.menu.MenuUseCase
+import hyuuny.fooddelivery.application.menugroup.MenuGroupUseCase
 import hyuuny.fooddelivery.common.constant.MenuStatus
 import hyuuny.fooddelivery.common.response.SimplePage
 import hyuuny.fooddelivery.common.utils.extractCursorAndCount
@@ -20,6 +22,7 @@ import org.springframework.web.reactive.function.server.ServerResponse.ok
 @Component
 class MenuHandler(
     private val useCase: MenuUseCase,
+    private val menuGroupUseCase: MenuGroupUseCase,
 ) {
 
     suspend fun getMenus(request: ServerRequest): ServerResponse {
@@ -37,27 +40,30 @@ class MenuHandler(
 
         val pageRequest = PageRequest.of(cursor, count, sort)
         val page = useCase.getMenusByAdminCondition(searchCondition, pageRequest)
-        val responses = SimplePage(page.content.map { MenuResponses(it) }, page)
+        val responses = SimplePage(page.content.map { MenuResponses.from(it) }, page)
         return ok().bodyValueAndAwait(responses)
     }
 
     suspend fun createMenu(request: ServerRequest): ServerResponse {
         val body = request.awaitBody<CreateMenuRequest>()
-        val menu = useCase.createMenu(body)
-        val response = MenuResponse(menu)
+
+        val menu = useCase.createMenu(body) { menuGroupUseCase.getMenuGroup(body.menuGroupId) }
+        val response = MenuResponse.from(menu)
         return ok().bodyValueAndAwait(response)
     }
 
     suspend fun getMenu(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
+
         val menu = useCase.getMenu(id)
-        val response = MenuResponse(menu)
+        val response = MenuResponse.from(menu)
         return ok().bodyValueAndAwait(response)
     }
 
     suspend fun updateMeno(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
         val body = request.awaitBody<UpdateMenuRequest>()
+
         useCase.updateMenu(id, body)
         return ok().buildAndAwait()
     }
@@ -65,12 +71,22 @@ class MenuHandler(
     suspend fun changeMenuStatus(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
         val body = request.awaitBody<ChangeMenuStatusRequest>()
+
         useCase.changeMenuStatus(id, body)
+        return ok().buildAndAwait()
+    }
+
+    suspend fun changeMenuGroup(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<ChangeMenuGroupRequest>()
+
+        useCase.changeMenuGroup(id) { menuGroupUseCase.getMenuGroup(body.menuGroupId) }
         return ok().buildAndAwait()
     }
 
     suspend fun deleteMenu(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
+
         useCase.deleteMenu(id)
         return ok().buildAndAwait()
     }

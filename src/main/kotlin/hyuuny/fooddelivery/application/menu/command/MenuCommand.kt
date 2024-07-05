@@ -26,3 +26,8 @@ data class ChangeMenuStatusCommand(
     val status: MenuStatus,
     val updatedAt: LocalDateTime
 )
+
+data class ChangeMenuGroupCommand(
+    val menuGroupId: Long,
+    val updatedAt: LocalDateTime
+)

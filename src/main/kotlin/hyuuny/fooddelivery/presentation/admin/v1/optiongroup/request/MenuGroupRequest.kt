@@ -12,6 +12,7 @@ data class UpdateOptionGroupRequest(
 )
 
 data class ReorderOptionGroupRequests(
+    val menuId: Long,
     val reOrderedOptionGroups: List<ReorderOptionGroupRequest>,
 )
 

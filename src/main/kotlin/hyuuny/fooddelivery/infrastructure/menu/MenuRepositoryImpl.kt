@@ -55,6 +55,18 @@ class MenuRepositoryImpl(
             )
     }
 
+    override suspend fun updateMenuGroupId(menu: Menu) {
+        template.update<Menu>()
+            .matching(
+                Query.query(
+                    where("id") isEqual (menu.id!!),
+                ),
+            ).applyAndAwait(
+                Update.update("menuGroupId", menu.menuGroupId)
+                    .set("updatedAt", menu.updatedAt)
+            )
+    }
+
     override suspend fun delete(id: Long) {
         dao.deleteById(id)
     }
