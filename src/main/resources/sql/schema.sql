@@ -259,3 +259,16 @@ CREATE TABLE IF NOT EXISTS review_comments
     updated_at TIMESTAMP NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_review_comments_review_id ON review_comments (review_id);
+
+CREATE TABLE IF NOT EXISTS liked_store
+(
+    id         SERIAL PRIMARY KEY,
+    user_id    BIGINT    NOT NULL,
+    store_id   BIGINT    NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    CONSTRAINT unique_user_store UNIQUE (user_id, store_id),
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_store FOREIGN KEY (store_id) REFERENCES stores (id)
+);
+CREATE INDEX IF NOT EXISTS idx_liked_stores_user_id ON liked_store (user_id);
+CREATE INDEX IF NOT EXISTS idx_liked_stores_user_id_store_id ON liked_store (user_id, store_id);
