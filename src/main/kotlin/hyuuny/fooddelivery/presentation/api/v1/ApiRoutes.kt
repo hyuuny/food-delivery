@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.presentation.api.v1
 
 import hyuuny.fooddelivery.presentation.api.v1.cart.CartApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.category.CategoryApiHandler
+import hyuuny.fooddelivery.presentation.api.v1.likedstore.LikedStoreApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.menu.MenuApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.order.OrderApiHandler
 import hyuuny.fooddelivery.presentation.api.v1.review.ReviewApiHandler
@@ -115,6 +116,19 @@ class ApiRoutes {
 
             "/api/v1/reviews".nest {
                 GET("", handler::getReviews)
+            }
+        }
+    }
+
+    @Bean
+    fun likedStoreApi(handler: LikedStoreApiHandler): RouterFunction<ServerResponse> {
+        return coRouter {
+            "/api/v1/liked-stores".nest {
+                POST("", handler::likeOrCancel)
+            }
+
+            "/api/v1/users/{userId}/liked-stores".nest {
+                GET("", handler::getAllLikedStores)
             }
         }
     }

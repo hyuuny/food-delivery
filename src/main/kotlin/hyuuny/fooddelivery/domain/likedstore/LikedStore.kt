@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.domain.likedstore
 
+import LikeOrCancelCommand
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -15,5 +16,13 @@ class LikedStore(
     @Id
     var id = id
         protected set
+
+    companion object {
+        fun handle(command: LikeOrCancelCommand): LikedStore = LikedStore(
+            userId = command.userId,
+            storeId = command.storeId,
+            createdAt = command.createdAt,
+        )
+    }
 
 }
