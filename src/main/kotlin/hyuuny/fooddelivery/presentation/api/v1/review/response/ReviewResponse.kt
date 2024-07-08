@@ -134,6 +134,8 @@ data class ReviewCommentResponse(
     val id: Long,
     val reviewId: Long,
     val userId: Long,
+    val ownerName: String,
+    val ownerImageUrl: String,
     val content: String,
     val createdAt: LocalDateTime,
 ) {
@@ -143,6 +145,8 @@ data class ReviewCommentResponse(
                 id = entity.id!!,
                 reviewId = entity.reviewId,
                 userId = entity.userId,
+                ownerName = entity.getOwnerName(),
+                ownerImageUrl = entity.getOwnerImageUrl(),
                 content = entity.content,
                 createdAt = entity.createdAt,
             )

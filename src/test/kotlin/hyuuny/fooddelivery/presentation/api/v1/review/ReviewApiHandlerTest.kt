@@ -266,6 +266,8 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].comment.id").isEqualTo(reviewComments[2].id!!)
             .jsonPath("$.content[1].comment.reviewId").isEqualTo(reviewComments[2].reviewId)
             .jsonPath("$.content[1].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[1].comment.ownerName").isEqualTo(reviewComments[2].getOwnerName())
+            .jsonPath("$.content[1].comment.ownerImageUrl").isEqualTo(reviewComments[2].getOwnerImageUrl())
             .jsonPath("$.content[1].comment.content").isEqualTo(reviewComments[2].content)
 
             .jsonPath("$.content[2].id").isEqualTo(reviews[1].id!!)
@@ -286,6 +288,8 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[2].comment.id").isEqualTo(reviewComments[1].id!!)
             .jsonPath("$.content[2].comment.reviewId").isEqualTo(reviewComments[1].reviewId)
             .jsonPath("$.content[2].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[2].comment.ownerName").isEqualTo(reviewComments[1].getOwnerName())
+            .jsonPath("$.content[2].comment.ownerImageUrl").isEqualTo(reviewComments[1].getOwnerImageUrl())
             .jsonPath("$.content[2].comment.content").isEqualTo(reviewComments[1].content)
 
             .jsonPath("$.content[3].id").isEqualTo(reviews[0].id!!)
@@ -306,6 +310,8 @@ class ReviewApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[3].comment.id").isEqualTo(reviewComments[0].id!!)
             .jsonPath("$.content[3].comment.reviewId").isEqualTo(reviewComments[0].reviewId)
             .jsonPath("$.content[3].comment.userId").isEqualTo(ownerId)
+            .jsonPath("$.content[3].comment.ownerName").isEqualTo(reviewComments[0].getOwnerName())
+            .jsonPath("$.content[3].comment.ownerImageUrl").isEqualTo(reviewComments[0].getOwnerImageUrl())
             .jsonPath("$.content[3].comment.content").isEqualTo(reviewComments[0].content)
 
             .jsonPath("$.pageNumber").isEqualTo(1)
