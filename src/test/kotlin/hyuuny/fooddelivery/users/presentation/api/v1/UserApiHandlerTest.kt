@@ -8,6 +8,7 @@ import ChangeUserPhoneNumberRequest
 import SignUpUserRequest
 import com.ninjasquad.springmockk.MockkBean
 import hyuuny.fooddelivery.BaseIntegrationTest
+import hyuuny.fooddelivery.common.constant.UserType
 import hyuuny.fooddelivery.users.application.UserUseCase
 import hyuuny.fooddelivery.users.domain.User
 import io.mockk.coEvery
@@ -34,7 +35,7 @@ class UserApiHandlerTest : BaseIntegrationTest() {
         val user = generateUser(request)
         coEvery { useCase.signUp(request) } returns user
 
-        webTestClient.post().uri("/api/v1/users/sign-up")
+        webTestClient.post().uri("/api/v1/users/sign-up/customers")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -43,11 +44,44 @@ class UserApiHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(user.id!!)
+            .jsonPath("$.userType").isEqualTo(user.userType.name)
             .jsonPath("$.name").isEqualTo(user.name)
             .jsonPath("$.nickname").isEqualTo(user.nickname)
             .jsonPath("$.email").isEqualTo(user.email)
             .jsonPath("$.phoneNumber").isEqualTo(user.phoneNumber)
             .jsonPath("$.imageUrl").isEqualTo(user.imageUrl!!)
+            .jsonPath("$.createdAt").exists()
+            .jsonPath("$.updatedAt").exists()
+    }
+
+    @DisplayName("라이더는 회원가입을 할 수 있다.")
+    @Test
+    fun signUpRider() {
+        val request = SignUpUserRequest(
+            name = "라이더",
+            nickname = "rider123",
+            email = "rider123@knou.ac.kr",
+            phoneNumber = "010-8392-1280",
+            imageUrl = "https://my-s3-bucket.s3.ap-northeast-2.amazonaws.com/images/rider-start.jpeg",
+        )
+        val rider = generateUser(request, UserType.RIDER)
+        coEvery { useCase.signUpRider(request) } returns rider
+
+        webTestClient.post().uri("/api/v1/users/sign-up/riders")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.id").isEqualTo(rider.id!!)
+            .jsonPath("$.userType").isEqualTo(rider.userType.name)
+            .jsonPath("$.name").isEqualTo(rider.name)
+            .jsonPath("$.nickname").isEqualTo(rider.nickname)
+            .jsonPath("$.email").isEqualTo(rider.email)
+            .jsonPath("$.phoneNumber").isEqualTo(rider.phoneNumber)
+            .jsonPath("$.imageUrl").isEqualTo(rider.imageUrl!!)
             .jsonPath("$.createdAt").exists()
             .jsonPath("$.updatedAt").exists()
     }
@@ -72,6 +106,7 @@ class UserApiHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(user.id!!)
+            .jsonPath("$.userType").isEqualTo(user.userType.name)
             .jsonPath("$.name").isEqualTo(user.name)
             .jsonPath("$.nickname").isEqualTo(user.nickname)
             .jsonPath("$.email").isEqualTo(user.email)
@@ -180,10 +215,11 @@ class UserApiHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
-    private fun generateUser(request: SignUpUserRequest): User {
+    private fun generateUser(request: SignUpUserRequest, userType: UserType = UserType.CUSTOMER): User {
         val now = LocalDateTime.now()
         return User(
             id = 1,
+            userType = userType,
             name = request.name,
             nickname = request.nickname,
             email = request.email,

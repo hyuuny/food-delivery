@@ -6,6 +6,7 @@ import ChangeUserNameCommand
 import ChangeUserNicknameCommand
 import ChangeUserPhoneNumberCommand
 import SignUpUserCommand
+import hyuuny.fooddelivery.common.constant.UserType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
@@ -13,6 +14,7 @@ import java.time.LocalDateTime
 @Table("users")
 class User(
     id: Long? = null,
+    val userType: UserType = UserType.CUSTOMER,
     name: String,
     nickname: String,
     email: String,
@@ -80,5 +82,9 @@ class User(
     }
 
     fun getImageUrlOrDefault(): String = imageUrl ?: USER_DEFAULT_IMAGE_URL
+
+    fun isCustomer(): Boolean = userType == UserType.CUSTOMER
+
+    fun isRider(): Boolean = userType == UserType.RIDER
 
 }

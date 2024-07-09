@@ -13,6 +13,7 @@ import ChangeUserPhoneNumberCommand
 import ChangeUserPhoneNumberRequest
 import SignUpUserCommand
 import SignUpUserRequest
+import hyuuny.fooddelivery.common.constant.UserType
 import hyuuny.fooddelivery.users.domain.User
 import hyuuny.fooddelivery.users.infrastructure.UserRepository
 import org.springframework.data.domain.Page
@@ -35,21 +36,21 @@ class UserUseCase(
 
     @Transactional
     suspend fun signUp(request: SignUpUserRequest): User {
-        if (repository.existsByEmail(request.email)) throw IllegalArgumentException("중복된 이메일입니다. email: ${request.email} ")
+        verifyDuplicatedEmail(request)
         UserVerifier.verify(request)
 
         val now = LocalDateTime.now()
-        val user = User.handle(
-            SignUpUserCommand(
-                name = request.name,
-                nickname = request.nickname,
-                email = request.email,
-                phoneNumber = request.phoneNumber,
-                imageUrl = request.imageUrl,
-                createdAt = now,
-                updatedAt = now,
-            )
-        )
+        val user = toUser(request, UserType.CUSTOMER, now)
+        return repository.insert(user)
+    }
+
+    @Transactional
+    suspend fun signUpRider(request: SignUpUserRequest): User {
+        verifyDuplicatedEmail(request)
+        UserVerifier.verify(request)
+
+        val now = LocalDateTime.now()
+        val user = toUser(request, UserType.RIDER, now)
         return repository.insert(user)
     }
 
@@ -141,5 +142,22 @@ class UserUseCase(
 
     private suspend fun findUserByIdOrThrow(id: Long): User =
         repository.findById(id) ?: throw NoSuchElementException("${id}번 회원을 찾을 수 없습니다.")
+
+    private suspend fun verifyDuplicatedEmail(request: SignUpUserRequest) {
+        if (repository.existsByEmail(request.email)) throw IllegalArgumentException("중복된 이메일입니다. email: ${request.email} ")
+    }
+
+    private fun toUser(request: SignUpUserRequest, userType: UserType, now: LocalDateTime) = User.handle(
+        SignUpUserCommand(
+            userType = userType,
+            name = request.name,
+            nickname = request.nickname,
+            email = request.email,
+            phoneNumber = request.phoneNumber,
+            imageUrl = request.imageUrl,
+            createdAt = now,
+            updatedAt = now,
+        )
+    )
 
 }

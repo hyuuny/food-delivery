@@ -1,6 +1,8 @@
+import hyuuny.fooddelivery.common.constant.UserType
 import java.time.LocalDateTime
 
 data class SignUpUserCommand(
+    val userType: UserType,
     val name: String,
     val nickname: String,
     val email: String,

@@ -13,7 +13,8 @@ class UserApiRouter {
     fun userApi(handler: UserApiHandler): RouterFunction<ServerResponse> {
         return coRouter {
             "/api/v1/users".nest {
-                POST("/sign-up", handler::signUp)
+                POST("/sign-up/customers", handler::signUp)
+                POST("/sign-up/riders", handler::signUpRider)
                 GET("/{id}", handler::getUser)
                 PATCH("/{id}/change-name", handler::changeName)
                 PATCH("/{id}/change-nickname", handler::changeNickname)

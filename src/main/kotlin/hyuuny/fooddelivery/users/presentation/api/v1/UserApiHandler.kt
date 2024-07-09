@@ -25,6 +25,14 @@ class UserApiHandler(
         return ok().bodyValueAndAwait(response)
     }
 
+    suspend fun signUpRider(request: ServerRequest): ServerResponse {
+        val body = request.awaitBody<SignUpUserRequest>()
+
+        val user = useCase.signUpRider(body)
+        val response = UserResponse.from(user)
+        return ok().bodyValueAndAwait(response)
+    }
+
     suspend fun getUser(request: ServerRequest): ServerResponse {
         val id = request.pathVariable("id").toLong()
 

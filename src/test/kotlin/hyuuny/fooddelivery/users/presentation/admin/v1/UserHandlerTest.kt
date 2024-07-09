@@ -80,7 +80,6 @@ class UserHandlerTest : BaseIntegrationTest() {
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.DEFAULT_DIRECTION, "id"))
         val page = PageImpl(users, pageable, users.size.toLong())
         coEvery { useCase.getUsersByAdminCondition(any(), any()) } returns page
-
         webTestClient.get().uri("/admin/v1/users?sort:id:desc")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
@@ -88,6 +87,7 @@ class UserHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.content[0].id").isEqualTo(fifthUser.id!!)
+            .jsonPath("$.content[0].userType").isEqualTo(fifthUser.userType.name)
             .jsonPath("$.content[0].name").isEqualTo(fifthUser.name)
             .jsonPath("$.content[0].nickname").isEqualTo(fifthUser.nickname)
             .jsonPath("$.content[0].email").isEqualTo(fifthUser.email)
@@ -95,6 +95,7 @@ class UserHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[0].createdAt").exists()
 
             .jsonPath("$.content[1].id").isEqualTo(fourthUser.id!!)
+            .jsonPath("$.content[1].userType").isEqualTo(fourthUser.userType.name)
             .jsonPath("$.content[1].name").isEqualTo(fourthUser.name)
             .jsonPath("$.content[1].nickname").isEqualTo(fourthUser.nickname)
             .jsonPath("$.content[1].email").isEqualTo(fourthUser.email)
@@ -102,6 +103,7 @@ class UserHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].createdAt").exists()
 
             .jsonPath("$.content[2].id").isEqualTo(thirdUser.id!!)
+            .jsonPath("$.content[2].userType").isEqualTo(thirdUser.userType.name)
             .jsonPath("$.content[2].name").isEqualTo(thirdUser.name)
             .jsonPath("$.content[2].nickname").isEqualTo(thirdUser.nickname)
             .jsonPath("$.content[2].email").isEqualTo(thirdUser.email)
@@ -109,6 +111,7 @@ class UserHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[2].createdAt").exists()
 
             .jsonPath("$.content[3].id").isEqualTo(secondUser.id!!)
+            .jsonPath("$.content[3].userType").isEqualTo(secondUser.userType.name)
             .jsonPath("$.content[3].name").isEqualTo(secondUser.name)
             .jsonPath("$.content[3].nickname").isEqualTo(secondUser.nickname)
             .jsonPath("$.content[3].email").isEqualTo(secondUser.email)
@@ -116,6 +119,7 @@ class UserHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[3].createdAt").exists()
 
             .jsonPath("$.content[4].id").isEqualTo(firstUser.id!!)
+            .jsonPath("$.content[4].userType").isEqualTo(firstUser.userType.name)
             .jsonPath("$.content[4].name").isEqualTo(firstUser.name)
             .jsonPath("$.content[4].nickname").isEqualTo(firstUser.nickname)
             .jsonPath("$.content[4].email").isEqualTo(firstUser.email)
@@ -126,6 +130,7 @@ class UserHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.size").isEqualTo(15)
             .jsonPath("$.last").isEqualTo(true)
             .jsonPath("$.totalElements").isEqualTo(5)
+
     }
 
     @DisplayName("관리자는 기간내에 가입한 회원 목록을 조회할 수 있다.")
@@ -199,6 +204,7 @@ class UserHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.content[0].id").isEqualTo(secondUser.id!!)
+            .jsonPath("$.content[0].userType").isEqualTo(secondUser.userType.name)
             .jsonPath("$.content[0].name").isEqualTo(secondUser.name)
             .jsonPath("$.content[0].nickname").isEqualTo(secondUser.nickname)
             .jsonPath("$.content[0].email").isEqualTo(secondUser.email)
@@ -240,6 +246,7 @@ class UserHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(user.id!!)
+            .jsonPath("$.userType").isEqualTo(user.userType.name)
             .jsonPath("$.name").isEqualTo(user.name)
             .jsonPath("$.nickname").isEqualTo(user.nickname)
             .jsonPath("$.email").isEqualTo(user.email)
@@ -271,6 +278,7 @@ class UserHandlerTest : BaseIntegrationTest() {
             .expectBody()
             .consumeWith(::println)
             .jsonPath("$.id").isEqualTo(user.id!!)
+            .jsonPath("$.userType").isEqualTo(user.userType.name)
             .jsonPath("$.name").isEqualTo(user.name)
             .jsonPath("$.nickname").isEqualTo(user.nickname)
             .jsonPath("$.email").isEqualTo(user.email)

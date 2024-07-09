@@ -1,6 +1,7 @@
 package hyuuny.fooddelivery.users.application
 
 import SignUpUserRequest
+import hyuuny.fooddelivery.common.constant.UserType
 import hyuuny.fooddelivery.users.domain.User
 import hyuuny.fooddelivery.users.infrastructure.UserRepository
 import io.kotest.assertions.throwables.shouldThrow
@@ -40,11 +41,39 @@ class SignUpUserUseCaseTest : BehaviorSpec({
         coEvery { repository.existsByEmail(request.email) } returns false
         coEvery { repository.insert(any()) } returns user
 
-        When("유효한 회원가입일 경우") {
+        When("고객이 회원가입하면") {
             val result = useCase.signUp(request)
 
-            Then("회원가입이 완료된다") {
+            Then("유저 타입이 CUSTOMER로 회원가입에 성공한다.") {
                 result.id.shouldNotBeNull()
+                result.userType shouldBe UserType.CUSTOMER
+                result.name shouldBe request.name
+                result.nickname shouldBe request.nickname
+                result.email shouldBe request.email
+                result.phoneNumber shouldBe request.phoneNumber
+                result.imageUrl shouldBe request.imageUrl
+                result.createdAt.shouldNotBeNull()
+                result.updatedAt shouldBe result.createdAt
+            }
+        }
+
+        When("라이더가 회원가입하면") {
+            coEvery { repository.insert(any()) } returns User(
+                id = 1L,
+                userType = UserType.RIDER,
+                name = request.name,
+                nickname = request.nickname,
+                email = request.email,
+                phoneNumber = request.phoneNumber,
+                imageUrl = request.imageUrl,
+                createdAt = now,
+                updatedAt = now,
+            )
+            val result = useCase.signUpRider(request)
+
+            Then("유저 타입이 RIDER로 회원가입에 성공한다.") {
+                result.id.shouldNotBeNull()
+                result.userType shouldBe UserType.RIDER
                 result.name shouldBe request.name
                 result.nickname shouldBe request.nickname
                 result.email shouldBe request.email
