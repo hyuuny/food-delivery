@@ -14,7 +14,7 @@ import kotlinx.coroutines.coroutineScope
 import org.springframework.stereotype.Component
 
 @Component
-class OrderCartValidator(
+class OrderCartVerifier(
     private val cartRepository: CartRepository,
     private val cartItemRepository: CartItemRepository,
     private val cartItemOptionRepository: CartItemOptionRepository,
@@ -22,7 +22,7 @@ class OrderCartValidator(
     private val optionRepository: OptionRepository,
 ) {
 
-    suspend fun validate(cartId: Long, request: CreateOrderRequest) {
+    suspend fun verify(cartId: Long, request: CreateOrderRequest) {
         coroutineScope {
             val cartDeferred = async { cartRepository.findById(cartId) }
             val cartItemsDeferred = async { cartItemRepository.findAllByCartId(cartId) }

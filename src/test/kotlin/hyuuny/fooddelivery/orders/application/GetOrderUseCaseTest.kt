@@ -23,14 +23,14 @@ class GetOrderUseCaseTest : BehaviorSpec({
     val orderRepository = mockk<OrderRepository>()
     val orderItemRepository = mockk<OrderItemRepository>()
     val orderItemOptionRepository = mockk<OrderItemOptionRepository>()
-    val orderCartValidator = mockk<OrderCartValidator>()
+    val orderCartVerifier = mockk<OrderCartVerifier>()
     val userUseCase = mockk<UserUseCase>()
 
     val useCase = OrderUseCase(
         orderRepository,
         orderItemRepository,
         orderItemOptionRepository,
-        orderCartValidator,
+        orderCartVerifier,
     )
 
     Given("주문내역을 상세조회 할 때") {

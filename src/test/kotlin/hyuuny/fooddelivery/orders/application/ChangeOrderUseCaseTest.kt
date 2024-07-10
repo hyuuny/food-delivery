@@ -23,13 +23,13 @@ class ChangeOrderUseCaseTest : BehaviorSpec({
     val repository = mockk<OrderRepository>()
     val orderItemRepository = mockk<OrderItemRepository>()
     val orderItemOptionRepository = mockk<OrderItemOptionRepository>()
-    val orderCartValidator = mockk<OrderCartValidator>()
+    val orderCartVerifier = mockk<OrderCartVerifier>()
 
     val useCase = OrderUseCase(
         repository,
         orderItemRepository,
         orderItemOptionRepository,
-        orderCartValidator,
+        orderCartVerifier,
     )
 
     Given("주문의 상태를 변경할 때") {

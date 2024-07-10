@@ -24,14 +24,14 @@ class RefundOrderUseCaseTest : BehaviorSpec({
     val repository = mockk<OrderRepository>()
     val orderItemRepository = mockk<OrderItemRepository>()
     val orderItemOptionRepository = mockk<OrderItemOptionRepository>()
-    val orderCartValidator = mockk<OrderCartValidator>()
+    val orderCartVerifier = mockk<OrderCartVerifier>()
     val userUseCase = mockk<UserUseCase>()
 
     val useCase = OrderUseCase(
         repository,
         orderItemRepository,
         orderItemOptionRepository,
-        orderCartValidator,
+        orderCartVerifier,
     )
 
     Given("회원이 주문을 환불할 때") {

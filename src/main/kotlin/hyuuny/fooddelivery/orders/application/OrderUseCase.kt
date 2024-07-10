@@ -33,7 +33,7 @@ class OrderUseCase(
     private val repository: OrderRepository,
     private val orderItemRepository: OrderItemRepository,
     private val orderItemOptionRepository: OrderItemOptionRepository,
-    private val orderCartValidator: OrderCartValidator,
+    private val orderCartVerifier: OrderCartVerifier,
 ) {
 
     companion object : Log
@@ -59,7 +59,7 @@ class OrderUseCase(
         getMenus: suspend () -> List<Menu>,
         getOptions: suspend () -> List<Option>,
     ): Order {
-        orderCartValidator.validate(cartId, request)
+        orderCartVerifier.verify(cartId, request)
 
         val now = LocalDateTime.now()
         val user = getUser()

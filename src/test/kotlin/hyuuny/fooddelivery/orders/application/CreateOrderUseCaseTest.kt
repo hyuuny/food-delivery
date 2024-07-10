@@ -32,7 +32,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
     val orderRepository = mockk<OrderRepository>()
     val orderItemRepository = mockk<OrderItemRepository>()
     val orderItemOptionRepository = mockk<OrderItemOptionRepository>()
-    val orderCartValidator = mockk<OrderCartValidator>()
+    val orderCartVerifier = mockk<OrderCartVerifier>()
     val userUseCase = mockk<UserUseCase>()
     val menuUseCase = mockk<MenuUseCase>()
     val optionUseCase = mockk<OptionUseCase>()
@@ -41,7 +41,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
         orderRepository,
         orderItemRepository,
         orderItemOptionRepository,
-        orderCartValidator,
+        orderCartVerifier,
     )
 
     Given("회원이 음식을 주문하면서") {
@@ -124,7 +124,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
             OrderItemOption(3L, 2L, 3L, "콘 아이스크림", 500, now),
         )
 
-        coEvery { orderCartValidator.validate(any(), any()) } returns Unit
+        coEvery { orderCartVerifier.verify(any(), any()) } returns Unit
         coEvery { userUseCase.getUser(any()) } returns user
         coEvery { menuUseCase.getAllByIds(any()) } returns menus
         coEvery { optionUseCase.getAllByIds(any()) } returns options
@@ -166,7 +166,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
 
         `when`("장바구니 결제 금액과 일치하지 않으면") {
             val invalidRequest = request.copy(totalPrice = -1)
-            coEvery { orderCartValidator.validate(any(), any())
+            coEvery { orderCartVerifier.verify(any(), any())
             } throws IllegalStateException("장바구니 금액과 주문 금액이 일치하지 않습니다.")
 
             then("주문 생성이 실패한다") {
@@ -184,7 +184,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
         }
 
         `when`("장바구니를 찾을 수 없다면") {
-            coEvery { orderCartValidator.validate(any(), any()) } throws NoSuchElementException("0번 장바구니를 찾을 수 없습니다.")
+            coEvery { orderCartVerifier.verify(any(), any()) } throws NoSuchElementException("0번 장바구니를 찾을 수 없습니다.")
 
             then("주문 생성이 실패한다") {
                 val ex = shouldThrow<NoSuchElementException> {
@@ -204,7 +204,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
             val cartOrderItems = listOf(CreateOrderItemRequest(menuId = 1, quantity = 1, optionIds = listOf(1, 2)))
             val invalidRequest = request.copy(orderItems = cartOrderItems)
             coEvery {
-                orderCartValidator.validate(
+                orderCartVerifier.verify(
                     any(),
                     any()
                 )
@@ -231,7 +231,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
             )
             val invalidRequest = request.copy(orderItems = cartOrderItems)
             coEvery {
-                orderCartValidator.validate(
+                orderCartVerifier.verify(
                     any(),
                     any()
                 )
@@ -254,7 +254,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
         `when`("장바구니의 배달비와 주문 시 배달비가 다르면") {
             val invalidRequest = request.copy(deliveryFee = 3000)
             coEvery {
-                orderCartValidator.validate(
+                orderCartVerifier.verify(
                     any(),
                     any()
                 )
