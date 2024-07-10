@@ -17,6 +17,7 @@ enum class OrderStatus(val value: String) {
     companion object {
         val CANCELABLE_ORDER_STATUS = setOf(CREATED, PENDING, PAYMENT_COMPLETED)
         val REFUNDABLE_ORDER_STATUS = setOf(DELIVERY_COMPLETED)
+        val ACCEPTABLE_DELIVERY_STATUS = setOf(CONFIRMED, PROCESSING)
     }
 
 }

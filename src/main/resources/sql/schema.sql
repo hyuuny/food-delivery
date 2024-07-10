@@ -273,3 +273,16 @@ CREATE TABLE IF NOT EXISTS liked_store
 );
 CREATE INDEX IF NOT EXISTS idx_liked_stores_user_id ON liked_store (user_id);
 CREATE INDEX IF NOT EXISTS idx_liked_stores_user_id_store_id ON liked_store (user_id, store_id);
+
+CREATE TABLE IF NOT EXISTS deliveries
+(
+    id             SERIAL PRIMARY KEY,
+    rider_id       BIGINT      NOT NULL,
+    order_id       BIGINT      NOT NULL,
+    status         VARCHAR(20) NOT NULL,
+    pickup_time    TIMESTAMP,
+    delivered_time TIMESTAMP,
+    cancel_time    TIMESTAMP,
+    created_at     TIMESTAMP   NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_deliveries_rider_id ON deliveries (rider_id);
