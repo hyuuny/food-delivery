@@ -180,6 +180,8 @@ class OrderUseCase(
         repository.updateStatus(order)
     }
 
+    suspend fun getAllByIds(ids: List<Long>): List<Order> = repository.findAllByIdIn(ids)
+
     private suspend fun findOrderByIdAndUserIdOrThrow(id: Long, userId: Long) =
         repository.findByIdAndUserId(id, userId) ?: throw NoSuchElementException("${id}번 주문을 찾을 수 없습니다.")
 

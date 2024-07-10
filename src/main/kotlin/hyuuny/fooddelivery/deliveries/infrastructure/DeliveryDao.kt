@@ -7,6 +7,4 @@ interface DeliveryDao: CoroutineCrudRepository<Delivery, Long> {
 
     suspend fun findByOrderId(orderId: Long): Delivery?
 
-    suspend fun findAllByRiderId(riderId: Long): List<Delivery>
-
 }

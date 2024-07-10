@@ -1,6 +1,9 @@
 package hyuuny.fooddelivery.deliveries.infrastructure
 
+import ApiDeliverSearchCondition
 import hyuuny.fooddelivery.deliveries.domain.Delivery
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 
 interface DeliveryRepository {
 
@@ -8,7 +11,7 @@ interface DeliveryRepository {
 
     suspend fun findById(id: Long): Delivery?
 
-    suspend fun findAllByRiderId(riderId: Long): List<Delivery>
+    suspend fun findAllDeliveries(searchCondition: ApiDeliverSearchCondition, pageable: Pageable): PageImpl<Delivery>
 
     suspend fun updatePickupTime(delivery: Delivery)
 

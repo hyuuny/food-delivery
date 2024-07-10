@@ -5,6 +5,7 @@ import ApiOrderSearchCondition
 import hyuuny.fooddelivery.orders.domain.Order
 import hyuuny.fooddelivery.stores.infrastructure.StoreDao
 import hyuuny.fooddelivery.users.infrastructure.UserDao
+import kotlinx.coroutines.flow.toList
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
@@ -29,6 +30,8 @@ class OrderRepositoryImpl(
     override suspend fun insert(order: Order): Order = dao.save(order)
 
     override suspend fun findById(id: Long): Order? = dao.findById(id)
+
+    override suspend fun findAllByIdIn(ids: List<Long>): List<Order> = dao.findAllById(ids).toList()
 
     override suspend fun findByIdAndUserId(id: Long, userId: Long): Order? = dao.findByIdAndUserId(id, userId)
 
@@ -129,6 +132,10 @@ class OrderRepositoryImpl(
 
     private suspend fun buildCriteria(searchCondition: ApiOrderSearchCondition): Criteria {
         var criteria = Criteria.empty()
+
+        searchCondition.userId.let {
+            criteria = criteria.and("userId").`is`(it)
+        }
 
         searchCondition.categoryIds?.let {
             criteria = criteria.and("categoryId").`in`(it)

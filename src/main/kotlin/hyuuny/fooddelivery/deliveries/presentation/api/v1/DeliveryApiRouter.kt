@@ -15,6 +15,10 @@ class DeliveryApiRouter {
             PATCH("/{id}/pickup", handler::pickup)
             PATCH("/{id}/delivered", handler::delivered)
         }
+
+        "/api/v1/users/{userId}/deliveries".nest {
+            GET("", handler::getDeliveries)
+        }
     }
 
 }

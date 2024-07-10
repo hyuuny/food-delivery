@@ -7,4 +7,6 @@ interface OrderDao : CoroutineCrudRepository<Order, Long> {
 
     suspend fun findByIdAndUserId(id: Long, userId: Long): Order?
 
+    suspend fun findByOrderNumber(orderNumber: String): Order?
+
 }

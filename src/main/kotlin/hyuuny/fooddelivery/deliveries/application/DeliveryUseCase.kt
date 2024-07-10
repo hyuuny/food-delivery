@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.deliveries.application
 
 import AcceptDeliveryCommand
 import AcceptDeliveryRequest
+import ApiDeliverSearchCondition
 import CancelDeliveryCommand
 import DeliveredDeliveryCommand
 import PickupDeliveryCommand
@@ -10,6 +11,8 @@ import hyuuny.fooddelivery.deliveries.domain.Delivery
 import hyuuny.fooddelivery.deliveries.infrastructure.DeliveryRepository
 import hyuuny.fooddelivery.orders.domain.Order
 import hyuuny.fooddelivery.users.domain.User
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -19,6 +22,14 @@ import java.time.LocalDateTime
 class DeliveryUseCase(
     private val repository: DeliveryRepository,
 ) {
+
+    suspend fun getAllDeliveryByApiCondition(
+        searchCondition: ApiDeliverSearchCondition,
+        pageable: Pageable
+    ): PageImpl<Delivery> {
+        val page = repository.findAllDeliveries(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
 
     @Transactional
     suspend fun acceptDelivery(
@@ -52,7 +63,6 @@ class DeliveryUseCase(
         val canceledOrder = getOrder()
         val rider = getRider()
         val delivery = findDeliveryByIdOrThrow(id)
-
         DeliveryVerifier.verifyCancel(delivery, canceledOrder, rider)
 
         delivery.handle(
@@ -74,7 +84,6 @@ class DeliveryUseCase(
         val order = getOrder()
         val rider = getRider()
         val delivery = findDeliveryByIdOrThrow(id)
-
         DeliveryVerifier.verifyPickup(delivery, order, rider)
 
         delivery.handle(
@@ -96,7 +105,6 @@ class DeliveryUseCase(
         val order = getOrder()
         val rider = getRider()
         val delivery = findDeliveryByIdOrThrow(id)
-
         DeliveryVerifier.verifyDelivered(delivery, order, rider)
 
         delivery.handle(
