@@ -143,4 +143,27 @@ class DeliveryApiHandlerTest : BaseIntegrationTest() {
             .consumeWith(::println)
     }
 
+    @DisplayName("배달 완료 처리할 수 있다.")
+    @Test
+    fun delivered() {
+        val id = 1L
+        val orderId = 38L
+        val riderId = 293L
+
+        val request = PickupDeliveryRequest(
+            orderId = orderId,
+            riderId = riderId
+        )
+        coEvery { useCase.delivered(any(), any(), any()) } returns Unit
+
+        webTestClient.patch().uri("/api/v1/deliveries/$id/delivered")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+    }
+
 }

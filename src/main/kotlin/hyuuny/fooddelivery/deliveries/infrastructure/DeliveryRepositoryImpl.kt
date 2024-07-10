@@ -34,7 +34,15 @@ class DeliveryRepositoryImpl(
     }
 
     override suspend fun updateDeliveredTime(delivery: Delivery) {
-        TODO("Not yet implemented")
+        template.update<Delivery>()
+            .matching(
+                Query.query(
+                    where("id").`is`(delivery.id!!),
+                ),
+            ).applyAndAwait(
+                Update.update("status", delivery.status)
+                    .set("deliveredTime", delivery.deliveredTime)
+            )
     }
 
     override suspend fun updateCancelTime(delivery: Delivery) {

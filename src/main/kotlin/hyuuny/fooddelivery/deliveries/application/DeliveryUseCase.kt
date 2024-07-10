@@ -3,6 +3,7 @@ package hyuuny.fooddelivery.deliveries.application
 import AcceptDeliveryCommand
 import AcceptDeliveryRequest
 import CancelDeliveryCommand
+import DeliveredDeliveryCommand
 import PickupDeliveryCommand
 import hyuuny.fooddelivery.common.constant.DeliveryStatus
 import hyuuny.fooddelivery.deliveries.domain.Delivery
@@ -83,6 +84,28 @@ class DeliveryUseCase(
             )
         )
         repository.updatePickupTime(delivery)
+    }
+
+    @Transactional
+    suspend fun delivered(
+        id: Long,
+        getOrder: suspend () -> Order,
+        getRider: suspend () -> User,
+    ) {
+        val now = LocalDateTime.now()
+        val order = getOrder()
+        val rider = getRider()
+        val delivery = findDeliveryByIdOrThrow(id)
+
+        DeliveryVerifier.verifyDelivered(delivery, order, rider)
+
+        delivery.handle(
+            DeliveredDeliveryCommand(
+                status = DeliveryStatus.DELIVERED,
+                deliveredTime = now,
+            )
+        )
+        repository.updateDeliveredTime(delivery)
     }
 
     private suspend fun findDeliveryByIdOrThrow(id: Long): Delivery =

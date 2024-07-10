@@ -13,6 +13,7 @@ class DeliveryApiRouter {
             POST("/accept", handler::acceptDelivery)
             PATCH("/{id}/cancel", handler::cancel)
             PATCH("/{id}/pickup", handler::pickup)
+            PATCH("/{id}/delivered", handler::delivered)
         }
     }
 

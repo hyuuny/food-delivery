@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.deliveries.presentation.api.v1
 
 import AcceptDeliveryRequest
 import CancelDeliveryRequest
+import DeliveredDeliveryRequest
 import PickupDeliveryRequest
 import hyuuny.fooddelivery.deliveries.application.DeliveryUseCase
 import hyuuny.fooddelivery.deliveries.presentation.api.v1.response.DeliveryResponse
@@ -47,6 +48,18 @@ class DeliveryApiHandler(
         val body = request.awaitBody<PickupDeliveryRequest>()
 
         useCase.pickup(
+            id = id,
+            getOrder = { orderUseCase.getOrder(body.orderId) },
+            getRider = { userUseCase.getUser(body.riderId) },
+        )
+        return ok().buildAndAwait()
+    }
+
+    suspend fun delivered(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+        val body = request.awaitBody<DeliveredDeliveryRequest>()
+
+        useCase.delivered(
             id = id,
             getOrder = { orderUseCase.getOrder(body.orderId) },
             getRider = { userUseCase.getUser(body.riderId) },

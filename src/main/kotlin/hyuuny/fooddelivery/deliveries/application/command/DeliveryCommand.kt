@@ -17,3 +17,8 @@ data class PickupDeliveryCommand(
     val status: DeliveryStatus,
     val pickupTime: LocalDateTime,
 )
+
+data class DeliveredDeliveryCommand(
+    val status: DeliveryStatus,
+    val deliveredTime: LocalDateTime,
+)

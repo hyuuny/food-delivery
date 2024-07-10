@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.deliveries.domain
 
 import AcceptDeliveryCommand
 import CancelDeliveryCommand
+import DeliveredDeliveryCommand
 import PickupDeliveryCommand
 import hyuuny.fooddelivery.common.constant.DeliveryStatus
 import org.springframework.data.annotation.Id
@@ -49,6 +50,11 @@ class Delivery(
     fun handle(command: PickupDeliveryCommand) {
         this.status = command.status
         this.pickupTime = command.pickupTime
+    }
+
+    fun handle(command: DeliveredDeliveryCommand) {
+        this.status = command.status
+        this.deliveredTime = command.deliveredTime
     }
 
 }

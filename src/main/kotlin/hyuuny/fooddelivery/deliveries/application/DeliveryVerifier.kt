@@ -26,4 +26,11 @@ object DeliveryVerifier {
         if (delivery.cancelTime != null) throw IllegalStateException("이미 취소된 배달입니다.")
     }
 
+    fun verifyDelivered(delivery: Delivery, order: Order, rider: User) {
+        if (delivery.orderId != order.id) throw IllegalStateException("주문 정보가 일치하지 않습니다.")
+        if (delivery.riderId != rider.id) throw IllegalStateException("라이더 정보가 일치하지 않습니다.")
+        if (delivery.cancelTime != null) throw IllegalStateException("이미 취소된 배달입니다.")
+        if (delivery.deliveredTime != null) throw IllegalStateException("이미 완료된 배달입니다.")
+    }
+
 }
