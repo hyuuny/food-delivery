@@ -23,7 +23,7 @@ class DeliveryUseCase(
     private val repository: DeliveryRepository,
 ) {
 
-    suspend fun getAllDeliveryByApiCondition(
+    suspend fun getDeliveriesByApiCondition(
         searchCondition: ApiDeliverSearchCondition,
         pageable: Pageable
     ): PageImpl<Delivery> {

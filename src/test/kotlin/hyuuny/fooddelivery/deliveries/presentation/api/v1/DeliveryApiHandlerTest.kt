@@ -12,8 +12,10 @@ import hyuuny.fooddelivery.deliveries.application.DeliveryUseCase
 import hyuuny.fooddelivery.deliveries.domain.Delivery
 import hyuuny.fooddelivery.orders.application.OrderUseCase
 import hyuuny.fooddelivery.orders.domain.Order
+import hyuuny.fooddelivery.stores.application.StoreDetailUseCase
 import hyuuny.fooddelivery.stores.application.StoreUseCase
 import hyuuny.fooddelivery.stores.domain.Store
+import hyuuny.fooddelivery.stores.domain.StoreDetail
 import hyuuny.fooddelivery.users.application.UserUseCase
 import hyuuny.fooddelivery.users.domain.User
 import io.mockk.coEvery
@@ -39,22 +41,27 @@ class DeliveryApiHandlerTest : BaseIntegrationTest() {
     @MockkBean
     private lateinit var storeUseCase: StoreUseCase
 
+    @MockkBean
+    private lateinit var storeDetailUseCase: StoreDetailUseCase
+
     @DisplayName("라이더는 배달을 수락할 수 있다.")
     @Test
     fun acceptDelivery() {
         val orderId = 1L
         val riderId = 293L
+        val storeId = 5L
+        val userId = 95L
 
         val now = LocalDateTime.now()
         val order = Order(
             id = orderId,
             orderNumber = generateOrderNumber(now),
-            userId = 95L,
-            storeId = 1L,
+            userId = userId,
+            storeId = storeId,
             categoryId = 1L,
             paymentId = generatePaymentId(),
             paymentMethod = PaymentMethod.NAVER_PAY,
-            status = OrderStatus.CONFIRMED,
+            status = OrderStatus.DELIVERY_COMPLETED,
             deliveryType = DeliveryType.OUTSOURCING,
             zipCode = "12345",
             address = "서울시 강남구 역삼동",
@@ -80,6 +87,44 @@ class DeliveryApiHandlerTest : BaseIntegrationTest() {
             updatedAt = now,
         )
 
+        val store = Store(
+            id = storeId,
+            categoryId = 2L,
+            deliveryType = DeliveryType.TAKE_OUT,
+            name = "카페천국",
+            ownerName = "나커피",
+            taxId = "125-21-12397",
+            deliveryFee = 3000,
+            minimumOrderAmount = 15000,
+            iconImageUrl = "https://my-s3-bucket.s3.ap-northeast-2.amazonaws.com/images/icon-image-3.jpeg",
+            description = "안녕하세요. 카페천국입니다 :)",
+            foodOrigin = "슈퍼빽보이'카나디언:돼지고기(국내산), 페퍼로니: 돼지고기(국내산과 외국산 섞음), 소고기(호주산), 베이컨:돼지고기(미국산)",
+            phoneNumber = "02-1726-2397",
+            createdAt = now.plusHours(4),
+            updatedAt = now.plusHours(4),
+        )
+        val storeDetail = StoreDetail(
+            id = 1,
+            storeId = store.id!!,
+            zipCode = "12345",
+            address = "서울시 강남구 강남대로123길 12",
+            detailedAddress = "1층 101호",
+            openHours = "매일 오전 11:00 ~ 오후 11시 30분",
+            closedDay = null,
+            createdAt = now,
+        )
+
+        val user = User(
+            id = userId,
+            name = "김성현",
+            nickname = "hyuuny",
+            email = "shyune@knou.ac.kr",
+            phoneNumber = "010-1234-1234",
+            imageUrl = "https://my-s3-bucket.s3.ap-northeast-2.amazonaws.com/images/hyuuny.jpeg",
+            createdAt = now,
+            updatedAt = now,
+        )
+
         val request = AcceptDeliveryRequest(
             orderId = order.id!!,
             riderId = rider.id!!,
@@ -88,11 +133,17 @@ class DeliveryApiHandlerTest : BaseIntegrationTest() {
             id = 1L,
             orderId = orderId,
             riderId = riderId,
-            status = DeliveryStatus.ACCEPTED,
+            status = DeliveryStatus.DELIVERED,
+            pickupTime = now.minusDays(1),
+            deliveredTime = now.minusDays(1),
             createdAt = now,
         )
 
         coEvery { useCase.acceptDelivery(any(), any(), any()) } returns delivery
+        coEvery { orderUseCase.getOrder(any()) } returns order
+        coEvery { storeUseCase.getStore(any()) } returns store
+        coEvery { storeDetailUseCase.getStoreDetailByStoreId(any()) } returns storeDetail
+        coEvery { userUseCase.getUser(any()) } returns user
 
         webTestClient.post().uri("/api/v1/deliveries/accept")
             .contentType(MediaType.APPLICATION_JSON)
@@ -105,9 +156,21 @@ class DeliveryApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.id").isEqualTo(delivery.id!!)
             .jsonPath("$.riderId").isEqualTo(delivery.riderId)
             .jsonPath("$.orderId").isEqualTo(delivery.orderId)
+            .jsonPath("$.orderNumber").isEqualTo(order.orderNumber)
+            .jsonPath("$.storeName").isEqualTo(store.name)
+            .jsonPath("$.storeZipCode").isEqualTo(storeDetail.zipCode)
+            .jsonPath("$.storeAddress").isEqualTo(storeDetail.address)
+            .jsonPath("$.storeDetailAddress").isEqualTo(storeDetail.detailedAddress!!)
+            .jsonPath("$.userName").isEqualTo(user.name)
+            .jsonPath("$.userZipCode").isEqualTo(order.zipCode)
+            .jsonPath("$.userAddress").isEqualTo(order.address)
+            .jsonPath("$.userDetailAddress").isEqualTo(order.detailAddress)
+            .jsonPath("$.messageToRider").isEqualTo(order.messageToRider!!)
+            .jsonPath("$.totalPrice").isEqualTo(order.totalPrice)
+            .jsonPath("$.deliveryFee").isEqualTo(order.deliveryFee)
             .jsonPath("$.status").isEqualTo(delivery.status.name)
-            .jsonPath("$.pickupTime").doesNotExist()
-            .jsonPath("$.deliveredTime").doesNotExist()
+            .jsonPath("$.pickupTime").exists()
+            .jsonPath("$.deliveredTime").exists()
             .jsonPath("$.cancelTime").doesNotExist()
             .jsonPath("$.createdAt").exists()
     }
@@ -258,7 +321,7 @@ class DeliveryApiHandlerTest : BaseIntegrationTest() {
         val sortedDeliveries = deliveries.sortedByDescending { it.id }
         val pageable = PageRequest.of(0, 15, Sort.by(Sort.DEFAULT_DIRECTION, "id"))
         val page = PageImpl(sortedDeliveries, pageable, sortedDeliveries.size.toLong())
-        coEvery { useCase.getAllDeliveryByApiCondition(any(), any()) } returns page
+        coEvery { useCase.getDeliveriesByApiCondition(any(), any()) } returns page
         coEvery { userUseCase.getUser(any()) } returns rider
         coEvery { orderUseCase.getAllByIds(any()) } returns orders
         coEvery { storeUseCase.getAllByIds(any()) } returns stores
@@ -273,61 +336,36 @@ class DeliveryApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.riderName").isEqualTo(rider.name)
             .jsonPath("$.details.content[0].id").isEqualTo(deliveries[4].id!!)
             .jsonPath("$.details.content[0].orderId").isEqualTo(orders[4].id!!)
-            .jsonPath("$.details.content[0].orderNumber").isEqualTo(orders[4].orderNumber)
             .jsonPath("$.details.content[0].storeName").isEqualTo(stores[4].name)
-            .jsonPath("$.details.content[0].zipCode").isEqualTo(orders[4].zipCode)
-            .jsonPath("$.details.content[0].address").isEqualTo(orders[4].address)
-            .jsonPath("$.details.content[0].detailAddress").isEqualTo(orders[4].detailAddress)
             .jsonPath("$.details.content[0].phoneNumber").isEqualTo(orders[4].phoneNumber)
-            .jsonPath("$.details.content[0].messageToRider").isEqualTo(orders[4].messageToRider!!)
             .jsonPath("$.details.content[0].totalPrice").isEqualTo(orders[4].totalPrice)
             .jsonPath("$.details.content[0].deliveryFee").isEqualTo(orders[4].deliveryFee)
 
             .jsonPath("$.details.content[1].id").isEqualTo(deliveries[3].id!!)
             .jsonPath("$.details.content[1].orderId").isEqualTo(orders[3].id!!)
-            .jsonPath("$.details.content[1].orderNumber").isEqualTo(orders[3].orderNumber)
             .jsonPath("$.details.content[1].storeName").isEqualTo(stores[3].name)
-            .jsonPath("$.details.content[1].zipCode").isEqualTo(orders[3].zipCode)
-            .jsonPath("$.details.content[1].address").isEqualTo(orders[3].address)
-            .jsonPath("$.details.content[1].detailAddress").isEqualTo(orders[3].detailAddress)
             .jsonPath("$.details.content[1].phoneNumber").isEqualTo(orders[3].phoneNumber)
-            .jsonPath("$.details.content[1].messageToRider").isEqualTo(orders[3].messageToRider!!)
             .jsonPath("$.details.content[1].totalPrice").isEqualTo(orders[3].totalPrice)
             .jsonPath("$.details.content[1].deliveryFee").isEqualTo(orders[3].deliveryFee)
 
             .jsonPath("$.details.content[2].id").isEqualTo(deliveries[2].id!!)
             .jsonPath("$.details.content[2].orderId").isEqualTo(orders[2].id!!)
-            .jsonPath("$.details.content[2].orderNumber").isEqualTo(orders[2].orderNumber)
             .jsonPath("$.details.content[2].storeName").isEqualTo(stores[2].name)
-            .jsonPath("$.details.content[2].zipCode").isEqualTo(orders[2].zipCode)
-            .jsonPath("$.details.content[2].address").isEqualTo(orders[2].address)
-            .jsonPath("$.details.content[2].detailAddress").isEqualTo(orders[2].detailAddress)
             .jsonPath("$.details.content[2].phoneNumber").isEqualTo(orders[2].phoneNumber)
-            .jsonPath("$.details.content[2].messageToRider").isEqualTo(orders[2].messageToRider!!)
             .jsonPath("$.details.content[2].totalPrice").isEqualTo(orders[2].totalPrice)
             .jsonPath("$.details.content[2].deliveryFee").isEqualTo(orders[2].deliveryFee)
 
             .jsonPath("$.details.content[3].id").isEqualTo(deliveries[1].id!!)
             .jsonPath("$.details.content[3].orderId").isEqualTo(orders[1].id!!)
-            .jsonPath("$.details.content[3].orderNumber").isEqualTo(orders[1].orderNumber)
             .jsonPath("$.details.content[3].storeName").isEqualTo(stores[1].name)
-            .jsonPath("$.details.content[3].zipCode").isEqualTo(orders[1].zipCode)
-            .jsonPath("$.details.content[3].address").isEqualTo(orders[1].address)
-            .jsonPath("$.details.content[3].detailAddress").isEqualTo(orders[1].detailAddress)
             .jsonPath("$.details.content[3].phoneNumber").isEqualTo(orders[1].phoneNumber)
-            .jsonPath("$.details.content[3].messageToRider").isEqualTo(orders[1].messageToRider!!)
             .jsonPath("$.details.content[3].totalPrice").isEqualTo(orders[1].totalPrice)
             .jsonPath("$.details.content[3].deliveryFee").isEqualTo(orders[1].deliveryFee)
 
             .jsonPath("$.details.content[4].id").isEqualTo(deliveries[0].id!!)
             .jsonPath("$.details.content[4].orderId").isEqualTo(orders[0].id!!)
-            .jsonPath("$.details.content[4].orderNumber").isEqualTo(orders[0].orderNumber)
             .jsonPath("$.details.content[4].storeName").isEqualTo(stores[0].name)
-            .jsonPath("$.details.content[4].zipCode").isEqualTo(orders[0].zipCode)
-            .jsonPath("$.details.content[4].address").isEqualTo(orders[0].address)
-            .jsonPath("$.details.content[4].detailAddress").isEqualTo(orders[0].detailAddress)
             .jsonPath("$.details.content[4].phoneNumber").isEqualTo(orders[0].phoneNumber)
-            .jsonPath("$.details.content[4].messageToRider").isEqualTo(orders[0].messageToRider!!)
             .jsonPath("$.details.content[4].totalPrice").isEqualTo(orders[0].totalPrice)
             .jsonPath("$.details.content[4].deliveryFee").isEqualTo(orders[0].deliveryFee)
 

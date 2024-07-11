@@ -11,7 +11,6 @@ import hyuuny.fooddelivery.common.utils.convertToLocalDate
 import hyuuny.fooddelivery.common.utils.extractCursorAndCount
 import hyuuny.fooddelivery.common.utils.parseSort
 import hyuuny.fooddelivery.deliveries.application.DeliveryUseCase
-import hyuuny.fooddelivery.deliveries.presentation.api.v1.response.DeliveryResponse
 import hyuuny.fooddelivery.deliveries.presentation.api.v1.response.DeliveryResponses
 import hyuuny.fooddelivery.orders.application.OrderUseCase
 import hyuuny.fooddelivery.users.application.UserUseCase
@@ -50,7 +49,7 @@ class DeliveryApiHandler(
         val (cursor, count) = extractCursorAndCount(request)
 
         val pageRequest = PageRequest.of(cursor, count, sort)
-        val page = useCase.getAllDeliveryByApiCondition(searchCondition, pageRequest)
+        val page = useCase.getDeliveriesByApiCondition(searchCondition, pageRequest)
         val deliveryResponses = responseMapper.mapToDeliveryResponses(page.content)
         val simplePage = SimplePage(deliveryResponses, page)
         val riderUser = userUseCase.getUser(userId)
@@ -66,7 +65,7 @@ class DeliveryApiHandler(
             getOrder = { orderUseCase.getOrder(body.orderId) },
             getRider = { userUseCase.getUser(body.riderId) },
         )
-        val response = DeliveryResponse.from(delivery)
+        val response = responseMapper.mapToDeliveryResponse(delivery)
         return ok().bodyValueAndAwait(response)
     }
 
