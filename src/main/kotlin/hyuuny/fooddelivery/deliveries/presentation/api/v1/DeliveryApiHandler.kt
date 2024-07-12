@@ -57,6 +57,14 @@ class DeliveryApiHandler(
         return ok().bodyValueAndAwait(responses)
     }
 
+    suspend fun getDelivery(request: ServerRequest): ServerResponse {
+        val id = request.pathVariable("id").toLong()
+
+        val delivery = useCase.getDelivery(id)
+        val response = responseMapper.mapToDeliveryResponse(delivery)
+        return ok().bodyValueAndAwait(response)
+    }
+
     suspend fun acceptDelivery(request: ServerRequest): ServerResponse {
         val body = request.awaitBody<AcceptDeliveryRequest>()
 

@@ -10,6 +10,7 @@ class DeliveryApiRouter {
     @Bean
     fun deliveryApi(handler: DeliveryApiHandler) = coRouter {
         "/api/v1/deliveries".nest {
+            GET("/{id}", handler::getDelivery)
             POST("/accept", handler::acceptDelivery)
             PATCH("/{id}/cancel", handler::cancel)
             PATCH("/{id}/pickup", handler::pickup)

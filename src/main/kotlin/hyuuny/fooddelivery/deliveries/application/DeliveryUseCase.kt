@@ -31,6 +31,8 @@ class DeliveryUseCase(
         return PageImpl(page.content, pageable, page.totalElements)
     }
 
+    suspend fun getDelivery(id: Long): Delivery = findDeliveryByIdOrThrow(id)
+
     @Transactional
     suspend fun acceptDelivery(
         request: AcceptDeliveryRequest,

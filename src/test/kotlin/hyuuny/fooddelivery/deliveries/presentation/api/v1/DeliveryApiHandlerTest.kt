@@ -375,4 +375,117 @@ class DeliveryApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.details.totalElements").isEqualTo(5)
     }
 
+    @DisplayName("배달 내역을 상세조회 할 수 있다.")
+    @Test
+    fun getDelivery() {
+        val id = 75L
+        val orderId = 1L
+        val riderId = 293L
+        val storeId = 5L
+        val userId = 95L
+
+        val now = LocalDateTime.now()
+        val order = Order(
+            id = orderId,
+            orderNumber = generateOrderNumber(now),
+            userId = userId,
+            storeId = storeId,
+            categoryId = 1L,
+            paymentId = generatePaymentId(),
+            paymentMethod = PaymentMethod.NAVER_PAY,
+            status = OrderStatus.OUT_FOR_DELIVERY,
+            deliveryType = DeliveryType.OUTSOURCING,
+            zipCode = "12345",
+            address = "서울시 강남구 역삼동",
+            detailAddress = "위워크 빌딩 19층",
+            phoneNumber = "010-1234-5678",
+            messageToRider = "1층 로비에 보관 부탁드립니다",
+            messageToStore = null,
+            totalPrice = 20000,
+            deliveryFee = 0,
+            createdAt = now,
+            updatedAt = now,
+        )
+
+        val store = Store(
+            id = storeId,
+            categoryId = 2L,
+            deliveryType = DeliveryType.TAKE_OUT,
+            name = "카페천국",
+            ownerName = "나커피",
+            taxId = "125-21-12397",
+            deliveryFee = 3000,
+            minimumOrderAmount = 15000,
+            iconImageUrl = "https://my-s3-bucket.s3.ap-northeast-2.amazonaws.com/images/icon-image-3.jpeg",
+            description = "안녕하세요. 카페천국입니다 :)",
+            foodOrigin = "",
+            phoneNumber = "02-1726-2397",
+            createdAt = now.plusHours(4),
+            updatedAt = now.plusHours(4),
+        )
+        val storeDetail = StoreDetail(
+            id = 1,
+            storeId = store.id!!,
+            zipCode = "12345",
+            address = "서울시 강남구 강남대로123길 12",
+            detailedAddress = "1층 101호",
+            openHours = "매일 오전 11:00 ~ 오후 11시 30분",
+            closedDay = null,
+            createdAt = now,
+        )
+
+        val user = User(
+            id = userId,
+            name = "김성현",
+            nickname = "hyuuny",
+            email = "shyune@knou.ac.kr",
+            phoneNumber = "010-1234-1234",
+            imageUrl = "https://my-s3-bucket.s3.ap-northeast-2.amazonaws.com/images/hyuuny.jpeg",
+            createdAt = now,
+            updatedAt = now,
+        )
+
+        val delivery = Delivery(
+            id = 1L,
+            orderId = orderId,
+            riderId = riderId,
+            status = DeliveryStatus.DELIVERING,
+            pickupTime = now.minusMinutes(20),
+            createdAt = now,
+        )
+
+        coEvery { useCase.getDelivery(any()) } returns delivery
+        coEvery { orderUseCase.getOrder(any()) } returns order
+        coEvery { storeUseCase.getStore(any()) } returns store
+        coEvery { storeDetailUseCase.getStoreDetailByStoreId(any()) } returns storeDetail
+        coEvery { userUseCase.getUser(any()) } returns user
+
+        webTestClient.get().uri("/api/v1/deliveries/$id")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .consumeWith(::println)
+            .jsonPath("$.id").isEqualTo(delivery.id!!)
+            .jsonPath("$.riderId").isEqualTo(delivery.riderId)
+            .jsonPath("$.orderId").isEqualTo(delivery.orderId)
+            .jsonPath("$.orderNumber").isEqualTo(order.orderNumber)
+            .jsonPath("$.storeName").isEqualTo(store.name)
+            .jsonPath("$.storeZipCode").isEqualTo(storeDetail.zipCode)
+            .jsonPath("$.storeAddress").isEqualTo(storeDetail.address)
+            .jsonPath("$.storeDetailAddress").isEqualTo(storeDetail.detailedAddress!!)
+            .jsonPath("$.userName").isEqualTo(user.name)
+            .jsonPath("$.userZipCode").isEqualTo(order.zipCode)
+            .jsonPath("$.userAddress").isEqualTo(order.address)
+            .jsonPath("$.userDetailAddress").isEqualTo(order.detailAddress)
+            .jsonPath("$.messageToRider").isEqualTo(order.messageToRider!!)
+            .jsonPath("$.totalPrice").isEqualTo(order.totalPrice)
+            .jsonPath("$.deliveryFee").isEqualTo(order.deliveryFee)
+            .jsonPath("$.status").isEqualTo(delivery.status.name)
+            .jsonPath("$.pickupTime").exists()
+            .jsonPath("$.deliveredTime").doesNotExist()
+            .jsonPath("$.cancelTime").doesNotExist()
+            .jsonPath("$.createdAt").exists()
+    }
+
 }
