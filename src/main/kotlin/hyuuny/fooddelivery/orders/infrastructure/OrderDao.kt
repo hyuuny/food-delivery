@@ -9,4 +9,8 @@ interface OrderDao : CoroutineCrudRepository<Order, Long> {
 
     suspend fun findByOrderNumber(orderNumber: String): Order?
 
+    suspend fun findAllByUserIdIn(userIds: List<Long>): List<Order>
+
+    suspend fun findAllByStoreIdIn(storeIds: List<Long>): List<Order>
+
 }

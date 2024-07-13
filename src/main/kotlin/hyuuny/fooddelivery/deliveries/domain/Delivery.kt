@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.deliveries.domain
 
 import AcceptDeliveryCommand
 import CancelDeliveryCommand
+import ChangeDeliveryStatusCommand
 import DeliveredDeliveryCommand
 import PickupDeliveryCommand
 import hyuuny.fooddelivery.common.constant.DeliveryStatus
@@ -55,6 +56,10 @@ class Delivery(
     fun handle(command: DeliveredDeliveryCommand) {
         this.status = command.status
         this.deliveredTime = command.deliveredTime
+    }
+
+    fun handle(command: ChangeDeliveryStatusCommand) {
+        this.status = command.status
     }
 
 }

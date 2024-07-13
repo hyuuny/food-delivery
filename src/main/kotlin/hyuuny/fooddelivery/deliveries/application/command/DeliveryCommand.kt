@@ -22,3 +22,7 @@ data class DeliveredDeliveryCommand(
     val status: DeliveryStatus,
     val deliveredTime: LocalDateTime,
 )
+
+data class ChangeDeliveryStatusCommand(
+    val status: DeliveryStatus,
+)

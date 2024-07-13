@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.deliveries.infrastructure
 
+import AdminDeliverySearchCondition
 import ApiDeliverSearchCondition
 import hyuuny.fooddelivery.deliveries.domain.Delivery
 import org.springframework.data.domain.PageImpl
@@ -10,6 +11,8 @@ interface DeliveryRepository {
     suspend fun insert(delivery: Delivery): Delivery
 
     suspend fun findById(id: Long): Delivery?
+
+    suspend fun findAllDeliveries(searchCondition: AdminDeliverySearchCondition, pageable: Pageable): PageImpl<Delivery>
 
     suspend fun findAllDeliveries(searchCondition: ApiDeliverSearchCondition, pageable: Pageable): PageImpl<Delivery>
 

@@ -2,8 +2,11 @@ package hyuuny.fooddelivery.deliveries.application
 
 import AcceptDeliveryCommand
 import AcceptDeliveryRequest
+import AdminDeliverySearchCondition
 import ApiDeliverSearchCondition
 import CancelDeliveryCommand
+import ChangeDeliveryStatusCommand
+import ChangeDeliveryStatusRequest
 import DeliveredDeliveryCommand
 import PickupDeliveryCommand
 import hyuuny.fooddelivery.common.constant.DeliveryStatus
@@ -22,6 +25,14 @@ import java.time.LocalDateTime
 class DeliveryUseCase(
     private val repository: DeliveryRepository,
 ) {
+
+    suspend fun getDeliveriesByAdminCondition(
+        searchCondition: AdminDeliverySearchCondition,
+        pageable: Pageable
+    ): PageImpl<Delivery> {
+        val page = repository.findAllDeliveries(searchCondition, pageable)
+        return PageImpl(page.content, pageable, page.totalElements)
+    }
 
     suspend fun getDeliveriesByApiCondition(
         searchCondition: ApiDeliverSearchCondition,
@@ -116,6 +127,17 @@ class DeliveryUseCase(
             )
         )
         repository.updateDeliveredTime(delivery)
+    }
+
+    @Transactional
+    suspend fun changeDeliverStatus(id: Long, request: ChangeDeliveryStatusRequest) {
+        val delivery = findDeliveryByIdOrThrow(id)
+        delivery.handle(
+            ChangeDeliveryStatusCommand(
+                status = request.status,
+            )
+        )
+        repository.updateStatus(delivery)
     }
 
     private suspend fun findDeliveryByIdOrThrow(id: Long): Delivery =
