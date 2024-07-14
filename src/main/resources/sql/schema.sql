@@ -286,3 +286,34 @@ CREATE TABLE IF NOT EXISTS deliveries
     created_at     TIMESTAMP   NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_deliveries_rider_id ON deliveries (rider_id);
+
+CREATE TABLE IF NOT EXISTS coupons
+(
+    id                      SERIAL PRIMARY KEY,
+    code                    VARCHAR(255) NOT NULL,
+    type                    VARCHAR(255) NOT NULL,
+    name                    VARCHAR(255) NOT NULL,
+    discount_amount         BIGINT       NOT NULL,
+    maximum_discount_amount BIGINT       NOT NULL,
+    minimum_order_amount    BIGINT       NOT NULL,
+    description             TEXT         NOT NULL,
+    valid_from              TIMESTAMP    NOT NULL,
+    valid_to                TIMESTAMP    NOT NULL,
+    created_at              TIMESTAMP    NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_coupons_code ON coupons (code);
+
+CREATE TABLE IF NOT EXISTS user_coupons
+(
+    id          SERIAL PRIMARY KEY,
+    user_id     BIGINT    NOT NULL,
+    coupon_id   BIGINT    NOT NULL,
+    used        BOOLEAN DEFAULT FALSE,
+    used_date   TIMESTAMP,
+    issued_date TIMESTAMP NOT NULL,
+    FOREIGN KEY (coupon_id) REFERENCES coupons (id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_coupons_user_id ON user_coupons (user_id);
+CREATE INDEX IF NOT EXISTS idx_user_coupons_coupon_id ON user_coupons (coupon_id);
+
