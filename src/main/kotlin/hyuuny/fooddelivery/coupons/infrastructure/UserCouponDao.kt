@@ -11,4 +11,6 @@ interface UserCouponDao : CoroutineCrudRepository<UserCoupon, Long> {
 
     suspend fun findAllByUserIdAndCouponIdIn(userId: Long, couponIds: List<Long>): List<UserCoupon>
 
+    suspend fun existsByUserIdAndCouponId(userId: Long, couponId: Long): Boolean
+
 }

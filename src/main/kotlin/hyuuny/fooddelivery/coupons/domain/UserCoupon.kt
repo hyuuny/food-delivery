@@ -31,4 +31,10 @@ class UserCoupon(
         )
     }
 
+    fun isAvailable(): Boolean {
+        val now = LocalDateTime.now()
+        val isValidTime = now in validFrom..validTo
+        return !used && isValidTime
+    }
+
 }

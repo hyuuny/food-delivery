@@ -2,6 +2,7 @@ package hyuuny.fooddelivery.coupons.infrastructure
 
 import hyuuny.fooddelivery.coupons.domain.Coupon
 import hyuuny.fooddelivery.coupons.presentation.admin.v1.request.AdminCouponSearchCondition
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.awaitFirstOrElse
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -49,6 +50,8 @@ class CouponRepositoryImpl(
             PageImpl(data, pageable, total)
         }
     }
+
+    override suspend fun findAllByIdIn(ids: List<Long>): List<Coupon> = dao.findAllById(ids).toList()
 
     private fun buildCriteria(searchCondition: AdminCouponSearchCondition): Criteria {
         var criteria = Criteria.empty()

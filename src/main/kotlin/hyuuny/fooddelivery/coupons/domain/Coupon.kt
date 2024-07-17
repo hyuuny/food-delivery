@@ -48,4 +48,11 @@ class Coupon(
 
     fun getIssuancePeriod(): ClosedRange<LocalDateTime> = issueStartDate..issueEndDate
 
+    fun isApplicableForOrder(categoryId: Long, storeId: Long): Boolean {
+        return when (type) {
+            CouponType.STORE -> this.storeId == storeId
+            CouponType.CATEGORY -> this.categoryId == categoryId
+        }
+    }
+
 }

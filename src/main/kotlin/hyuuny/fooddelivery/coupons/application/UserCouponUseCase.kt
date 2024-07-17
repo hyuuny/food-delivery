@@ -5,7 +5,10 @@ import hyuuny.fooddelivery.coupons.application.command.IssueUserCouponCommand
 import hyuuny.fooddelivery.coupons.domain.Coupon
 import hyuuny.fooddelivery.coupons.domain.UserCoupon
 import hyuuny.fooddelivery.coupons.infrastructure.UserCouponRepository
+import hyuuny.fooddelivery.coupons.presentation.api.v1.request.ApiCouponSearchCondition
 import hyuuny.fooddelivery.users.domain.User
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -18,6 +21,11 @@ class UserCouponUseCase(
 
     companion object : Log
 
+    suspend fun getUserCouponByApiCondition(
+        searchCondition: ApiCouponSearchCondition,
+        pageable: Pageable,
+    ): PageImpl<UserCoupon> = repository.findAllUserCoupons(searchCondition, pageable)
+
     @Transactional
     suspend fun issueCoupon(
         getUser: suspend () -> User,
@@ -27,7 +35,7 @@ class UserCouponUseCase(
         val user = getUser()
         val coupon = getCoupon()
 
-        if (findUserCouponByUserIdAndCouponIdOrNull(user, coupon) != null) throw IllegalStateException("이미 발급된 쿠폰입니다.")
+        if (repository.existsByUserIdAndCouponId(user.id!!, coupon.id!!)) throw IllegalStateException("이미 발급된 쿠폰입니다.")
         if (now !in coupon.getIssuancePeriod()) throw IllegalStateException("쿠폰 발급 기간이 아닙니다.")
 
         val userCoupon = UserCoupon.handle(
@@ -43,7 +51,24 @@ class UserCouponUseCase(
         return repository.insert(userCoupon)
     }
 
-    private suspend fun findUserCouponByUserIdAndCouponIdOrNull(user: User, coupon: Coupon) =
-        repository.findByUserIdAndCouponId(user.id!!, coupon.id!!)
+    suspend fun getAllByUserIdAndCouponIds(userId: Long, couponIds: List<Long>) =
+        repository.findAllByUserIdAndCouponIdIn(userId, couponIds)
+
+    suspend fun getAllAvailableUserCoupon(userId: Long): List<UserCoupon> {
+        val now = LocalDateTime.now()
+        return repository.findAllByUserIdAndUsedFalse(userId, now)
+    }
+
+    suspend fun getUserCoupon(
+        couponId: Long,
+        getUser: suspend () -> User,
+    ): UserCoupon {
+        val user = getUser()
+        return findUserCouponByUserIdAndCouponIdOrThrow(user.id!!, couponId)
+    }
+
+    private suspend fun findUserCouponByUserIdAndCouponIdOrThrow(userId: Long, couponId: Long) =
+        repository.findByUserIdAndCouponId(userId, couponId)
+            ?: throw NoSuchElementException("${userId}번 회원의 ${couponId}번 쿠폰을 찾을 수 없습니다.")
 
 }

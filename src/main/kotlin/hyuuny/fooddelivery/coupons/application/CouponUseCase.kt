@@ -60,6 +60,8 @@ class CouponUseCase(
         return repository.findAllByIssueStartDateLessThanEqualAndIssueEndDateGreaterThanEqual(now)
     }
 
+    suspend fun getAllByIds(ids: List<Long>): List<Coupon> = repository.findAllByIdIn(ids)
+
     private suspend fun findCouponByIdOrThrow(id: Long) =
         repository.findById(id) ?: throw NoSuchElementException("${id}번 쿠폰을 찾을 수 없습니다.")
 

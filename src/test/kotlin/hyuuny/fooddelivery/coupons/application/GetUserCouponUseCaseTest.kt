@@ -9,21 +9,20 @@ import hyuuny.fooddelivery.users.application.UserUseCase
 import hyuuny.fooddelivery.users.domain.User
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.LocalDateTime
 
-internal class IssueUserCouponUseCaseTest : BehaviorSpec({
+internal class GetUserCouponUseCaseTest : BehaviorSpec({
 
     val repository = mockk<UserCouponRepository>()
     val useCase = UserCouponUseCase(repository)
     val userUseCase = mockk<UserUseCase>()
     val couponUseCase = mockk<CouponUseCase>()
 
-    given("회원이 쿠폰을 발급 받을 때") {
+    given("회원이 자신이 갖고 있는 쿠폰을 조회할 때") {
         val userId = 1L
         val couponId = 3L
         val categoryId = 1L
@@ -40,7 +39,7 @@ internal class IssueUserCouponUseCaseTest : BehaviorSpec({
             updatedAt = now,
         )
         val coupon = Coupon(
-            id = 1,
+            id = couponId,
             code = "오늘도치킨",
             type = CouponType.CATEGORY,
             categoryId = categoryId,
@@ -68,24 +67,25 @@ internal class IssueUserCouponUseCaseTest : BehaviorSpec({
             issuedDate = now,
             validFrom = coupon.validFrom,
             validTo = coupon.validTo,
+            used = true,
+            usedDate = now.plusMinutes(30)
         )
         coEvery { userUseCase.getUser(any()) } returns user
         coEvery { couponUseCase.getCoupon(any()) } returns coupon
-        coEvery { repository.existsByUserIdAndCouponId(any(), any()) } returns false
-        coEvery { repository.insert(any()) } returns userCoupon
+        coEvery { repository.findByUserIdAndCouponId(any(), any()) } returns userCoupon
 
-        `when`("발급 기간내 처음 발급받는다면") {
-            val result = useCase.issueCoupon({ user }, { coupon })
+        `when`("존재하는 회원의 쿠폰이면") {
+            val result = useCase.getUserCoupon(couponId) { user }
 
-            then("정상적으로 쿠폰이 발급된다.") {
+            then("정상적으로 조회할 수 있다.") {
                 result.id.shouldNotBeNull()
                 result.userId shouldBe request.userId
                 result.couponId shouldBe request.couponId
-                result.used shouldBe false
-                result.usedDate.shouldBeNull()
+                result.used shouldBe userCoupon.used
+                result.usedDate shouldBe userCoupon.usedDate
                 result.validFrom shouldBe coupon.validFrom
                 result.validTo shouldBe coupon.validTo
-                result.issuedDate.shouldNotBeNull()
+                result.issuedDate shouldBe userCoupon.issuedDate
             }
         }
 
@@ -94,61 +94,24 @@ internal class IssueUserCouponUseCaseTest : BehaviorSpec({
 
             Then("회원을 찾을 수 없다는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
-                    useCase.issueCoupon({ userUseCase.getUser(0) }, { coupon })
+                    useCase.getUserCoupon(couponId) { userUseCase.getUser(0) }
                 }
                 ex.message shouldBe "0번 회원을 찾을 수 없습니다."
             }
         }
 
-        When("존재하지 않는 쿠폰이면") {
+        When("회원이 소유하지 않은 쿠폰이면") {
             coEvery { userUseCase.getUser(any()) } returns user
-            coEvery { couponUseCase.getCoupon(any()) } throws NoSuchElementException("0번 쿠폰을 찾을 수 없습니다.")
+            coEvery { couponUseCase.getCoupon(any()) } returns coupon
+            coEvery { repository.findByUserIdAndCouponId(any(), any()) } returns null
 
-            Then("쿠폰을 찾을 수 없다는 메세지가 반환된다.") {
+            Then("회원의 쿠폰을 찾을 수 없다는 메세지가 반환된다.") {
                 val ex = shouldThrow<NoSuchElementException> {
-                    useCase.issueCoupon({ user }, { couponUseCase.getCoupon(0) })
+                    useCase.getUserCoupon(couponId) { user }
                 }
-                ex.message shouldBe "0번 쿠폰을 찾을 수 없습니다."
+                ex.message shouldBe "${userId}번 회원의 ${couponId}번 쿠폰을 찾을 수 없습니다."
             }
         }
 
-        When("이미 발급받은 쿠폰이면") {
-            coEvery { repository.existsByUserIdAndCouponId(any(), any()) } returns true
-
-            Then("이미 발급된 쿠폰이라는 메세지가 반환된다.") {
-                val ex = shouldThrow<IllegalStateException> {
-                    useCase.issueCoupon({ user }, { coupon })
-                }
-                ex.message shouldBe "이미 발급된 쿠폰입니다."
-            }
-        }
-
-        When("아직 쿠폰 발급기간이 아니라면") {
-            val invalidCoupon = Coupon(
-                id = 1,
-                code = "오늘도치킨",
-                type = CouponType.CATEGORY,
-                categoryId = categoryId,
-                storeId = null,
-                name = "치킨 3천원 할인",
-                discountAmount = 3000L,
-                minimumOrderAmount = 14000,
-                description = "치킨 3천원 할인 쿠폰",
-                issueStartDate = now.plusDays(1),
-                issueEndDate = now.plusDays(7),
-                validFrom = now.plusDays(1),
-                validTo = now.plusDays(7),
-                createdAt = now,
-            )
-            coEvery { couponUseCase.getCoupon(any()) } returns invalidCoupon
-            coEvery { repository.existsByUserIdAndCouponId(any(), any()) } returns false
-
-            Then("쿠폰 발급기간이 아니라는 메세지가 반환된다.") {
-                val ex = shouldThrow<IllegalStateException> {
-                    useCase.issueCoupon({ user }, { invalidCoupon })
-                }
-                ex.message shouldBe "쿠폰 발급 기간이 아닙니다."
-            }
-        }
     }
 })

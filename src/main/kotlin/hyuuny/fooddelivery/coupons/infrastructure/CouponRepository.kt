@@ -18,4 +18,6 @@ interface CouponRepository {
 
     suspend fun findAllCoupons(searchCondition: AdminCouponSearchCondition, pageable: Pageable): PageImpl<Coupon>
 
+    suspend fun findAllByIdIn(ids: List<Long>): List<Coupon>
+
 }

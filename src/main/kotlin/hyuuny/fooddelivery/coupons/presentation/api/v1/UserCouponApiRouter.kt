@@ -11,6 +11,13 @@ class UserCouponApiRouter {
     fun couponApi(handler: UserCouponApiHandler) = coRouter {
         "/api/v1/coupons".nest {
             POST("/issue", handler::issueUserCoupon)
+            GET("/{userId}/issuable", handler::getIssuableCoupons)
+        }
+
+        "/api/v1/users/{userId}/coupons".nest {
+            GET("", handler::getOwnedCoupons)
+            GET("/available", handler::getAvailableCoupons)
+            GET("/{id}", handler::getCoupon)
         }
     }
 
