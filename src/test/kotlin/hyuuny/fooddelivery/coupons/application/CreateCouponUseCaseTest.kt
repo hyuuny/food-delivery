@@ -6,6 +6,7 @@ import hyuuny.fooddelivery.coupons.infrastructure.CouponRepository
 import hyuuny.fooddelivery.coupons.presentation.admin.v1.request.CreateCouponRequest
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -19,10 +20,14 @@ internal class CreateCouponUseCaseTest : BehaviorSpec({
     val verifier = mockk<CouponVerifier>()
 
     given("쿠폰을 등록하면서") {
+        val categoryId = 1L
+
         val tomorrow = LocalDateTime.now().plusDays(1)
         val request = CreateCouponRequest(
             code = "오늘도치킨",
             type = CouponType.CATEGORY,
+            categoryId = categoryId,
+            storeId = null,
             name = "치킨 3천원 할인",
             discountAmount = 3000L,
             minimumOrderAmount = 14000,
@@ -38,6 +43,8 @@ internal class CreateCouponUseCaseTest : BehaviorSpec({
             id = 1,
             code = "오늘도치킨",
             type = CouponType.CATEGORY,
+            categoryId = categoryId,
+            storeId = null,
             name = "치킨 3천원 할인",
             discountAmount = 3000L,
             minimumOrderAmount = 14000,
@@ -58,6 +65,8 @@ internal class CreateCouponUseCaseTest : BehaviorSpec({
                 result.id.shouldNotBeNull()
                 result.code shouldBe request.code
                 result.type shouldBe request.type
+                result.categoryId shouldBe request.categoryId
+                result.storeId.shouldBeNull()
                 result.name shouldBe request.name
                 result.discountAmount shouldBe request.discountAmount
                 result.minimumOrderAmount shouldBe request.minimumOrderAmount
@@ -75,6 +84,8 @@ internal class CreateCouponUseCaseTest : BehaviorSpec({
                 id = 1,
                 code = "오늘도치킨",
                 type = CouponType.CATEGORY,
+                categoryId = categoryId,
+                storeId = null,
                 name = "치킨 3천원 할인",
                 discountAmount = 3000L,
                 minimumOrderAmount = 14000,
@@ -92,6 +103,31 @@ internal class CreateCouponUseCaseTest : BehaviorSpec({
                     useCase.createCoupon(request)
                 }
                 ex.message shouldBe "이미 사용중인 쿠폰 코드입니다. code: ${request.code}"
+            }
+        }
+
+        When("카테고리 할인 쿠폰에 카테고리 아이디가 없으면") {
+            val invalidCodeRequest = request.copy(type = CouponType.CATEGORY, categoryId = null)
+            coEvery { repository.findByCode(any()) } returns null
+            coEvery { verifier.verify(any()) } throws IllegalArgumentException("카테고리 쿠폰은 카테고리 아이디가 필수 값입니다.")
+
+            Then("카테고리 아이디는 필수 값이라는 메세지를 반환한다.") {
+                val ex = shouldThrow<IllegalArgumentException> {
+                    useCase.createCoupon(invalidCodeRequest)
+                }
+                ex.message shouldBe "카테고리 쿠폰은 카테고리 아이디가 필수 값입니다."
+            }
+        }
+
+        When("매장 할인 쿠폰에 매장 아이디가 없으면") {
+            val invalidCodeRequest = request.copy(type = CouponType.STORE, storeId = null)
+            coEvery { verifier.verify(any()) } throws IllegalArgumentException("매장 쿠폰은 매장 아이디가 필수 값입니다.")
+
+            Then("매장 아이디는 필수 값이라는 메세지를 반환한다.") {
+                val ex = shouldThrow<IllegalArgumentException> {
+                    useCase.createCoupon(invalidCodeRequest)
+                }
+                ex.message shouldBe "매장 쿠폰은 매장 아이디가 필수 값입니다."
             }
         }
 

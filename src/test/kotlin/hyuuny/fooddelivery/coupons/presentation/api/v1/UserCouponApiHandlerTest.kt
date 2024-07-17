@@ -36,6 +36,8 @@ class UserCouponApiHandlerTest : BaseIntegrationTest() {
             id = 1,
             userId = userId,
             couponId = couponId,
+            validFrom = now,
+            validTo = now.plusDays(10),
             issuedDate = now,
         )
         coEvery { useCase.issueCoupon(any(), any()) } returns userCoupon
@@ -53,6 +55,8 @@ class UserCouponApiHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.couponId").isEqualTo(couponId)
             .jsonPath("$.used").isEqualTo(false)
             .jsonPath("$.usedDate").doesNotExist()
+            .jsonPath("$.validFrom").exists()
+            .jsonPath("$.validTo").exists()
             .jsonPath("$.issuedDate").exists()
     }
 

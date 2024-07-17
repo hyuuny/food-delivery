@@ -38,6 +38,8 @@ class CouponUseCase(
             CreateCouponCommand(
                 code = request.code,
                 type = request.type,
+                categoryId = request.categoryId,
+                storeId = request.storeId,
                 name = request.name,
                 discountAmount = request.discountAmount,
                 minimumOrderAmount = request.minimumOrderAmount,
@@ -56,10 +58,6 @@ class CouponUseCase(
 
     suspend fun getAllIssuableCoupon(now: LocalDateTime): List<Coupon> {
         return repository.findAllByIssueStartDateLessThanEqualAndIssueEndDateGreaterThanEqual(now)
-    }
-
-    suspend fun getAllAvailableCoupon(now: LocalDateTime): List<Coupon> {
-        return repository.findAllByValidFromLessThanEqualAndValidToGreaterThanEqual(now)
     }
 
     private suspend fun findCouponByIdOrThrow(id: Long) =

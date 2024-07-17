@@ -39,20 +39,6 @@ class CouponRepositoryImpl(
             .awaitFirstOrElse { emptyList() }
     }
 
-    override suspend fun findAllByValidFromLessThanEqualAndValidToGreaterThanEqual(now: LocalDateTime): List<Coupon> {
-        return template.select(Coupon::class.java)
-            .matching(
-                Query.query(
-                    Criteria.where("valid_from").lessThanOrEquals(now)
-                        .and("valid_to").greaterThanOrEquals(now)
-                ).sort(
-                    Sort.by("id").descending()
-                )
-            ).all()
-            .collectList()
-            .awaitFirstOrElse { emptyList() }
-    }
-
     override suspend fun findAllCoupons(
         searchCondition: AdminCouponSearchCondition,
         pageable: Pageable

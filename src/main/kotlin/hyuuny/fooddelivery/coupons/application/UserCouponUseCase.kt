@@ -1,5 +1,6 @@
 package hyuuny.fooddelivery.coupons.application
 
+import hyuuny.fooddelivery.common.log.Log
 import hyuuny.fooddelivery.coupons.application.command.IssueUserCouponCommand
 import hyuuny.fooddelivery.coupons.domain.Coupon
 import hyuuny.fooddelivery.coupons.domain.UserCoupon
@@ -14,6 +15,8 @@ import java.time.LocalDateTime
 class UserCouponUseCase(
     private val repository: UserCouponRepository,
 ) {
+
+    companion object : Log
 
     @Transactional
     suspend fun issueCoupon(
@@ -32,8 +35,11 @@ class UserCouponUseCase(
                 userId = user.id!!,
                 couponId = coupon.id!!,
                 issuedDate = now,
+                validFrom = coupon.validFrom,
+                validTo = coupon.validTo,
             )
         )
+        log.info("issued coupon id: ${coupon.id}, code: ${coupon.code} user id: ${user.id}")
         return repository.insert(userCoupon)
     }
 

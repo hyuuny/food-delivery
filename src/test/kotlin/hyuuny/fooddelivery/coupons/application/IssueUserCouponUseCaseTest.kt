@@ -26,6 +26,7 @@ internal class IssueUserCouponUseCaseTest : BehaviorSpec({
     given("회원이 쿠폰을 발급 받을 때") {
         val userId = 1L
         val couponId = 3L
+        val categoryId = 1L
 
         val now = LocalDateTime.now()
         val user = User(
@@ -42,6 +43,8 @@ internal class IssueUserCouponUseCaseTest : BehaviorSpec({
             id = 1,
             code = "오늘도치킨",
             type = CouponType.CATEGORY,
+            categoryId = categoryId,
+            storeId = null,
             name = "치킨 3천원 할인",
             discountAmount = 3000L,
             minimumOrderAmount = 14000,
@@ -63,6 +66,8 @@ internal class IssueUserCouponUseCaseTest : BehaviorSpec({
             userId = userId,
             couponId = couponId,
             issuedDate = now,
+            validFrom = coupon.validFrom,
+            validTo = coupon.validTo,
         )
         coEvery { userUseCase.getUser(any()) } returns user
         coEvery { couponUseCase.getCoupon(any()) } returns coupon
@@ -78,6 +83,8 @@ internal class IssueUserCouponUseCaseTest : BehaviorSpec({
                 result.couponId shouldBe request.couponId
                 result.used shouldBe false
                 result.usedDate.shouldBeNull()
+                result.validFrom shouldBe coupon.validFrom
+                result.validTo shouldBe coupon.validTo
                 result.issuedDate.shouldNotBeNull()
             }
         }
@@ -121,6 +128,8 @@ internal class IssueUserCouponUseCaseTest : BehaviorSpec({
                 id = 1,
                 code = "오늘도치킨",
                 type = CouponType.CATEGORY,
+                categoryId = categoryId,
+                storeId = null,
                 name = "치킨 3천원 할인",
                 discountAmount = 3000L,
                 minimumOrderAmount = 14000,
@@ -141,6 +150,5 @@ internal class IssueUserCouponUseCaseTest : BehaviorSpec({
                 ex.message shouldBe "쿠폰 발급 기간이 아닙니다."
             }
         }
-
     }
 })

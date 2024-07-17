@@ -9,6 +9,8 @@ data class UserCouponResponse(
     val couponId: Long,
     val used: Boolean,
     val usedDate: LocalDateTime?,
+    val validFrom: LocalDateTime,
+    val validTo: LocalDateTime,
     val issuedDate: LocalDateTime,
 ) {
     companion object {
@@ -18,6 +20,8 @@ data class UserCouponResponse(
             couponId = entity.couponId,
             used = entity.used,
             usedDate = entity.usedDate,
+            validFrom = entity.validFrom,
+            validTo = entity.validTo,
             issuedDate = entity.issuedDate,
         )
     }

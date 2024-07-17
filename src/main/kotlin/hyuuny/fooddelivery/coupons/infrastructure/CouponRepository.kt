@@ -16,8 +16,6 @@ interface CouponRepository {
 
     suspend fun findAllByIssueStartDateLessThanEqualAndIssueEndDateGreaterThanEqual(now: LocalDateTime): List<Coupon>
 
-    suspend fun findAllByValidFromLessThanEqualAndValidToGreaterThanEqual(now: LocalDateTime): List<Coupon>
-
     suspend fun findAllCoupons(searchCondition: AdminCouponSearchCondition, pageable: Pageable): PageImpl<Coupon>
 
 }

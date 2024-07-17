@@ -292,6 +292,8 @@ CREATE TABLE IF NOT EXISTS coupons
     id                   SERIAL PRIMARY KEY,
     code                 VARCHAR(255) NOT NULL,
     type                 VARCHAR(255) NOT NULL,
+    category_id          BIGINT,
+    store_id             BIGINT,
     name                 VARCHAR(255) NOT NULL,
     discount_amount      BIGINT       NOT NULL,
     minimum_order_amount BIGINT       NOT NULL,
@@ -311,6 +313,8 @@ CREATE TABLE IF NOT EXISTS user_coupons
     coupon_id   BIGINT    NOT NULL,
     used        BOOLEAN DEFAULT FALSE,
     used_date   TIMESTAMP,
+    valid_from  TIMESTAMP NOT NULL,
+    valid_to    TIMESTAMP NOT NULL,
     issued_date TIMESTAMP NOT NULL,
     FOREIGN KEY (coupon_id) REFERENCES coupons (id)
 );

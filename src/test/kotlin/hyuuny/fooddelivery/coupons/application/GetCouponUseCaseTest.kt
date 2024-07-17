@@ -5,6 +5,7 @@ import hyuuny.fooddelivery.coupons.domain.Coupon
 import hyuuny.fooddelivery.coupons.infrastructure.CouponRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -18,12 +19,15 @@ internal class GetCouponUseCaseTest : BehaviorSpec({
 
     given("쿠폰을 상세조회 할 때") {
         val id = 1L
+        val categoryId = 1L
 
         val now = LocalDateTime.now()
         val coupon = Coupon(
             id = id,
             code = "오늘도치킨",
             type = CouponType.CATEGORY,
+            categoryId = categoryId,
+            storeId = null,
             name = "치킨 3천원 할인",
             discountAmount = 3000L,
             minimumOrderAmount = 14000,
@@ -43,6 +47,8 @@ internal class GetCouponUseCaseTest : BehaviorSpec({
                 result.id.shouldNotBeNull()
                 result.code shouldBe coupon.code
                 result.type shouldBe coupon.type
+                result.categoryId shouldBe coupon.categoryId
+                result.storeId.shouldBeNull()
                 result.name shouldBe coupon.name
                 result.discountAmount shouldBe coupon.discountAmount
                 result.minimumOrderAmount shouldBe coupon.minimumOrderAmount

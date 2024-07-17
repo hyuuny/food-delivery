@@ -12,9 +12,8 @@ class UserCouponRepositoryImpl(
 
     override suspend fun insert(userCoupon: UserCoupon): UserCoupon = dao.save(userCoupon)
 
-    override suspend fun findByUserIdAndCouponId(userId: Long, couponId: Long): UserCoupon? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun findByUserIdAndCouponId(userId: Long, couponId: Long): UserCoupon? =
+        dao.findByUserIdAndCouponId(userId, couponId)
 
     override suspend fun findAllByUserId(userId: Long): List<UserCoupon> {
         TODO("Not yet implemented")

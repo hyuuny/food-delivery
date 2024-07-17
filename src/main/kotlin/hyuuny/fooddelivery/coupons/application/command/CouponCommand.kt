@@ -4,6 +4,8 @@ import java.time.LocalDateTime
 data class CreateCouponCommand(
     val code: String,
     val type: CouponType,
+    val categoryId: Long?,
+    val storeId: Long?,
     val name: String,
     val discountAmount: Long,
     val minimumOrderAmount: Long,

@@ -12,6 +12,8 @@ class UserCoupon(
     val couponId: Long,
     val used: Boolean = false,
     val usedDate: LocalDateTime? = null,
+    val validFrom: LocalDateTime,
+    val validTo: LocalDateTime,
     val issuedDate: LocalDateTime,
 ) {
 
@@ -24,6 +26,8 @@ class UserCoupon(
             userId = command.userId,
             couponId = command.couponId,
             issuedDate = command.issuedDate,
+            validFrom = command.validFrom,
+            validTo = command.validTo,
         )
     }
 

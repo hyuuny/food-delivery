@@ -11,6 +11,8 @@ class Coupon(
     id: Long? = null,
     val code: String,
     val type: CouponType,
+    val categoryId: Long?,
+    val storeId: Long?,
     val name: String,
     val discountAmount: Long,
     val minimumOrderAmount: Long,
@@ -30,6 +32,8 @@ class Coupon(
         fun handle(command: CreateCouponCommand): Coupon = Coupon(
             code = command.code,
             type = command.type,
+            categoryId = command.categoryId,
+            storeId = command.storeId,
             name = command.name,
             discountAmount = command.discountAmount,
             minimumOrderAmount = command.minimumOrderAmount,

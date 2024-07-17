@@ -6,4 +6,6 @@ data class IssueUserCouponCommand(
     val userId: Long,
     val couponId: Long,
     val issuedDate: LocalDateTime,
+    val validFrom: LocalDateTime,
+    val validTo: LocalDateTime,
 )

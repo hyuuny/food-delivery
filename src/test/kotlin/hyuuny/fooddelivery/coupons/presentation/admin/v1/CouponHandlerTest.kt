@@ -23,10 +23,14 @@ class CouponHandlerTest : BaseIntegrationTest() {
     @DisplayName("쿠폰을 등록할 수 있다.")
     @Test
     fun createCoupon() {
+        val categoryId = 1L
+
         val now = LocalDateTime.now()
         val request = CreateCouponRequest(
             code = "오늘도치킨",
             type = CouponType.CATEGORY,
+            categoryId = categoryId,
+            storeId = null,
             name = "치킨 3천원 할인",
             discountAmount = 3000L,
             minimumOrderAmount = 14000,
@@ -64,6 +68,7 @@ class CouponHandlerTest : BaseIntegrationTest() {
     @DisplayName("쿠폰을 조회 및 검색할 수 있다.")
     @Test
     fun getCoupons() {
+        val categoryId = 1L
         val couponIds = listOf(1, 2, 3, 4, 5)
 
         val now = LocalDateTime.now()
@@ -73,6 +78,8 @@ class CouponHandlerTest : BaseIntegrationTest() {
                 id = it.toLong(),
                 code = "${upIdx}번 쿠폰",
                 type = CouponType.CATEGORY,
+                categoryId = categoryId,
+                storeId = null,
                 name = "치킨 3천원 할인",
                 discountAmount = 3000L,
                 minimumOrderAmount = 14000,
@@ -99,7 +106,8 @@ class CouponHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[0].id").isEqualTo(coupons[4].id!!)
             .jsonPath("$.content[0].code").isEqualTo(coupons[4].code)
             .jsonPath("$.content[0].type").isEqualTo(coupons[4].type.name)
-            .jsonPath("$.content[0].name").isEqualTo(coupons[4].name)
+            .jsonPath("$.content[0].categoryId").isEqualTo(coupons[4].categoryId!!)
+            .jsonPath("$.content[0].storeId").doesNotExist()
             .jsonPath("$.content[0].discountAmount").isEqualTo(coupons[4].discountAmount)
             .jsonPath("$.content[0].issueStartDate").exists()
             .jsonPath("$.content[0].issueEndDate").exists()
@@ -109,6 +117,8 @@ class CouponHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[1].id").isEqualTo(coupons[3].id!!)
             .jsonPath("$.content[1].code").isEqualTo(coupons[3].code)
             .jsonPath("$.content[1].type").isEqualTo(coupons[3].type.name)
+            .jsonPath("$.content[1].categoryId").isEqualTo(coupons[3].categoryId!!)
+            .jsonPath("$.content[1].storeId").doesNotExist()
             .jsonPath("$.content[1].name").isEqualTo(coupons[3].name)
             .jsonPath("$.content[1].discountAmount").isEqualTo(coupons[3].discountAmount)
             .jsonPath("$.content[1].issueStartDate").exists()
@@ -119,6 +129,8 @@ class CouponHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[2].id").isEqualTo(coupons[2].id!!)
             .jsonPath("$.content[2].code").isEqualTo(coupons[2].code)
             .jsonPath("$.content[2].type").isEqualTo(coupons[2].type.name)
+            .jsonPath("$.content[2].categoryId").isEqualTo(coupons[2].categoryId!!)
+            .jsonPath("$.content[2].storeId").doesNotExist()
             .jsonPath("$.content[2].name").isEqualTo(coupons[2].name)
             .jsonPath("$.content[2].discountAmount").isEqualTo(coupons[2].discountAmount)
             .jsonPath("$.content[2].issueStartDate").exists()
@@ -129,6 +141,8 @@ class CouponHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[3].id").isEqualTo(coupons[1].id!!)
             .jsonPath("$.content[3].code").isEqualTo(coupons[1].code)
             .jsonPath("$.content[3].type").isEqualTo(coupons[1].type.name)
+            .jsonPath("$.content[3].categoryId").isEqualTo(coupons[1].categoryId!!)
+            .jsonPath("$.content[3].storeId").doesNotExist()
             .jsonPath("$.content[3].name").isEqualTo(coupons[1].name)
             .jsonPath("$.content[3].discountAmount").isEqualTo(coupons[1].discountAmount)
             .jsonPath("$.content[3].issueStartDate").exists()
@@ -139,6 +153,8 @@ class CouponHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.content[4].id").isEqualTo(coupons[0].id!!)
             .jsonPath("$.content[4].code").isEqualTo(coupons[0].code)
             .jsonPath("$.content[4].type").isEqualTo(coupons[0].type.name)
+            .jsonPath("$.content[4].categoryId").isEqualTo(coupons[0].categoryId!!)
+            .jsonPath("$.content[4].storeId").doesNotExist()
             .jsonPath("$.content[4].name").isEqualTo(coupons[0].name)
             .jsonPath("$.content[4].discountAmount").isEqualTo(coupons[0].discountAmount)
             .jsonPath("$.content[4].issueStartDate").exists()
@@ -155,10 +171,14 @@ class CouponHandlerTest : BaseIntegrationTest() {
     @DisplayName("쿠폰을 상세조회 할 수 있다.")
     @Test
     fun getCoupon() {
+        val categoryId = 1L
+
         val now = LocalDateTime.now()
         val request = CreateCouponRequest(
             code = "오늘도치킨",
             type = CouponType.CATEGORY,
+            categoryId = categoryId,
+            storeId = null,
             name = "치킨 3천원 할인",
             discountAmount = 3000L,
             minimumOrderAmount = 14000,
@@ -180,6 +200,8 @@ class CouponHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.id").isEqualTo(coupon.id!!)
             .jsonPath("$.code").isEqualTo(coupon.code)
             .jsonPath("$.type").isEqualTo(coupon.type.name)
+            .jsonPath("$.categoryId").isEqualTo(coupon.categoryId!!)
+            .jsonPath("$.storeId").doesNotExist()
             .jsonPath("$.name").isEqualTo(coupon.name)
             .jsonPath("$.discountAmount").isEqualTo(coupon.discountAmount)
             .jsonPath("$.minimumOrderAmount").isEqualTo(coupon.minimumOrderAmount)
@@ -196,6 +218,8 @@ class CouponHandlerTest : BaseIntegrationTest() {
             id = 1,
             code = request.code,
             type = request.type,
+            categoryId = request.categoryId,
+            storeId = request.storeId,
             name = request.name,
             discountAmount = request.discountAmount,
             minimumOrderAmount = request.minimumOrderAmount,
