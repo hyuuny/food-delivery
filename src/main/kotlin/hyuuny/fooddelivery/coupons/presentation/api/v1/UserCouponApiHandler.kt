@@ -7,8 +7,6 @@ import hyuuny.fooddelivery.coupons.application.CouponUseCase
 import hyuuny.fooddelivery.coupons.application.UserCouponUseCase
 import hyuuny.fooddelivery.coupons.presentation.api.v1.request.ApiCouponSearchCondition
 import hyuuny.fooddelivery.coupons.presentation.api.v1.request.IssueUserCouponRequest
-import hyuuny.fooddelivery.coupons.presentation.api.v1.response.AvailableCouponResponses
-import hyuuny.fooddelivery.coupons.presentation.api.v1.response.IssuableCouponResponses
 import hyuuny.fooddelivery.coupons.presentation.api.v1.response.UserCouponResponse
 import hyuuny.fooddelivery.coupons.presentation.api.v1.response.UserWithCouponResponse
 import hyuuny.fooddelivery.users.application.UserUseCase
@@ -65,35 +63,18 @@ class UserCouponApiHandler(
         val now = LocalDateTime.now()
         val issuableCoupons = couponUseCase.getAllIssuableCoupon(now).sortedByDescending { it.issueStartDate }
         val userCoupons = useCase.getAllByUserIdAndCouponIds(userId, issuableCoupons.mapNotNull { it.id })
-        val userCouponMap = userCoupons.associateBy { it.couponId }
-
-        val responses = issuableCoupons.map {
-            val userCoupon = userCouponMap[it.id]
-            IssuableCouponResponses.from(it, userCoupon != null)
-        }
+        val responses = responseMapper.mapToIssuableCouponResponses(issuableCoupons, userCoupons)
         return ok().bodyValueAndAwait(responses)
     }
 
     suspend fun getAvailableCoupons(request: ServerRequest): ServerResponse {
         val userId = request.pathVariable("userId").toLong()
 
-        val categoryId = request.queryParam("categoryId").map { it.toLong() }
-            .orElseThrow { ResponseStatusException(HttpStatus.BAD_REQUEST) }
-        val storeId = request.queryParam("storeId").map { it.toLong() }
-            .orElseThrow { ResponseStatusException(HttpStatus.BAD_REQUEST) }
+        val categoryId = request.queryParamOrThrow("categoryId")
+        val storeId = request.queryParamOrThrow("storeId")
 
         val userCoupons = useCase.getAllAvailableUserCoupon(userId)
-        val coupons = couponUseCase.getAllByIds(userCoupons.map { it.couponId })
-        val couponMap = coupons.associateBy { it.id }
-
-        val responses = userCoupons.mapNotNull {
-            val coupon = couponMap[it.couponId] ?: return@mapNotNull null
-            val isCouponValidForOrder = coupon.isApplicableForOrder(categoryId, storeId)
-
-            AvailableCouponResponses.from(it, coupon, isCouponValidForOrder)
-        }.sortedWith(compareByDescending<AvailableCouponResponses> { it.isCouponValidForOrder }
-            .thenByDescending { it.discountAmount })
-
+        val responses = responseMapper.mapToAvailableCouponResponses(categoryId, storeId, userCoupons)
         return ok().bodyValueAndAwait(responses)
     }
 
@@ -106,5 +87,9 @@ class UserCouponApiHandler(
         val response = UserWithCouponResponse.from(userCoupon, coupon)
         return ok().bodyValueAndAwait(response)
     }
+
+    private fun ServerRequest.queryParamOrThrow(name: String): Long = queryParam(name)
+        .map { it.toLong() }.orElseThrow { throw ResponseStatusException(HttpStatus.BAD_REQUEST) }
+
 
 }

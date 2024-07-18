@@ -6,6 +6,7 @@ import java.time.LocalDate
 data class CreateOrderRequest(
     val storeId: Long,
     val categoryId: Long,
+    val couponId: Long?,
     val paymentMethod: PaymentMethod,
     val deliveryType: DeliveryType,
     val zipCode: String,
@@ -15,6 +16,8 @@ data class CreateOrderRequest(
     val messageToRider: String?,
     val messageToStore: String?,
     val orderItems: List<CreateOrderItemRequest>,
+    val orderPrice: Long,
+    val couponDiscountAmount: Long,
     val totalPrice: Long,
     val deliveryFee: Long,
 )

@@ -34,6 +34,7 @@ class OrderUseCase(
     private val orderItemRepository: OrderItemRepository,
     private val orderItemOptionRepository: OrderItemOptionRepository,
     private val orderCartVerifier: OrderCartVerifier,
+    private val orderDiscountVerifier: OrderDiscountVerifier,
 ) {
 
     companion object : Log
@@ -59,16 +60,21 @@ class OrderUseCase(
         getMenus: suspend () -> List<Menu>,
         getOptions: suspend () -> List<Option>,
     ): Order {
-        orderCartVerifier.verify(cartId, request)
-
         val now = LocalDateTime.now()
         val user = getUser()
+
+        orderCartVerifier.verify(cartId, request)
+        request.couponId?.let {
+            orderDiscountVerifier.verifyCouponDiscount(user.id!!, request)
+        }
+
         val order = Order.handle(
             CreateOrderCommand(
                 orderNumber = generateOrderNumber(now),
                 userId = user.id!!,
                 storeId = request.storeId,
                 categoryId = request.categoryId,
+                couponId = request.couponId,
                 paymentId = generatePaymentId(),
                 paymentMethod = request.paymentMethod,
                 status = OrderStatus.CREATED,
@@ -79,6 +85,8 @@ class OrderUseCase(
                 phoneNumber = request.phoneNumber,
                 messageToRider = request.messageToRider,
                 messageToStore = request.messageToStore,
+                orderPrice = request.orderPrice,
+                couponDiscountAmount = request.couponDiscountAmount,
                 totalPrice = request.totalPrice,
                 deliveryFee = request.deliveryFee,
                 createdAt = now,

@@ -2,9 +2,11 @@ package hyuuny.fooddelivery.orders.application
 
 import CreateOrderItemRequest
 import CreateOrderRequest
+import hyuuny.fooddelivery.common.constant.CouponType
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.OrderStatus
 import hyuuny.fooddelivery.common.constant.PaymentMethod
+import hyuuny.fooddelivery.coupons.domain.Coupon
 import hyuuny.fooddelivery.menus.application.MenuUseCase
 import hyuuny.fooddelivery.menus.domain.Menu
 import hyuuny.fooddelivery.options.application.OptionUseCase
@@ -15,6 +17,7 @@ import hyuuny.fooddelivery.orders.domain.OrderItemOption
 import hyuuny.fooddelivery.orders.infrastructure.OrderItemOptionRepository
 import hyuuny.fooddelivery.orders.infrastructure.OrderItemRepository
 import hyuuny.fooddelivery.orders.infrastructure.OrderRepository
+import hyuuny.fooddelivery.stores.application.StoreUseCase
 import hyuuny.fooddelivery.users.application.UserUseCase
 import hyuuny.fooddelivery.users.domain.User
 import io.kotest.assertions.throwables.shouldThrow
@@ -33,7 +36,9 @@ class CreateOrderUseCaseTest : BehaviorSpec({
     val orderItemRepository = mockk<OrderItemRepository>()
     val orderItemOptionRepository = mockk<OrderItemOptionRepository>()
     val orderCartVerifier = mockk<OrderCartVerifier>()
+    val orderDiscountVerifier = mockk<OrderDiscountVerifier>()
     val userUseCase = mockk<UserUseCase>()
+    val storeUseCase = mockk<StoreUseCase>()
     val menuUseCase = mockk<MenuUseCase>()
     val optionUseCase = mockk<OptionUseCase>()
 
@@ -42,12 +47,14 @@ class CreateOrderUseCaseTest : BehaviorSpec({
         orderItemRepository,
         orderItemOptionRepository,
         orderCartVerifier,
+        orderDiscountVerifier
     )
 
     Given("회원이 음식을 주문하면서") {
         val cartId = 1L
         val userId = 1L
         val storeId = 1L
+        val couponId = 5L
 
         val now = LocalDateTime.now()
         val user = User(
@@ -61,9 +68,28 @@ class CreateOrderUseCaseTest : BehaviorSpec({
             updatedAt = now,
         )
 
+        val coupon = Coupon(
+            id = 1,
+            code = "패스트푸드최고",
+            type = CouponType.STORE,
+            categoryId = null,
+            storeId = storeId,
+            name = "패스트푸드 3천원 할인",
+            discountAmount = 3000L,
+            minimumOrderAmount = 14000,
+            description = "패스트푸드 3천원 할인 쿠폰",
+            issueStartDate = now.minusDays(1),
+            issueEndDate = now.plusDays(7),
+            validFrom = now.minusDays(1),
+            validTo = now.plusDays(7),
+            createdAt = now,
+        )
+
+        val orderPrice = 23000L
         val request = CreateOrderRequest(
             storeId = 1,
             categoryId = 1L,
+            couponId = couponId,
             paymentMethod = PaymentMethod.NAVER_PAY,
             deliveryType = DeliveryType.OUTSOURCING,
             zipCode = "12345",
@@ -72,7 +98,9 @@ class CreateOrderUseCaseTest : BehaviorSpec({
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = null,
-            totalPrice = 23000,
+            orderPrice = orderPrice,
+            couponDiscountAmount = coupon.discountAmount,
+            totalPrice = orderPrice.minus(coupon.discountAmount),
             deliveryFee = 0,
             orderItems = listOf(
                 CreateOrderItemRequest(menuId = 1, quantity = 1, optionIds = listOf(1, 2)),
@@ -88,6 +116,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
             userId = userId,
             storeId = storeId,
             categoryId = 1L,
+            couponId = couponId,
             paymentId = paymentId,
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -98,7 +127,9 @@ class CreateOrderUseCaseTest : BehaviorSpec({
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = null,
-            totalPrice = 23000,
+            orderPrice = orderPrice,
+            couponDiscountAmount = coupon.discountAmount,
+            totalPrice = orderPrice - coupon.discountAmount,
             deliveryFee = 0,
             createdAt = now,
             updatedAt = now,
@@ -125,6 +156,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
         )
 
         coEvery { orderCartVerifier.verify(any(), any()) } returns Unit
+        coEvery { orderDiscountVerifier.verifyCouponDiscount(any(), any()) } returns Unit
         coEvery { userUseCase.getUser(any()) } returns user
         coEvery { menuUseCase.getAllByIds(any()) } returns menus
         coEvery { optionUseCase.getAllByIds(any()) } returns options
@@ -149,6 +181,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
                 result.userId shouldBe userId
                 result.storeId shouldBe request.storeId
                 result.categoryId shouldBe request.categoryId
+                result.couponId shouldBe request.couponId
                 result.paymentId shouldBe paymentId
                 result.paymentMethod shouldBe request.paymentMethod
                 result.status shouldBe OrderStatus.CREATED
@@ -159,6 +192,9 @@ class CreateOrderUseCaseTest : BehaviorSpec({
                 result.phoneNumber shouldBe request.phoneNumber
                 result.messageToRider shouldBe request.messageToRider
                 result.messageToStore shouldBe request.messageToStore
+                result.orderPrice shouldBe request.orderPrice
+                result.couponDiscountAmount shouldBe request.couponDiscountAmount
+                result.couponDiscountAmount shouldBe request.couponDiscountAmount
                 result.totalPrice shouldBe request.totalPrice
                 result.deliveryFee shouldBe request.deliveryFee
             }
@@ -166,7 +202,8 @@ class CreateOrderUseCaseTest : BehaviorSpec({
 
         `when`("장바구니 결제 금액과 일치하지 않으면") {
             val invalidRequest = request.copy(totalPrice = -1)
-            coEvery { orderCartVerifier.verify(any(), any())
+            coEvery {
+                orderCartVerifier.verify(any(), any())
             } throws IllegalStateException("장바구니 금액과 주문 금액이 일치하지 않습니다.")
 
             then("주문 생성이 실패한다") {
@@ -273,6 +310,124 @@ class CreateOrderUseCaseTest : BehaviorSpec({
                 ex.message shouldBe "배달비가 일치하지 않습니다."
             }
         }
-    }
 
+        `when`("주문 금액이 매장최소주문 금액보다 적으면") {
+            coEvery {
+                orderCartVerifier.verify(
+                    any(),
+                    any()
+                )
+            } throws IllegalStateException("최소 주문 금액을 충족하지 않습니다.")
+
+            then("최소 주문 금액을 충족하지 않는다는 메세지가 반환된다.") {
+                val ex = shouldThrow<IllegalStateException> {
+                    useCase.createOrder(
+                        cartId = cartId,
+                        request = request,
+                        getUser = { userUseCase.getUser(userId) },
+                        getMenus = { menuUseCase.getAllByIds(request.orderItems.map { it.menuId }) },
+                        getOptions = { optionUseCase.getAllByIds(request.orderItems.flatMap { it.optionIds }) }
+                    )
+                }
+                ex.message shouldBe "최소 주문 금액을 충족하지 않습니다."
+            }
+        }
+
+        `when`("주문에 사용한 쿠폰을 찾을 수 없으면") {
+            val invalidRequest = request.copy(couponId = 0)
+            coEvery { orderCartVerifier.verify(any(), any()) } returns Unit
+            coEvery {
+                orderDiscountVerifier.verifyCouponDiscount(
+                    any(),
+                    any()
+                )
+            } throws NoSuchElementException("0번 쿠폰을 찾을 수 없습니다.")
+
+            then("쿠폰을 찾을 수 없다는 메세지가 반환된다.") {
+                val ex = shouldThrow<NoSuchElementException> {
+                    useCase.createOrder(
+                        cartId = cartId,
+                        request = invalidRequest,
+                        getUser = { userUseCase.getUser(userId) },
+                        getMenus = { menuUseCase.getAllByIds(request.orderItems.map { it.menuId }) },
+                        getOptions = { optionUseCase.getAllByIds(request.orderItems.flatMap { it.optionIds }) }
+                    )
+                }
+                ex.message shouldBe "0번 쿠폰을 찾을 수 없습니다."
+            }
+        }
+
+        `when`("주문에 사용한 쿠폰을 회원이 갖고 있지 않으면") {
+            val invalidRequest = request.copy(couponId = 2)
+            coEvery { orderCartVerifier.verify(any(), any()) } returns Unit
+            coEvery {
+                orderDiscountVerifier.verifyCouponDiscount(
+                    any(),
+                    any()
+                )
+            } throws NoSuchElementException("1번 회원의 2번 쿠폰을 찾을 수 없습니다.")
+
+            then("회원의 쿠폰을 찾을 수 없다는 메세지가 반환된다.") {
+                val ex = shouldThrow<NoSuchElementException> {
+                    useCase.createOrder(
+                        cartId = cartId,
+                        request = invalidRequest,
+                        getUser = { userUseCase.getUser(userId) },
+                        getMenus = { menuUseCase.getAllByIds(request.orderItems.map { it.menuId }) },
+                        getOptions = { optionUseCase.getAllByIds(request.orderItems.flatMap { it.optionIds }) }
+                    )
+                }
+                ex.message shouldBe "1번 회원의 2번 쿠폰을 찾을 수 없습니다."
+            }
+        }
+
+        `when`("주문의 쿠폰 할인 금액과 쿠폰의 할인 금액이 일치하지 않으면") {
+            val invalidRequest = request.copy(couponDiscountAmount = 1000)
+            coEvery { orderCartVerifier.verify(any(), any()) } returns Unit
+            coEvery {
+                orderDiscountVerifier.verifyCouponDiscount(
+                    any(),
+                    any()
+                )
+            } throws NoSuchElementException("쿠폰 할인 금액이 일치하지 않습니다.")
+
+            then("쿠폰 할인 금액이 일치하지 않는다는 메세지가 반환된다.") {
+                val ex = shouldThrow<NoSuchElementException> {
+                    useCase.createOrder(
+                        cartId = cartId,
+                        request = invalidRequest,
+                        getUser = { userUseCase.getUser(userId) },
+                        getMenus = { menuUseCase.getAllByIds(request.orderItems.map { it.menuId }) },
+                        getOptions = { optionUseCase.getAllByIds(request.orderItems.flatMap { it.optionIds }) }
+                    )
+                }
+                ex.message shouldBe "쿠폰 할인 금액이 일치하지 않습니다."
+            }
+        }
+
+        `when`("주문에 사용할 수 없는 쿠폰이면") {
+            val invalidRequest = request.copy(storeId = 203)
+            coEvery { orderCartVerifier.verify(any(), any()) } returns Unit
+            coEvery {
+                orderDiscountVerifier.verifyCouponDiscount(
+                    any(),
+                    any()
+                )
+            } throws NoSuchElementException("해당 주문에 사용할 수 없는 쿠폰입니다.")
+
+            then("주문에 사용할 수 없는 쿠폰이라는 메세지가 반환된다.") {
+                val ex = shouldThrow<NoSuchElementException> {
+                    useCase.createOrder(
+                        cartId = cartId,
+                        request = invalidRequest,
+                        getUser = { userUseCase.getUser(userId) },
+                        getMenus = { menuUseCase.getAllByIds(request.orderItems.map { it.menuId }) },
+                        getOptions = { optionUseCase.getAllByIds(request.orderItems.flatMap { it.optionIds }) }
+                    )
+                }
+                ex.message shouldBe "해당 주문에 사용할 수 없는 쿠폰입니다."
+            }
+        }
+
+    }
 })

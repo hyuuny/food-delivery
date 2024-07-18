@@ -25,6 +25,7 @@ class CancelOrderUseCaseTest : BehaviorSpec({
     val orderItemRepository = mockk<OrderItemRepository>()
     val orderItemOptionRepository = mockk<OrderItemOptionRepository>()
     val orderCartVerifier = mockk<OrderCartVerifier>()
+    val orderDiscountVerifier = mockk<OrderDiscountVerifier>()
     val userUseCase = mockk<UserUseCase>()
 
     val useCase = OrderUseCase(
@@ -32,6 +33,7 @@ class CancelOrderUseCaseTest : BehaviorSpec({
         orderItemRepository,
         orderItemOptionRepository,
         orderCartVerifier,
+        orderDiscountVerifier,
     )
 
     Given("회원이 주문을 취소할 때") {
@@ -57,6 +59,7 @@ class CancelOrderUseCaseTest : BehaviorSpec({
             userId = userId,
             storeId = storeId,
             categoryId = 1L,
+            couponId = null,
             paymentId = "PAY_${UUID.randomUUID().toString().replace("-", "").substring(0, 10)}",
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -67,6 +70,8 @@ class CancelOrderUseCaseTest : BehaviorSpec({
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = null,
+            orderPrice = 23000,
+            couponDiscountAmount = 0,
             totalPrice = 23000,
             deliveryFee = 0,
             createdAt = now,
@@ -91,6 +96,7 @@ class CancelOrderUseCaseTest : BehaviorSpec({
                 userId = userId,
                 storeId = storeId,
                 categoryId = 1L,
+                couponId = null,
                 paymentId = "PAY_${UUID.randomUUID().toString().replace("-", "").substring(0, 10)}",
                 paymentMethod = PaymentMethod.NAVER_PAY,
                 status = OrderStatus.PROCESSING,
@@ -101,6 +107,8 @@ class CancelOrderUseCaseTest : BehaviorSpec({
                 phoneNumber = "010-1234-5678",
                 messageToRider = "1층 로비에 보관 부탁드립니다",
                 messageToStore = null,
+                orderPrice = 23000,
+                couponDiscountAmount = 0,
                 totalPrice = 23000,
                 deliveryFee = 0,
                 createdAt = now,

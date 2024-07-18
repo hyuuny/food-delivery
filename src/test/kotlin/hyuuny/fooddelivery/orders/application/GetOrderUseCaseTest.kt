@@ -1,8 +1,10 @@
 package hyuuny.fooddelivery.orders.application
 
+import hyuuny.fooddelivery.common.constant.CouponType
 import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.OrderStatus
 import hyuuny.fooddelivery.common.constant.PaymentMethod
+import hyuuny.fooddelivery.coupons.domain.Coupon
 import hyuuny.fooddelivery.orders.domain.Order
 import hyuuny.fooddelivery.orders.infrastructure.OrderItemOptionRepository
 import hyuuny.fooddelivery.orders.infrastructure.OrderItemRepository
@@ -24,6 +26,7 @@ class GetOrderUseCaseTest : BehaviorSpec({
     val orderItemRepository = mockk<OrderItemRepository>()
     val orderItemOptionRepository = mockk<OrderItemOptionRepository>()
     val orderCartVerifier = mockk<OrderCartVerifier>()
+    val orderDiscountVerifier = mockk<OrderDiscountVerifier>()
     val userUseCase = mockk<UserUseCase>()
 
     val useCase = OrderUseCase(
@@ -31,6 +34,7 @@ class GetOrderUseCaseTest : BehaviorSpec({
         orderItemRepository,
         orderItemOptionRepository,
         orderCartVerifier,
+        orderDiscountVerifier,
     )
 
     Given("주문내역을 상세조회 할 때") {
@@ -38,6 +42,7 @@ class GetOrderUseCaseTest : BehaviorSpec({
         val storeId = 1L
         val orderId = 130L
         val categoryId = 37L
+        val couponId = 5L
 
         val now = LocalDateTime.now()
         val user = User(
@@ -51,14 +56,33 @@ class GetOrderUseCaseTest : BehaviorSpec({
             updatedAt = now,
         )
 
+        val coupon = Coupon(
+            id = 1,
+            code = "패스트푸드최고",
+            type = CouponType.CATEGORY,
+            categoryId = categoryId,
+            storeId = null,
+            name = "패스트푸드 3천원 할인",
+            discountAmount = 3000L,
+            minimumOrderAmount = 14000,
+            description = "패스트푸드 3천원 할인 쿠폰",
+            issueStartDate = now.minusDays(1),
+            issueEndDate = now.plusDays(7),
+            validFrom = now.minusDays(1),
+            validTo = now.plusDays(7),
+            createdAt = now,
+        )
+
         val orderNumber = "O_${now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"))}"
         val paymentId = "PAY_${UUID.randomUUID().toString().replace("-", "")}"
+        val orderPrice = 23000L
         val order = Order(
             id = orderId,
             orderNumber = orderNumber,
             userId = userId,
             storeId = storeId,
             categoryId = categoryId,
+            couponId = couponId,
             paymentId = paymentId,
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -69,7 +93,9 @@ class GetOrderUseCaseTest : BehaviorSpec({
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = null,
-            totalPrice = 23000,
+            orderPrice = orderPrice,
+            couponDiscountAmount = coupon.discountAmount,
+            totalPrice = orderPrice - coupon.discountAmount,
             deliveryFee = 0,
             createdAt = now,
             updatedAt = now,
@@ -87,6 +113,7 @@ class GetOrderUseCaseTest : BehaviorSpec({
                 result.userId shouldBe order.userId
                 result.storeId shouldBe order.storeId
                 result.categoryId shouldBe order.categoryId
+                result.couponId shouldBe order.couponId
                 result.paymentId shouldBe order.paymentId
                 result.paymentMethod shouldBe order.paymentMethod
                 result.status shouldBe order.status
@@ -97,6 +124,8 @@ class GetOrderUseCaseTest : BehaviorSpec({
                 result.phoneNumber shouldBe order.phoneNumber
                 result.messageToRider shouldBe order.messageToRider
                 result.messageToStore shouldBe order.messageToStore
+                result.orderPrice shouldBe order.orderPrice
+                result.couponDiscountAmount shouldBe order.couponDiscountAmount
                 result.totalPrice shouldBe order.totalPrice
                 result.deliveryFee shouldBe order.deliveryFee
             }

@@ -59,6 +59,7 @@ class OrderHandlerTest : BaseIntegrationTest() {
             userId = 1L,
             storeId = 1L,
             categoryId = 1L,
+            couponId = null,
             paymentId = "PAY_${UUID.randomUUID().toString().replace("-", "")}",
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -69,6 +70,8 @@ class OrderHandlerTest : BaseIntegrationTest() {
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = null,
+            orderPrice = 20000,
+            couponDiscountAmount = 0,
             totalPrice = 20000,
             deliveryFee = 0,
             createdAt = now,
@@ -81,6 +84,7 @@ class OrderHandlerTest : BaseIntegrationTest() {
             userId = 2L,
             storeId = 1L,
             categoryId = 1L,
+            couponId = null,
             paymentId = "PAY_${UUID.randomUUID().toString().replace("-", "")}",
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -91,6 +95,8 @@ class OrderHandlerTest : BaseIntegrationTest() {
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = null,
+            orderPrice = 20000,
+            couponDiscountAmount = 0,
             totalPrice = 20000,
             deliveryFee = 0,
             createdAt = now.minusDays(1),
@@ -103,6 +109,7 @@ class OrderHandlerTest : BaseIntegrationTest() {
             userId = 3L,
             storeId = 3L,
             categoryId = 1L,
+            couponId = null,
             paymentId = "PAY_${UUID.randomUUID().toString().replace("-", "")}",
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -113,6 +120,8 @@ class OrderHandlerTest : BaseIntegrationTest() {
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = null,
+            orderPrice = 16000,
+            couponDiscountAmount = 0,
             totalPrice = 16000,
             deliveryFee = 0,
             createdAt = now.minusWeeks(1),
@@ -125,6 +134,7 @@ class OrderHandlerTest : BaseIntegrationTest() {
             userId = 4L,
             storeId = 4L,
             categoryId = 1L,
+            couponId = null,
             paymentId = "PAY_${UUID.randomUUID().toString().replace("-", "")}",
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -135,6 +145,8 @@ class OrderHandlerTest : BaseIntegrationTest() {
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = null,
+            orderPrice = 18000,
+            couponDiscountAmount = 0,
             totalPrice = 18000,
             deliveryFee = 0,
             createdAt = now.minusWeeks(2),
@@ -147,6 +159,7 @@ class OrderHandlerTest : BaseIntegrationTest() {
             userId = 5L,
             storeId = 5L,
             categoryId = 1L,
+            couponId = null,
             paymentId = "PAY_${UUID.randomUUID().toString().replace("-", "")}",
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -157,6 +170,8 @@ class OrderHandlerTest : BaseIntegrationTest() {
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = null,
+            orderPrice = 14500,
+            couponDiscountAmount = 0,
             totalPrice = 14500,
             deliveryFee = 0,
             createdAt = now.minusWeeks(3),
@@ -244,6 +259,7 @@ class OrderHandlerTest : BaseIntegrationTest() {
         val userId = 1L
         val storeId = 7L
         val categoryId = 13L
+        val couponId = 27L
 
         val now = LocalDateTime.now()
         val user = User(
@@ -272,12 +288,14 @@ class OrderHandlerTest : BaseIntegrationTest() {
             createdAt = now,
             updatedAt = now,
         )
+        val couponDiscountAmount = 5000L
         val order = Order(
             id = id,
             orderNumber = generateOrderNumber(now),
             userId = userId,
             storeId = storeId,
             categoryId = categoryId,
+            couponId = couponId,
             paymentId = generatePaymentId(),
             paymentMethod = PaymentMethod.NAVER_PAY,
             status = OrderStatus.CREATED,
@@ -288,7 +306,9 @@ class OrderHandlerTest : BaseIntegrationTest() {
             phoneNumber = "010-1234-5678",
             messageToRider = "1층 로비에 보관 부탁드립니다",
             messageToStore = "리뷰이벤트 참여합니다 !",
-            totalPrice = 23000,
+            orderPrice = 23000,
+            couponDiscountAmount = couponDiscountAmount,
+            totalPrice = 23000 - couponDiscountAmount,
             deliveryFee = 0,
             createdAt = now,
             updatedAt = now,
@@ -315,7 +335,6 @@ class OrderHandlerTest : BaseIntegrationTest() {
             OrderItemResponse.from(orderItem, itemOptions)
         }
         val expectedResponse = OrderResponse.from(order, user.name, store.name, orderItemResponses)
-        val expectedTotalPrice = orderItems.sumOf { it.menuPrice } + orderItemOptions.sumOf { it.optionPrice }
 
         webTestClient.get().uri("/admin/v1/orders/${order.id}")
             .accept(MediaType.APPLICATION_JSON)
@@ -330,6 +349,7 @@ class OrderHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.storeId").isEqualTo(expectedResponse.storeId)
             .jsonPath("$.storeName").isEqualTo(expectedResponse.storeName)
             .jsonPath("$.categoryId").isEqualTo(expectedResponse.categoryId)
+            .jsonPath("$.couponId").isEqualTo(expectedResponse.couponId!!)
             .jsonPath("$.paymentId").isEqualTo(expectedResponse.paymentId)
             .jsonPath("$.paymentMethod").isEqualTo(expectedResponse.paymentMethod.name)
             .jsonPath("$.status").isEqualTo(expectedResponse.status.name)
@@ -340,6 +360,8 @@ class OrderHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.phoneNumber").isEqualTo(expectedResponse.phoneNumber)
             .jsonPath("$.messageToRider").isEqualTo(expectedResponse.messageToRider!!)
             .jsonPath("$.messageToStore").isEqualTo(expectedResponse.messageToStore!!)
+            .jsonPath("$.orderPrice").isEqualTo(expectedResponse.orderPrice)
+            .jsonPath("$.couponDiscountAmount").isEqualTo(expectedResponse.couponDiscountAmount)
             .jsonPath("$.totalPrice").isEqualTo(expectedResponse.totalPrice)
             .jsonPath("$.deliveryFee").isEqualTo(expectedResponse.deliveryFee)
             .jsonPath("$.orderItems").isArray
@@ -365,7 +387,6 @@ class OrderHandlerTest : BaseIntegrationTest() {
             .jsonPath("$.orderItems[0].options[1].optionName")
             .isEqualTo(expectedResponse.orderItems[0].options[1].optionName)
             .jsonPath("$.orderItems[0].options[1].price").isEqualTo(expectedResponse.orderItems[0].options[1].price)
-            .jsonPath("$.totalPrice").isEqualTo(expectedTotalPrice)
     }
 
     @DisplayName("관리자는 회원의 주문 상태를 변경할 수 있다.")

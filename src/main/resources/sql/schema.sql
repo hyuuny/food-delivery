@@ -174,25 +174,28 @@ CREATE INDEX IF NOT EXISTS idx_user_addresses_user_id ON user_addresses (user_id
 
 CREATE TABLE IF NOT EXISTS orders
 (
-    id               SERIAL PRIMARY KEY,
-    order_number     VARCHAR(255) NOT NULL UNIQUE,
-    user_id          BIGINT       NOT NULL,
-    store_id         BIGINT       NOT NULL,
-    category_id      BIGINT       NOT NULL,
-    payment_id       VARCHAR(255) NOT NULL,
-    payment_method   VARCHAR(50)  NOT NULL,
-    status           VARCHAR(50)  NOT NULL,
-    delivery_type    VARCHAR(50)  NOT NULL,
-    zip_code         VARCHAR(20)  NOT NULL,
-    address          VARCHAR(255) NOT NULL,
-    detail_address   VARCHAR(255) NOT NULL,
-    phone_number     VARCHAR(20)  NOT NULL,
-    message_to_rider VARCHAR(255),
-    message_to_store VARCHAR(255),
-    total_price      BIGINT       NOT NULL,
-    delivery_fee     BIGINT DEFAULT 0,
-    created_at       TIMESTAMP    NOT NULL,
-    updated_at       TIMESTAMP    NOT NULL
+    id                     SERIAL PRIMARY KEY,
+    order_number           VARCHAR(255) NOT NULL UNIQUE,
+    user_id                BIGINT       NOT NULL,
+    store_id               BIGINT       NOT NULL,
+    category_id            BIGINT       NOT NULL,
+    coupon_id              BIGINT,
+    payment_id             VARCHAR(255) NOT NULL,
+    payment_method         VARCHAR(50)  NOT NULL,
+    status                 VARCHAR(50)  NOT NULL,
+    delivery_type          VARCHAR(50)  NOT NULL,
+    zip_code               VARCHAR(20)  NOT NULL,
+    address                VARCHAR(255) NOT NULL,
+    detail_address         VARCHAR(255) NOT NULL,
+    phone_number           VARCHAR(20)  NOT NULL,
+    message_to_rider       VARCHAR(255),
+    message_to_store       VARCHAR(255),
+    order_price            BIGINT       NOT NULL,
+    coupon_discount_amount BIGINT       NOT NULL,
+    total_price            BIGINT       NOT NULL,
+    delivery_fee           BIGINT DEFAULT 0,
+    created_at             TIMESTAMP    NOT NULL,
+    updated_at             TIMESTAMP    NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders (user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_store_id ON orders (store_id);
