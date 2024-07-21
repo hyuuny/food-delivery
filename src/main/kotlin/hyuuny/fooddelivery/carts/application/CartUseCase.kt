@@ -35,7 +35,7 @@ class CartUseCase(
         val store = getStore()
         val findCart = findCartByUserId(userId)
         val cart = findCart?.also {
-            if (it.storeId != store.id) throw IllegalArgumentException("장바구니에는 같은 매장의 메뉴만 담을 수 있습니다.")
+            if (it.storeId != null && it.storeId != store.id) throw IllegalArgumentException("장바구니에는 같은 매장의 메뉴만 담을 수 있습니다.")
         } ?: insertCart(userId, store, now)
 
         val cartItem = cartItemRepository.insert(
