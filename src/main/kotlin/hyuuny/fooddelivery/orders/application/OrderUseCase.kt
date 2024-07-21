@@ -12,6 +12,7 @@ import generateOrderNumber
 import generatePaymentId
 import hyuuny.fooddelivery.common.constant.OrderStatus
 import hyuuny.fooddelivery.common.log.Log
+import hyuuny.fooddelivery.coupons.application.command.CancelUseCouponCommand
 import hyuuny.fooddelivery.coupons.application.command.UseCouponCommand
 import hyuuny.fooddelivery.coupons.infrastructure.UserCouponRepository
 import hyuuny.fooddelivery.menus.domain.Menu
@@ -146,6 +147,9 @@ class OrderUseCase(
         val user = getUser()
         val order = repository.findByIdAndUserId(id, user.id!!) ?: throw NoSuchElementException("${id}번 주문을 찾을 수 없습니다.")
         if (!order.isCancelable()) throw IllegalStateException("주문 취소가 불가능합니다.")
+        order.couponId?.let {
+            handleCouponCancellation(user.id!!, it)
+        }
 
         val now = LocalDateTime.now()
         order.handle(
@@ -164,6 +168,9 @@ class OrderUseCase(
         val user = getUser()
         val order = repository.findByIdAndUserId(id, user.id!!) ?: throw NoSuchElementException("${id}번 주문을 찾을 수 없습니다.")
         if (!order.isRefundable()) throw IllegalStateException("주문 환불이 불가능합니다.")
+        order.couponId?.let {
+            handleCouponCancellation(user.id!!, it)
+        }
 
         val now = LocalDateTime.now()
         order.handle(
@@ -197,6 +204,12 @@ class OrderUseCase(
     private suspend fun handleCouponUsage(userId: Long, request: CreateOrderRequest, now: LocalDateTime) {
         val userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, request.couponId!!)!!
         userCoupon.handle(UseCouponCommand(true, now))
+        userCouponRepository.updateUsedAndUsedDate(userCoupon)
+    }
+
+    private suspend fun handleCouponCancellation(userId: Long, couponId: Long) {
+        val userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId)!!
+        userCoupon.handle(CancelUseCouponCommand(false, null))
         userCouponRepository.updateUsedAndUsedDate(userCoupon)
     }
 
