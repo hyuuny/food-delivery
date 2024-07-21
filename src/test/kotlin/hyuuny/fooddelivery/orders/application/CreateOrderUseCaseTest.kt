@@ -7,6 +7,8 @@ import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.OrderStatus
 import hyuuny.fooddelivery.common.constant.PaymentMethod
 import hyuuny.fooddelivery.coupons.domain.Coupon
+import hyuuny.fooddelivery.coupons.domain.UserCoupon
+import hyuuny.fooddelivery.coupons.infrastructure.UserCouponRepository
 import hyuuny.fooddelivery.menus.application.MenuUseCase
 import hyuuny.fooddelivery.menus.domain.Menu
 import hyuuny.fooddelivery.options.application.OptionUseCase
@@ -25,6 +27,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -35,6 +38,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
     val orderRepository = mockk<OrderRepository>()
     val orderItemRepository = mockk<OrderItemRepository>()
     val orderItemOptionRepository = mockk<OrderItemOptionRepository>()
+    val userCouponRepository = mockk<UserCouponRepository>()
     val orderCartVerifier = mockk<OrderCartVerifier>()
     val orderDiscountVerifier = mockk<OrderDiscountVerifier>()
     val userUseCase = mockk<UserUseCase>()
@@ -46,6 +50,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
         orderRepository,
         orderItemRepository,
         orderItemOptionRepository,
+        userCouponRepository,
         orderCartVerifier,
         orderDiscountVerifier
     )
@@ -69,7 +74,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
         )
 
         val coupon = Coupon(
-            id = 1,
+            id = couponId,
             code = "패스트푸드최고",
             type = CouponType.STORE,
             categoryId = null,
@@ -83,6 +88,17 @@ class CreateOrderUseCaseTest : BehaviorSpec({
             validFrom = now.minusDays(1),
             validTo = now.plusDays(7),
             createdAt = now,
+        )
+
+        val userCoupon = UserCoupon(
+            id = 1,
+            userId = userId,
+            couponId = couponId,
+            used = false,
+            usedDate = null,
+            validFrom = coupon.validFrom,
+            validTo = coupon.validTo,
+            issuedDate = now,
         )
 
         val orderPrice = 23000L
@@ -160,6 +176,8 @@ class CreateOrderUseCaseTest : BehaviorSpec({
         coEvery { userUseCase.getUser(any()) } returns user
         coEvery { menuUseCase.getAllByIds(any()) } returns menus
         coEvery { optionUseCase.getAllByIds(any()) } returns options
+        coEvery { userCouponRepository.findByUserIdAndCouponId(any(), any()) } returns userCoupon
+        coEvery { userCouponRepository.updateUsedAndUsedDate(any()) } returns Unit
 
         coEvery { orderItemRepository.insert(any()) } returns orderItems[0]
         coEvery { orderItemRepository.insert(any()) } returns orderItems[1]
@@ -197,6 +215,7 @@ class CreateOrderUseCaseTest : BehaviorSpec({
                 result.couponDiscountAmount shouldBe request.couponDiscountAmount
                 result.totalPrice shouldBe request.totalPrice
                 result.deliveryFee shouldBe request.deliveryFee
+                coVerify { userCouponRepository.updateUsedAndUsedDate(any()) }
             }
         }
 

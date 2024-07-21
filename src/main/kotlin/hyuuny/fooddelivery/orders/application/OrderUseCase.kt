@@ -12,6 +12,8 @@ import generateOrderNumber
 import generatePaymentId
 import hyuuny.fooddelivery.common.constant.OrderStatus
 import hyuuny.fooddelivery.common.log.Log
+import hyuuny.fooddelivery.coupons.application.command.UseCouponCommand
+import hyuuny.fooddelivery.coupons.infrastructure.UserCouponRepository
 import hyuuny.fooddelivery.menus.domain.Menu
 import hyuuny.fooddelivery.options.domain.Option
 import hyuuny.fooddelivery.orders.domain.Order
@@ -33,6 +35,7 @@ class OrderUseCase(
     private val repository: OrderRepository,
     private val orderItemRepository: OrderItemRepository,
     private val orderItemOptionRepository: OrderItemOptionRepository,
+    private val userCouponRepository: UserCouponRepository,
     private val orderCartVerifier: OrderCartVerifier,
     private val orderDiscountVerifier: OrderDiscountVerifier,
 ) {
@@ -66,6 +69,7 @@ class OrderUseCase(
         orderCartVerifier.verify(cartId, request)
         request.couponId?.let {
             orderDiscountVerifier.verifyCouponDiscount(user.id!!, request)
+            handleCouponUsage(user.id!!, request, now)
         }
 
         val order = Order.handle(
@@ -189,6 +193,12 @@ class OrderUseCase(
     }
 
     suspend fun getAllByIds(ids: List<Long>): List<Order> = repository.findAllByIdIn(ids)
+
+    private suspend fun handleCouponUsage(userId: Long, request: CreateOrderRequest, now: LocalDateTime) {
+        val userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, request.couponId!!)!!
+        userCoupon.handle(UseCouponCommand(true, now))
+        userCouponRepository.updateUsedAndUsedDate(userCoupon)
+    }
 
     private suspend fun findOrderByIdAndUserIdOrThrow(id: Long, userId: Long) =
         repository.findByIdAndUserId(id, userId) ?: throw NoSuchElementException("${id}번 주문을 찾을 수 없습니다.")

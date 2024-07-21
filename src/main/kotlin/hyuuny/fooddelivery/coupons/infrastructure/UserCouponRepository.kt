@@ -20,4 +20,6 @@ interface UserCouponRepository {
 
     suspend fun existsByUserIdAndCouponId(userId: Long, couponId: Long): Boolean
 
+    suspend fun updateUsedAndUsedDate(userCoupon: UserCoupon)
+
 }

@@ -7,8 +7,11 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.r2dbc.core.applyAndAwait
+import org.springframework.data.r2dbc.core.update
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query
+import org.springframework.data.relational.core.query.Update
 import org.springframework.stereotype.Component
 import selectAndCount
 import java.time.LocalDateTime
@@ -45,6 +48,19 @@ class UserCouponRepositoryImpl(
 
     override suspend fun existsByUserIdAndCouponId(userId: Long, couponId: Long): Boolean =
         dao.existsByUserIdAndCouponId(userId, couponId)
+
+    override suspend fun updateUsedAndUsedDate(userCoupon: UserCoupon) {
+        template.update<UserCoupon>()
+            .matching(
+                Query.query(
+                    Criteria.where("userId").`is`(userCoupon.userId)
+                        .and("couponId").`is`(userCoupon.couponId)
+                ),
+            ).applyAndAwait(
+                Update.update("used", userCoupon.used)
+                    .set("usedDate", userCoupon.usedDate)
+            )
+    }
 
     override suspend fun findAllUserCoupons(
         searchCondition: ApiCouponSearchCondition,

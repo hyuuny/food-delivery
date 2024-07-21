@@ -5,6 +5,7 @@ import hyuuny.fooddelivery.common.constant.DeliveryType
 import hyuuny.fooddelivery.common.constant.OrderStatus
 import hyuuny.fooddelivery.common.constant.PaymentMethod
 import hyuuny.fooddelivery.coupons.domain.Coupon
+import hyuuny.fooddelivery.coupons.infrastructure.UserCouponRepository
 import hyuuny.fooddelivery.orders.domain.Order
 import hyuuny.fooddelivery.orders.infrastructure.OrderItemOptionRepository
 import hyuuny.fooddelivery.orders.infrastructure.OrderItemRepository
@@ -25,6 +26,7 @@ class GetOrderUseCaseTest : BehaviorSpec({
     val orderRepository = mockk<OrderRepository>()
     val orderItemRepository = mockk<OrderItemRepository>()
     val orderItemOptionRepository = mockk<OrderItemOptionRepository>()
+    val userCouponRepository = mockk<UserCouponRepository>()
     val orderCartVerifier = mockk<OrderCartVerifier>()
     val orderDiscountVerifier = mockk<OrderDiscountVerifier>()
     val userUseCase = mockk<UserUseCase>()
@@ -33,6 +35,7 @@ class GetOrderUseCaseTest : BehaviorSpec({
         orderRepository,
         orderItemRepository,
         orderItemOptionRepository,
+        userCouponRepository,
         orderCartVerifier,
         orderDiscountVerifier,
     )

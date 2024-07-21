@@ -9,3 +9,13 @@ data class IssueUserCouponCommand(
     val validFrom: LocalDateTime,
     val validTo: LocalDateTime,
 )
+
+data class UseCouponCommand(
+    val used: Boolean,
+    val useDate: LocalDateTime,
+)
+
+data class CancelUseCouponCommand(
+    val used: Boolean,
+    val usedDate: LocalDateTime?,
+)
