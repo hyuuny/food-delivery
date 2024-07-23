@@ -17,7 +17,7 @@
 
 프레임워크
 
-- `Spring Webflux`, `Spring Data R2DBC`
+- `Spring Webflux`
 
 데이터베이스
 
@@ -25,7 +25,7 @@
 
 라이브러리
 
-- `Coroutines`
+- `Coroutines`, `Spring Data R2DBC`
 
 도구 및 서비스
 
